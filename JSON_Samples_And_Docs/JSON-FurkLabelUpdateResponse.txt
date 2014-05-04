@@ -1,0 +1,11 @@
+{
+   "status" : "ok",
+   "label" : {
+      "color" : "red",
+      "sorder" : "0",
+      "id_labels" : "0",
+      "name" : "CW TV Series",
+      "id" : "5654220318654345890",
+      "bg" : null
+   }
+}

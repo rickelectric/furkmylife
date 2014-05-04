@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="427.0" prefWidth="440.0" style="-fx-background-color: #44FF99;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="org.rickelectric.furkmanager.views.fxwindows.APIConsoleFX">
+  <!-- TODO Add Nodes -->
+  <children>
+    <BorderPane prefHeight="427.0" prefWidth="440.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <center>
+        <TextArea fx:id="output_result" editable="false" prefHeight="323.0" prefWidth="411.999977929685" style="-fx-text-fill: white;&#10;-fx-background-color: black;&#10;-fx-font-family: Dialog;&#10;-fx-font-size: 14;&#10;-fx-font-weight: bold;" text="" wrapText="true" />
+      </center>
+      <top>
+        <Pane fx:id="contentPane" prefHeight="103.0" prefWidth="440.0" style="">
+          <children>
+            <TextField fx:id="input_text" layoutX="105.0" layoutY="20.0" prefWidth="321.0" promptText="/&lt;apiobject&gt;/&lt;function&gt;?&lt;parameters&gt;" style="-fx-text-fill: white;&#10;-fx-background-color: black;&#10;-fx-font-family: Dialog;&#10;-fx-font-size: 14;&#10;-fx-font-weight: bold;" />
+            <Label layoutX="14.0" layoutY="23.0" prefWidth="80.0" text="Sub-URI: " />
+            <Label layoutX="14.0" layoutY="74.0" prefWidth="66.0" text="Response: " />
+            <Label layoutX="14.0" layoutY="52.0" text="Method: " />
+            <ComboBox fx:id="method" layoutX="105.0" layoutY="50.0" prefHeight="21.9609375" prefWidth="98.0" promptText="">
+              <items>
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Item 1" />
+                  <String fx:value="Item 2" />
+                  <String fx:value="Item 3" />
+                </FXCollections>
+              </items>
+            </ComboBox>
+            <ProgressIndicator fx:id="progress_loading" layoutX="14.0" layoutY="119.0" prefHeight="169.0" prefWidth="205.99997792968497" progress="-1.0">
+              <effect>
+                <Bloom threshold="0.8629629629629629">
+                  <input>
+                    <Reflection />
+                  </input>
+                </Bloom>
+              </effect>
+            </ProgressIndicator>
+          </children>
+        </Pane>
+      </top>
+    </BorderPane>
+  </children>
+</AnchorPane>

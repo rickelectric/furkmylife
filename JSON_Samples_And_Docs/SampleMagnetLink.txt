@@ -1,0 +1,12 @@
+Magnets:
+
+magnet:
+	?xt=urn:btih:785f20d5878c73860ed8698dfebb8606918d13eb
+	&dn=Dating.Rules.From.My.Future.Self.S02E06.Unknown.h.264-NOGRP.mp4
+	&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80
+	&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&
+	tr=udp%3A%2F%2Ftracker.istole.it%3A6969
+	&tr=udp%3A%2F%2Ftracker.ccc.de%3A80
+	&tr=udp%3A%2F%2Fopen.demonii.com%3A1337
+	
+

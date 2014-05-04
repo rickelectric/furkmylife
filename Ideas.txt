@@ -1,0 +1,18 @@
+>> Tabs on the Main Window.
+
+>> Each tab updates periodically (Active Downloads = 30s, Completed Downloads = 1min)
+
+
+>>A Furk JSON Return Parser which returns an object containing:
+	>>The Status Code ("ok"/"error")
+		>>If Error, The error text
+	>>An array of FurkFiles
+	>>An array of FurkDLs
+	>>An array of FurkFeeds (To Be Implemented)
+	
+Notes:
+
+Sending an array of ids means passing the parameter twice or more in the url:
+
+	https://www.furk.net/api/file/get ?id=15177999108182432046 &id=91767999100983836251 &id=72579810668000024167
+	

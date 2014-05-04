@@ -1,0 +1,37 @@
+{
+   "status" : "ok",
+   "labels" : [
+      {
+         "color" : "black",
+         "sorder" : "0",
+         "id_labels" : "0",
+         "name" : "0-FurkManagerRoot",
+         "id" : "7512857738130969168",
+         "bg" : "black"
+      },
+      {
+         "color" : "red",
+         "sorder" : "0",
+         "id_labels" : "0",
+         "name" : "CW TV Series",
+         "id" : "5654220318654345890",
+         "bg" : "white"
+      },
+      {
+	      "color" : "green",
+	      "sorder" : "0",
+	      "id_labels" : "7512857738130969168",
+	      "name" : "Music",
+	      "id" : "9297763644503580994",
+	      "bg" : "white"
+	   },
+	   {
+	      "color" : "orange",
+	      "sorder" : "0",
+	      "id_labels" : "7512857738130969168",
+	      "name" : "Videos",
+	      "id" : "14594890798213989483",
+	      "bg" : "white"
+	   }
+   ]
+}
