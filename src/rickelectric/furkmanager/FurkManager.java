@@ -176,15 +176,20 @@ public class FurkManager {
 		if (APIBridge.key() == null)
 			login();
 		else {
+			
 			loading();
 			load.setText("Loading User Data...");
-			API.UserData.loadUserData();
-			load.setText("Loading Folders...");
-			API.Label.getAll();
+			if(!API.UserData.isLoaded())
+				API.UserData.loadUserData();
 			load.setText("Loading Files...");
-			API.File.getAllFinished();
-			load.setText("Folder Manager Initializing...");
-			APIFolderManager.init(API.Label.root());
+			if(API.File.getAllCached()==null)
+				API.File.getAllFinished();
+			load.setText("Loading Folders...");
+			if(API.Label.getAllCached()==null){
+				API.Label.getAll();
+				load.setText("Folder Manager Initializing...");
+				APIFolderManager.init(API.Label.root());
+			}
 			load.setText("Launching...");
 			
 			mainWin();

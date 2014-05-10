@@ -17,7 +17,7 @@ import rickelectric.furkmanager.models.FurkDownload;
 import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.icons.DownloadIconPanel;
+import rickelectric.furkmanager.views.icons.DownloadIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class Download_MyDownloads extends JPanel {
@@ -73,7 +73,7 @@ public class Download_MyDownloads extends JPanel {
 
 			private void populateResultPanel(FurkDownload o) {
 				JPanel pane;
-				pane = new DownloadIconPanel(o);
+				pane = new DownloadIcon(o);
 
 				resultPanel.add(pane);
 				resultPanel.add(Box.createVerticalStrut(3));

@@ -19,7 +19,7 @@ import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.icons.FileIconPanel;
+import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class File_MyFiles extends JPanel {
@@ -78,7 +78,7 @@ public class File_MyFiles extends JPanel {
 				pane.setPreferredSize(new Dimension(510, 142));
 				int i = 0;
 				while (i < 3 && i < o.length && o[i] != null) {
-					pane.add(new FileIconPanel(FileIconPanel.SMALL_MODE, o[i]));
+					pane.add(new FileIcon(FileIcon.SMALL_MODE, o[i]));
 					i++;
 				}
 				pane.setBackground(resultPanel.getBackground());
@@ -132,16 +132,20 @@ public class File_MyFiles extends JPanel {
 					}
 
 					resultScroller.getVerticalScrollBar().setValue(position);
-					getTopLevelAncestor().repaint();
-					((AppFrameClass) getTopLevelAncestor())
+					try{
+						getTopLevelAncestor().repaint();
+						((AppFrameClass) getTopLevelAncestor())
 							.setStatus("My Files Loaded: " + numResults
 									+ " Files");
+					}catch(Exception e){}
 				} catch (Exception e) {
 					e.printStackTrace();
 					label_loading.setIcon(new ImageIcon(FurkManager.class.getResource("img/remove.png")));
 				}
-				((AppFrameClass)getTopLevelAncestor()).addConsole();
-				((AppFrameClass)getTopLevelAncestor()).addImgCacheViewer();
+				try{
+					((AppFrameClass)getTopLevelAncestor()).addConsole();
+					((AppFrameClass)getTopLevelAncestor()).addImgCacheViewer();
+				}catch(Exception e){}
 			}
 		});
 		tLoad.start();

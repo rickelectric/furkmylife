@@ -26,8 +26,8 @@ import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
 
-public class DownloadIconPanel extends JPanel implements
-		Comparable<DownloadIconPanel> {
+public class DownloadIcon extends JPanel implements
+		Comparable<DownloadIcon> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -142,7 +142,7 @@ public class DownloadIconPanel extends JPanel implements
 		}
 	}
 
-	public DownloadIconPanel(final FurkDownload o) {
+	public DownloadIcon(final FurkDownload o) {
 		this.cDownload = o;
 		this.thisPanel = this;
 
@@ -328,7 +328,7 @@ public class DownloadIconPanel extends JPanel implements
 	}
 
 	@Override
-	public int compareTo(DownloadIconPanel o) {
+	public int compareTo(DownloadIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
 	}
 }

@@ -76,7 +76,7 @@ public class TFileTreePanel extends JPanel {
 				currentParent.add(new TFileTreeNode(f));
 			}
 		}
-
+		
 		return root;
 	}
 

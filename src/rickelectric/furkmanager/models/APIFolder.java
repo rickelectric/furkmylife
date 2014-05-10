@@ -1,6 +1,7 @@
 package rickelectric.furkmanager.models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rickelectric.furkmanager.network.API;
@@ -119,6 +120,15 @@ public class APIFolder implements MoveableItem{
 				if(f.getID().equals(obj.getID())) return true;
 		}
 		return false;
+	}
+
+	public void sort() {
+		for(MoveableItem i:files){
+			if(i instanceof APIFolder){
+				((APIFolder) i).sort();
+			}
+		}
+		Collections.sort(files);
 	}
 
 }

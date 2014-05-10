@@ -32,13 +32,13 @@ import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_FileView;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 
-public class FileIconPanel extends JPanel implements Comparable<FileIconPanel> {
+public class FileIcon extends JPanel implements Comparable<FileIcon> {
 
 	private static final long serialVersionUID = 1L;
 
 	private Color bgc;
 
-	private FileIconPanel thisPanel;
+	private FileIcon thisPanel;
 
 	private APIObject cFile;
 	public static final int WIDE_MODE = 100, SMALL_MODE = 200;
@@ -297,7 +297,7 @@ public class FileIconPanel extends JPanel implements Comparable<FileIconPanel> {
 		}
 	}
 	
-	public FileIconPanel(APIObject o){
+	public FileIcon(APIObject o){
 		this.cFile = o;
 		this.mode = WIDE_MODE;
 		this.thisPanel = this;
@@ -328,7 +328,7 @@ public class FileIconPanel extends JPanel implements Comparable<FileIconPanel> {
 		});
 	}
 	
-	public FileIconPanel(FurkFile o){
+	public FileIcon(FurkFile o){
 		this.cFile = o;
 		this.mode = SMALL_MODE;
 		this.thisPanel = this;
@@ -359,7 +359,7 @@ public class FileIconPanel extends JPanel implements Comparable<FileIconPanel> {
 		});
 	}
 
-	public FileIconPanel(int mode, APIObject o) {
+	public FileIcon(int mode, APIObject o) {
 		this.cFile = o;
 		this.mode = mode;
 		this.thisPanel = this;
@@ -571,7 +571,7 @@ public class FileIconPanel extends JPanel implements Comparable<FileIconPanel> {
 	}
 
 	@Override
-	public int compareTo(FileIconPanel o) {
+	public int compareTo(FileIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
 	}
 }

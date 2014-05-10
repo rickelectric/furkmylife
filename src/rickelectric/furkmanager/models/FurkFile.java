@@ -244,5 +244,16 @@ public class FurkFile extends APIObject implements MoveableItem{
 				+ isLinked + ", isReady=" + isReady + ", isProtected="
 				+ isProtected + "]";
 	}
+
+	@Override
+	public int compareTo(Object o) {
+		if(o instanceof MoveableItem){
+			return getName().compareTo(((MoveableItem) o).getName());
+		}
+		if(o instanceof String){
+			return getName().compareTo(o.toString());
+		}
+		throw new IllegalArgumentException("Expected MoveableItem or String");
+	}
 	
 }

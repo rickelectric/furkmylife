@@ -8,6 +8,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import rickelectric.furkmanager.FurkManager;
@@ -16,7 +17,7 @@ import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.panels.Main_FileView;
+import rickelectric.furkmanager.views.panels.File_FolderView;
 import rickelectric.furkmanager.views.panels.TFileTreePanel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 
@@ -28,9 +29,15 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 	private static boolean action;
 	private boolean isAction;
 	private FurkFile file;
+	
+	private JTree parentTree;
 
 	public boolean isBusy() {
 		return isAction;
+	}
+	
+	public void setParent(JTree parent){
+		this.parentTree=parent;
 	}
 
 	public boolean expanded = false;
@@ -54,7 +61,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 	}
 
 	public void action() {
-
+		
 	}
 
 	public void action(final Runnable r) {
@@ -64,13 +71,18 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 			public void run() {
 				isAction = true;
 				action = true;
-				r.run();
+				if(r!=null) r.run();
 				if (!expanded) {
 					try{
 						DefaultMutableTreeNode rfs = TFileTreePanel
 								.getTFileTree(file);
 						setAllowsChildren(true);
-						add(rfs);
+						
+						int numChildren=rfs.getChildCount();
+						
+						for(int i=0;i<numChildren;i++){
+							FileTreeNode.this.add(((DefaultMutableTreeNode) rfs.getChildAt(0)));
+						}
 						expanded = true;
 					}catch(Exception e){
 						e.printStackTrace();
@@ -89,16 +101,11 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		private static final long serialVersionUID = 1L;
 
 		private FurkFile cFile = null;
-
-		// FileType Menu
-		private JMenuItem view;
-		private JMenuItem fview;
+		
+		private JMenuItem view,fview,link;
 		private JMenuItem browser,idm,internal,cp;
-		private JMenuItem moveto;
-		private JMenuItem link;
 		private JMenuItem recycle;
-		private JMenuItem delete;
-
+		
 		public ContextMenu(FurkFile cFile) {
 			super();
 			this.cFile = cFile;
@@ -110,10 +117,6 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 			fview = new JMenuItem("Open Download Page");
 			fview.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/web_view.png")));
 			fview.addActionListener(this);
-
-			moveto = new JMenuItem("Move To...");
-			moveto.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/file_download.png")));
-			moveto.addActionListener(this);
 
 			cp = new JMenuItem("Copy Download Page Link");
 			cp.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_icon.png")));
@@ -157,7 +160,6 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 			add(fview);
 			add(cp);
 			add(download);
-			add(moveto);
 			add(recycle);
 		}
 
@@ -219,24 +221,9 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(recycle)) {
 							// Recycle
-							String id = ((FurkFile) cFile).getID();
+							String id = cFile.getID();
 							API.File.unlink(new String[] { id });
-							Container parent = getParent();
-							try {
-								do {
-									parent = parent.getParent();
-								} while (!(parent instanceof Main_FileView));
-								((Main_FileView) parent).refreshMyFiles(false);
-							} catch (Exception e) {
-								System.err
-										.println("Could Not Find Proper Parent");
-								e.printStackTrace();
-							}
-						}
-						if (src.equals(delete)) {
-							// Permanently Delete
-							String id = ((FurkFile) cFile).getID();
-							API.File.clear(new String[] { id });
+							parentRef(true);
 						}
 					} catch (Exception e) {
 					}
@@ -244,6 +231,20 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 				}
 			});
 			t.start();
+		}
+	}
+	
+	public void parentRef(boolean hard){
+		Container parent = parentTree.getParent();
+		try {
+			while (!(parent instanceof File_FolderView)){
+				parent = parent.getParent();
+			}
+			((File_FolderView) parent).refreshMyFolders(hard);
+		} catch (Exception e) {
+			System.err
+					.println("Could Not Find Proper Parent");
+			e.printStackTrace();
 		}
 	}
 

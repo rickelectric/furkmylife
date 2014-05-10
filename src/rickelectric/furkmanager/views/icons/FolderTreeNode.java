@@ -1,5 +1,6 @@
 package rickelectric.furkmanager.views.icons;
 
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -8,23 +9,30 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIFolder;
 import rickelectric.furkmanager.network.APIFolderManager;
+import rickelectric.furkmanager.views.panels.File_FolderView;
 
 public class FolderTreeNode extends DefaultMutableTreeNode implements
 		FurkTreeNode {
 	private static final long serialVersionUID = 1L;
 
 	private APIFolder folder;
-
+	private JTree parentTree;
+	
 	public APIFolder getUserObject() {
 		return folder;
 	}
+	
+	public void setParent(JTree parent){
+		this.parentTree=parent;
+	}
 
-	public FolderTreeNode(APIFolder folder) {
+	public FolderTreeNode(APIFolder folder){
 		super(folder.getName());
 		this.folder = folder;
 	}
@@ -88,8 +96,10 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 				int resp=JOptionPane.showConfirmDialog(null, f, "Folder Name", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if(resp==JOptionPane.OK_OPTION){
 					String name=f.getText();
-					if(name!=null&&name.length()>=0)
-						APIFolderManager.newFolder(folder, name);
+					if(name!=null&&name.length()>=0){
+						if(APIFolderManager.newFolder(folder, name))
+							parentRef(false);
+					}
 					
 				}
 			}
@@ -106,13 +116,36 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 				if(resp==JOptionPane.OK_OPTION){
 					String name=f.getText();
 					if(name!=null&&name.length()>=0)
-						APIFolderManager.rename(folder,name);
+						if(APIFolderManager.rename(folder,name)){
+							parentRef(false);
+						}
 				}
 			}
 			else if(src==folder_delete){
-				//TODO Place all files to the unorganized files section
-				//TODO Delete Folder
+				int resp=JOptionPane.showConfirmDialog(null,
+					"Are You Sure You Want To Delete This Folder?\n"
+					+ "(This Operation Is Permanent)", 
+					"Delete", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if(resp==JOptionPane.YES_OPTION){
+					if(APIFolderManager.delete(folder)){
+						parentRef(true);
+					}
+				}
 			}
+		}
+	}
+	
+	private void parentRef(boolean hard){
+		try {
+			Container parent=parentTree.getParent();
+			do {
+				parent = parent.getParent();
+			} while (!(parent instanceof File_FolderView));
+			((File_FolderView) parent).refreshMyFolders(hard);
+		} catch (Exception ex){
+			System.err
+					.println("Could Not Find Proper Parent");
+			ex.printStackTrace();
 		}
 	}
 

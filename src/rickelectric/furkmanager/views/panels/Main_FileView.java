@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.swingmods.TranslucentPane;
+import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
 public class Main_FileView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;

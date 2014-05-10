@@ -170,7 +170,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 			if(nodes[i].getUserObject() instanceof MoveableItem){
 				//Move Item In FolderManager and on Furk Servers Before Move Here
 				MoveableItem item=(MoveableItem)(nodes[i].getUserObject());
-				APIFolderManager.moveItem(item, parent.getUserObject());
+				APIFolderManager.move(item, parent.getUserObject());
 				if(nodes[i] instanceof FolderTreeNode){
 					APIFolder folder=((FolderTreeNode)nodes[i]).getUserObject();
 					nodes[i]=APIFolderManager.popTree(folder);

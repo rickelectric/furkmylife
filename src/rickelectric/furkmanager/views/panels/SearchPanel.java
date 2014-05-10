@@ -30,7 +30,7 @@ import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.icons.FileIconPanel;
+import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class SearchPanel extends JPanel implements ActionListener {
@@ -225,14 +225,14 @@ public class SearchPanel extends JPanel implements ActionListener {
 	private void populateResultField(APIObject[] o, boolean wide) {
 		JPanel pane;
 		if (wide)
-			pane = new FileIconPanel(FileIconPanel.WIDE_MODE, o[0]);
+			pane = new FileIcon(FileIcon.WIDE_MODE, o[0]);
 		else {
 			pane = new JPanel();
 			pane.setLayout(new FlowLayout(FlowLayout.LEFT, 17, 3));
 			pane.setPreferredSize(new Dimension(510, 142));
 			int i = 0;
 			while (i < 3 && i < o.length && o[i] != null) {
-				pane.add(new FileIconPanel(FileIconPanel.SMALL_MODE, o[i]));
+				pane.add(new FileIcon(FileIcon.SMALL_MODE, o[i]));
 				i++;
 			}
 			pane.setBackground(resultPanel.getBackground());

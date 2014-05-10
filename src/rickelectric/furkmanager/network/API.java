@@ -605,7 +605,7 @@ public class API {
 		}
 
 		public static ArrayList<FurkLabel> getAll() {
-			String json = APIBridge.labelGet(true);
+			String json = APIBridge.labelGet(false);
 			JSONObject re = new JSONObject(json);
 			if (re.get("status").equals("error"))
 				return null;
@@ -614,7 +614,7 @@ public class API {
 			return allLabels;
 		}
 
-		public static boolean add(FurkLabel l) {
+		public static FurkLabel add(FurkLabel l){
 			try {
 				String url = APIBridge.API_BASE + "/label/upsert?"
 						+ APIBridge.key() + "&name="
@@ -634,11 +634,12 @@ public class API {
 				String json = APIBridge.jsonPost(url, false, false);
 				JSONObject re = new JSONObject(json);
 				if (re.get("status").equals("error"))
-					return false;
+					return null;
 				l.setID(re.getJSONObject("label").getString("id"));
-				return true;
+				if(allLabels!=null) allLabels.add(l);
+				return l;
 			} catch (Exception e) {
-				return false;
+				return null;
 			}
 		}
 
@@ -734,8 +735,12 @@ public class API {
 		public static ArrayList<FurkLabel> childrenOf(FurkLabel parent) {
 			String fsync = parent.getID();
 			ArrayList<FurkLabel> labels = new ArrayList<FurkLabel>();
-			for (FurkLabel l : getAllCached()) {
-				if (l.getParentID() != null && l.getParentID().equals(fsync))
+			for (FurkLabel l : getAllCached()){
+				if(l.getParentID()==null || l.getParentID().equals("0")){
+					if(parent.equals(root()))
+						labels.add(l);
+				}
+				else if (l.getParentID().equals(fsync))
 					labels.add(l);
 			}
 			return labels;
@@ -747,7 +752,7 @@ public class API {
 					return l;
 			}
 			FurkLabel root = new FurkLabel(null, "0-FurkManagerRoot");
-			add(root);
+			root=add(root);
 			return root;
 		}
 
@@ -794,8 +799,10 @@ public class API {
 	}
 
 	public static class UserData {
+		
+		private static boolean isLoaded=false;
 
-		public static void loadUserData() {
+		public static void loadUserData(){
 			String json = null;
 			int numFails = 0;
 			while (json == null)
@@ -822,6 +829,8 @@ public class API {
 			JSONArray bwStats = user.getJSONArray("bw_stats");
 			JSONArray subnet = user.getJSONArray("net_stats");
 			FurkUserData.BandwidthStats.load(bwStats, subnet);
+			
+			isLoaded=true;
 		}
 
 		/**
@@ -853,6 +862,10 @@ public class API {
 			saveString += "&" + dl_uri_key;
 
 			APIBridge.jsonPost(saveString, false, false);
+		}
+
+		public static boolean isLoaded() {
+			return isLoaded;
 		}
 
 	}

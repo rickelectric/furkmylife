@@ -17,9 +17,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import rickelectric.furkmanager.swingmods.TranslucentPane;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
 public class Main_SettingsView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;

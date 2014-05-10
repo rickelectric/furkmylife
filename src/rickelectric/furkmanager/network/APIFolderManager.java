@@ -11,12 +11,52 @@ import rickelectric.furkmanager.models.FurkLabel;
 import rickelectric.furkmanager.models.MoveableItem;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FolderTreeNode;
+import rickelectric.furkmanager.views.panels.File_FolderView;
 
 public class APIFolderManager {
 
 	private static APIFolder root;
 	private static ArrayList<MoveableItem> register;
 
+	public static void init(FurkLabel rootLabel) {
+		if (root == null || !root.getLabel().equals(rootLabel)) {
+			register=null;
+			System.gc();
+			register = new ArrayList<MoveableItem>();
+			root = new APIFolder(rootLabel);
+			register(root);
+			root.populate();
+			sort();
+		}
+	}
+	
+	public static void refresh() {
+		if(API.Label.getAll()!=null){
+			root=null;
+			init(API.Label.root());
+		}
+	}
+	
+	public static boolean newFolder(APIFolder parent, String name) {
+		if (name == null || name.length() == 0)
+			return false;
+		if (isRegistered(parent)) {
+			FurkLabel nf = new FurkLabel(null, name);
+			if ((nf = API.Label.add(nf)) != null) {
+				APIFolder child = new APIFolder(nf);
+				register(child);
+				parent.addItem(child);
+				sort();
+				return true;
+			}
+			// Add Failed
+		}
+		// Invalid Parent
+		FurkManager.trayAlert(FurkManager.TRAY_ERROR, "Error",
+				"Unable To Create Folder \"" + name + "\"", null);
+		return false;
+	}
+	
 	public static boolean isRegistered(MoveableItem i) {
 		for (MoveableItem c : register) {
 			if (i.getID().equals(c.getID())) {
@@ -32,35 +72,13 @@ public class APIFolderManager {
 		return register.add(i);
 	}
 
-	public static void init(FurkLabel rootLabel) {
-		register = new ArrayList<MoveableItem>();
-		root = new APIFolder(rootLabel);
-		register(root);
-		root.populate();
-	}
-
-	public static boolean newFolder(APIFolder parent, String name){
-		if(name==null||name.length()==0) return false;
-		if (isRegistered(parent)) {
-			FurkLabel nf = new FurkLabel(null, name);
-			if (API.Label.add(nf)){
-				APIFolder child = new APIFolder(nf);
-				register(child);
-				parent.addItem(child);
-				return true;
-			}
-			// Add Failed
-		}
-		FurkManager.trayAlert(FurkManager.TRAY_ERROR, "Error", "Unable To Create Folder \""+name+"\"", null);
-		return false;// Invalid Parent
-	}
-
 	public static boolean rename(APIFolder folder, String name) {
-		if (isRegistered(folder)){
+		if (isRegistered(folder)) {
 			FurkLabel nf = folder.getLabel();
-			String old=nf.getName();
+			String old = nf.getName();
 			nf.setName(name);
 			if (API.Label.update(nf)) {
+				sort();
 				return true;
 			}
 			// Rename Failed
@@ -69,11 +87,23 @@ public class APIFolderManager {
 		return false;
 	}
 
-	public static boolean moveItem(MoveableItem obj, APIFolder dest) {
+	private static void sort(){
+		root.sort();
+	}
+
+	public static boolean delete(APIFolder folder) {
+		if (isRegistered(folder)) {
+			FurkLabel l = folder.getLabel();
+			if (move(folder, null) && API.Label.delete(l)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean move(MoveableItem obj, APIFolder dest) {
 		try {
-			System.out.println("Moving " + obj.getName() + "\nTo "
-					+ dest.getName());
-			if (isRegistered(dest) && isRegistered(obj)) {
+			if (isRegistered(obj)) {
 				APIFolder src = null;
 				if (root.contains(obj))
 					src = root;
@@ -90,10 +120,13 @@ public class APIFolderManager {
 					}
 				}
 				if (src != null) {
-					if (dest.equals(src))
+					if (dest!=null && dest.equals(src))
 						return true;
 					System.out.println("From " + src.getName());
 					src.removeItem(obj);
+				}
+				if(dest==null){
+					return true;
 				}
 				dest.addItem(obj);
 				if (obj instanceof APIFolder) {
@@ -111,10 +144,12 @@ public class APIFolderManager {
 					}
 					if (!dest.equals(root)) {// New Folder Is Not Root (null)
 												// Folder
-						API.Label
-								.linkToFiles(dest.getID(), new String[] { id });
+						if(API.Label.linkToFiles(dest.getID(), new String[] { id })){
+							((FurkFile) obj).setIdLabels(new String[]{dest.getID()});
+						}
 					}
 				}
+				sort();
 				return true;
 			} else {
 				System.out.println("Not Registered");
@@ -134,7 +169,8 @@ public class APIFolderManager {
 
 	public static FolderTreeNode popTree(APIFolder folder) {
 		FolderTreeNode col = new FolderTreeNode(folder);
-
+		col.setParent(File_FolderView.currTree());
+		
 		ArrayList<MoveableItem> list = folder.getFiles();
 		for (MoveableItem m : list) {
 			if (m instanceof APIFolder) {
@@ -142,6 +178,7 @@ public class APIFolderManager {
 				col.add(ftr);
 			} else if (m instanceof FurkFile) {
 				FileTreeNode ftr = new FileTreeNode((FurkFile) m);
+				ftr.setParent(File_FolderView.currTree());
 				col.add(ftr);
 			}
 		}

@@ -23,9 +23,9 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.network.API;
-import rickelectric.furkmanager.swingmods.TranslucentPane;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
 public class Main_UserView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;

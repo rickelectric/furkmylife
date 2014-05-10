@@ -22,15 +22,15 @@ import javax.swing.border.EtchedBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.APIBridge;
-import rickelectric.furkmanager.swingmods.OpacEffects;
-import rickelectric.furkmanager.swingmods.Slideable;
-import rickelectric.furkmanager.swingmods.TranslucentPane;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
 import rickelectric.furkmanager.views.panels.Main_FeedView;
 import rickelectric.furkmanager.views.panels.Main_FileView;
 import rickelectric.furkmanager.views.panels.Main_SettingsView;
 import rickelectric.furkmanager.views.panels.Main_UserView;
+import rickelectric.furkmanager.views.swingmods.OpacEffects;
+import rickelectric.furkmanager.views.swingmods.Slideable;
+import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
 public class MainWindow extends AppFrameClass{
 	private static final long serialVersionUID = 1L;

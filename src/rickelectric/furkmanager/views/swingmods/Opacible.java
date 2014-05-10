@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.swingmods;
+package rickelectric.furkmanager.views.swingmods;
 
 public interface Opacible{
 	

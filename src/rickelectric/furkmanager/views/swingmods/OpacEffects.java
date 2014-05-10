@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.swingmods;
+package rickelectric.furkmanager.views.swingmods;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
