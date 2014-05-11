@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 public class APIBridge{
 	
-	protected static String api_key=null;
+	private static String api_key=null;
 	public static String key(){
 		if(api_key==null) return null;
 		return "api_key="+api_key;
@@ -18,7 +18,9 @@ public class APIBridge{
 	
 	public static final String API_BASE="https://www.furk.net/api";
 	
-	public static void initialize(String api_key){APIBridge.api_key=api_key;}
+	public static void initialize(String api_key){
+		APIBridge.api_key=api_key;
+	}
 	
 	private static boolean overrideCache=false;
 	public static boolean overrideCache(){return overrideCache;}
@@ -329,5 +331,8 @@ public class APIBridge{
 			throw new RuntimeException("Connection Error");
 		}
 	}
-
+	public static String getKey() {
+		return api_key;
+	}
+	
 }

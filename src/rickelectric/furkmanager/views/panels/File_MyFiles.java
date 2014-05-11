@@ -16,7 +16,7 @@ import javax.swing.SwingConstants;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIObject;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
@@ -96,12 +96,12 @@ public class File_MyFiles extends JPanel {
 
 					ArrayList<APIObject> ffarray = hardReload 
 							? (mode == MYFILES 
-								? API.File.getAllFinished()
-								: API.File.getAllDeleted()
+								? API_File.getAllFinished()
+								: API_File.getAllDeleted()
 								)
 							: (mode==RECYCLER?
-									API.File.getAllDeleted():
-									API.File.getAllCached()
+									API_File.getAllDeleted():
+									API_File.getAllCached()
 								);
 
 					resultPanel.removeAll();

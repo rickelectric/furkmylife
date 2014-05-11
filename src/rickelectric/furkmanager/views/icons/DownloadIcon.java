@@ -21,8 +21,8 @@ import javax.swing.border.EtchedBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkDownload;
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
 
@@ -120,11 +120,11 @@ public class DownloadIcon extends JPanel implements
 							// View Details
 						}
 						if(src.equals(retry)){
-							API.Download.addHash(cDownload.getInfoHash());
+							API_Download.addHash(cDownload.getInfoHash());
 						}
 						if (src.equals(delete)) {
 							// Remove Download
-							API.Download.unlink(new String[] { cDownload
+							API_Download.unlink(new String[] { cDownload
 									.getId() });
 							parentRefresh();
 						}
@@ -235,7 +235,7 @@ public class DownloadIcon extends JPanel implements
 					return;
 				}
 				try {
-					FurkDownload did = API.Download.get(cDownload.getId());
+					FurkDownload did = API_Download.get(cDownload.getId());
 					if (did != null) {
 						if (cDownload.getDlStatus().equals("active")) {
 							if (did.getDlStatus().equals("finished")
@@ -248,15 +248,6 @@ public class DownloadIcon extends JPanel implements
 										"Download Complete",
 										"Finished Downloading '"
 												+ did.getName() + "'", null);
-								new Thread(new Runnable(){
-									public void run(){
-										boolean override=APIBridge.overrideCache();
-										APIBridge.overrideCache(true);
-										try{API.File.getAllFinished();}
-										catch(Exception e){}
-										APIBridge.overrideCache(override);
-									}
-								}).start();
 								this.cancel();
 								parentRefresh();
 							} else if (did.getDlStatus().equals("failed")) {
@@ -276,11 +267,7 @@ public class DownloadIcon extends JPanel implements
 						FurkManager.trayAlert(FurkManager.TRAY_INFO,
 								"Download Complete", "Finished Downloading '"
 										+ cDownload.getName() + "'",
-								new Runnable() {
-									public void run() {
-										API.File.info(cDownload.getInfoHash());
-									}
-								});
+								null);
 						APIBridge.fileGet(APIBridge.GET_ALL, null, null, null,
 								false);
 						this.cancel();

@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_UserData;
 
 public class FurkUserData {
 
@@ -52,7 +52,7 @@ public class FurkUserData {
 		public static String jsonPreferences;// prefs_json;
 
 		public static void save() {
-			API.UserData.saveUserPrefs();
+			API_UserData.saveUserPrefs();
 		}
 
 		public static void save(final Runnable after) {

@@ -28,9 +28,11 @@ import org.eclipse.ecf.protocol.bittorrent.TorrentFile;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIObject;
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.StreamDownloader;
+import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.API_Download;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -213,10 +215,10 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 				try{
 					int type=choice_type.getSelectedIndex();
 					if(type==1){
-						if(API.Download.addTorrentFile(link)){
+						if(API_Download.addTorrentFile(link)){
 							FurkManager.trayAlert(FurkManager.TRAY_INFO, "Success", "Added "+link+" to my Furk account.", new Runnable(){
 								public void run(){
-									API.Download.getAll();
+									API_Download.getAll();
 								}
 							});
 							close();
@@ -225,10 +227,10 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 						}
 					}
 					else{
-						if(API.Download.addHash(link)){
+						if(API_Download.addHash(link)){
 							FurkManager.trayAlert(FurkManager.TRAY_INFO, "Success", "Added "+link+" to my Furk account.", new Runnable(){
 								public void run(){
-									API.Download.getAll();
+									API_Download.getAll();
 								}
 							});
 							close();
@@ -267,7 +269,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 	}
 	
 	private void hashInfo(String hash){
-		APIObject info=API.File.info(hash);
+		APIObject info=API_File.info(hash);
 		if(info==null){
 			FurkManager.trayAlert(FurkManager.TRAY_WARNING, "Info GET Error", 
 				"Unable to obtain data on this link from Furk.net.\n"

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.APIFolderManager;
+import rickelectric.furkmanager.network.api.API_File;
+import rickelectric.furkmanager.network.api.API_Label;
 
 public class APIFolder implements MoveableItem{
 	
@@ -22,7 +23,7 @@ public class APIFolder implements MoveableItem{
 	}
 	
 	public void populate(){
-		List<FurkLabel> ll=API.Label.childrenOf(fsync);
+		List<FurkLabel> ll=API_Label.childrenOf(fsync);
 		for(FurkLabel l:ll){
 			APIFolder tf=new APIFolder(l);
 			if(APIFolderManager.register(tf)){
@@ -30,7 +31,7 @@ public class APIFolder implements MoveableItem{
 				addItem(tf);
 			}
 		}
-		List<FurkFile> files=API.File.childrenOf(fsync);
+		List<FurkFile> files=API_File.childrenOf(fsync);
 		for(FurkFile f:files){
 			if(APIFolderManager.register(f)){
 				addItem(f);

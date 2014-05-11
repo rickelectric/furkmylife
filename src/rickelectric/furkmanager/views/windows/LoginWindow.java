@@ -26,8 +26,9 @@ import javax.swing.border.EtchedBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.data.HelpData;
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Settings_ProxyPorts;
@@ -245,7 +246,7 @@ public class LoginWindow extends AppFrameClass {
 				boolean keyPing=APIBridge.ping(key);
 				if(keyPing){
 					APIBridge.initialize(key);
-					API.UserData.loadUserData();
+					API_UserData.loadUserData();
 					dispose();
 					loggingIn=false;
 					FurkManager.appRun();

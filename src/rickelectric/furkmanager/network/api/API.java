@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.network;
+package rickelectric.furkmanager.network.api;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
+import rickelectric.furkmanager.network.APIBridge;
 
 public class API {
 
@@ -28,7 +29,7 @@ public class API {
 	}
 
 	public static String key() {
-		return APIBridge.api_key;
+		return APIBridge.getKey();
 	}
 
 	public Iterator<String> messages() {
@@ -37,7 +38,7 @@ public class API {
 		return msgCache.iterator();
 	}
 
-	private static void setMessages(JSONArray j) {
+	protected static void setMessages(JSONArray j) {
 		if (j == null)
 			return;
 		msgCache = new ArrayList<String>();
@@ -52,7 +53,7 @@ public class API {
 	 * @author Rick Lewis (Ionicle)
 	 * 
 	 */
-	public static class File {
+	public static class _File {
 
 		public enum GET_TYPE {
 			GET_DELETED, GET_FINISHED
@@ -305,7 +306,7 @@ public class API {
 	 * @author Rick Lewis (Ionicle)
 	 * 
 	 */
-	public static class TFile {
+	public static class _TFile {
 
 		public static ArrayList<FurkTFile> jsonFiles(JSONArray tf) {
 			ArrayList<FurkTFile> tfiles = new ArrayList<FurkTFile>();
@@ -403,7 +404,7 @@ public class API {
 	 * @author Rick Lewis (Ionicle)
 	 * 
 	 */
-	public static class Download {
+	public static class _Download {
 
 		private static ArrayList<FurkDownload> downloadList;
 
@@ -567,7 +568,7 @@ public class API {
 	 * @author Rick Lewis (Ionicle)
 	 * 
 	 */
-	public static class Label {
+	public static class _Label {
 
 		private static ArrayList<FurkLabel> allLabels;
 
@@ -758,7 +759,7 @@ public class API {
 
 	}
 
-	public static class Message {
+	public static class _Message {
 
 		public static ArrayList<APIMessage> jsonMessages(JSONArray a) {
 			if (a == null)
@@ -792,13 +793,13 @@ public class API {
 			JSONArray mlist = o.getJSONArray("messages");
 			if (mlist == null || mlist == JSONObject.NULL)
 				return null;
-			ArrayList<APIMessage> msgs = API.Message.jsonMessages(mlist);
+			ArrayList<APIMessage> msgs = jsonMessages(mlist);
 			return msgs;
 		}
 
 	}
 
-	public static class UserData {
+	public static class _UserData {
 		
 		private static boolean isLoaded=false;
 
@@ -894,7 +895,7 @@ public class API {
 
 		JSONArray files = jo.getJSONArray("files");
 
-		ArrayList<APIObject> ffarray = API.File.jsonFiles(files);
+		ArrayList<APIObject> ffarray = API_File.jsonFiles(files);
 		return ffarray;
 	}
 

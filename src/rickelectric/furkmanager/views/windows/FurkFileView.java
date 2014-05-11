@@ -20,7 +20,8 @@ import javax.swing.border.LineBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_Download;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.ScreenshotViewPanel;
 import rickelectric.furkmanager.views.panels.TFileTreePanel;
@@ -137,7 +138,7 @@ public class FurkFileView extends AppFrameClass {
 				String cmd = e.getActionCommand();
 				if (cmd.equals("Add To My Files")) {
 					String id = ff.getID();
-					if (!API.File.link(new String[] { id })) {
+					if (!API_File.link(new String[] { id })) {
 						JOptionPane.showMessageDialog(null, "File Not Added");
 						return;
 					} else {
@@ -148,7 +149,7 @@ public class FurkFileView extends AppFrameClass {
 				}
 				if (cmd.equals("Remove From My Files")) {
 					String id = ff.getID();
-					if (!API.File.unlink(new String[] { id })) {
+					if (!API_File.unlink(new String[] { id })) {
 						JOptionPane.showMessageDialog(null, "File Not Removed");
 						return;
 					} else {
@@ -159,7 +160,7 @@ public class FurkFileView extends AppFrameClass {
 				}
 				if (cmd.equals("Add To My Downloads")) {
 					String hash = ff.getInfoHash();
-					if (!API.Download.addHash(hash)) {
+					if (!API_Download.addHash(hash)) {
 						JOptionPane.showMessageDialog(null,
 								"Download Not Added");
 						return;

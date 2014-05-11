@@ -7,9 +7,10 @@ import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.InstanceConn;
 import rickelectric.furkmanager.network.RequestCache;
+import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -35,8 +36,8 @@ public class DataToJSON {
 			root.put("status", "error");
 			root.put("error", "Limit is Zero");
 		}
-		ArrayList<APIObject> files = API.File.getAllCached();
-		if(files==null) files = API.File.getAllFinished();
+		ArrayList<APIObject> files = API_File.getAllCached();
+		if(files==null) files = API_File.getAllFinished();
 		if (files == null){
 			root.put("status", "error");
 			root.put("error", "Error Obtaining Files.");

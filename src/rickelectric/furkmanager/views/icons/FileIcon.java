@@ -26,7 +26,8 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_Download;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_FileView;
@@ -214,7 +215,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 						}
 						if (src.equals(add)) {
 							// Add To My Files
-							API.File.link(new String[] { ((FurkFile) cFile)
+							API_File.link(new String[] { ((FurkFile) cFile)
 									.getID() });
 							FurkManager.trayAlert(
 								FurkManager.TRAY_INFO,"Added",
@@ -227,7 +228,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 						}
 						if (src.equals(add_dl)) {
 							// Add To My Downloads
-							API.Download.addHash(cFile.getInfoHash());
+							API_Download.addHash(cFile.getInfoHash());
 							FurkManager.trayAlert(FurkManager.TRAY_INFO,
 									"Download Added",
 									"'" + cFile.getName()+ "' Added To My Downloads",
@@ -268,7 +269,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 						if (src.equals(recycle)) {
 							// Recycle
 							String id = ((FurkFile) cFile).getID();
-							if(API.File.unlink(new String[] { id })){
+							if(API_File.unlink(new String[] { id })){
 								FurkManager.trayAlert(FurkManager.TRAY_INFO,
 									"Deleted",
 									"File '" + cFile.getName()+ "' Sent To Recycle Bin",
@@ -279,7 +280,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 						if (src.equals(delete)) {
 							// Permanently Delete
 							String id = ((FurkFile) cFile).getID();
-							API.File.clear(new String[] { id });
+							API_File.clear(new String[] { id });
 							parentRefresh();
 						}
 					} catch (Exception e) {

@@ -15,8 +15,9 @@ import org.json.JSONObject;
 import rickelectric.furkmanager.data.DataToJSON;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.RequestCache;
+import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -79,7 +80,7 @@ public class CrxSocketLink extends WebSocketServer {
 			}
 			else if(type.equals("view")){
 				int num=o.getInt("num");
-				List<APIObject> files=API.File.getAllCached();
+				List<APIObject> files=API_File.getAllCached();
 				if(files!=null){
 					APIObject a=files.get(num-1);
 					if(a instanceof FurkFile)

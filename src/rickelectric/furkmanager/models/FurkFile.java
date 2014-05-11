@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_File;
 
 public class FurkFile extends APIObject implements MoveableItem{
 	
@@ -176,7 +176,7 @@ public class FurkFile extends APIObject implements MoveableItem{
 	public boolean serverRefresh(){
 		exec.execute(new Runnable(){
 			public void run(){
-				APIObject f=API.File.get(getID());
+				APIObject f=API_File.get(getID());
 				if(f!=null&&f instanceof FurkFile)
 					overwrite((FurkFile)f);
 			}

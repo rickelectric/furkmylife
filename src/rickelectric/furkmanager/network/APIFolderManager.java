@@ -9,6 +9,7 @@ import rickelectric.furkmanager.models.APIFolder;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkLabel;
 import rickelectric.furkmanager.models.MoveableItem;
+import rickelectric.furkmanager.network.api.API_Label;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FolderTreeNode;
 import rickelectric.furkmanager.views.panels.File_FolderView;
@@ -31,9 +32,9 @@ public class APIFolderManager {
 	}
 	
 	public static void refresh() {
-		if(API.Label.getAll()!=null){
+		if(API_Label.getAll()!=null){
 			root=null;
-			init(API.Label.root());
+			init(API_Label.root());
 		}
 	}
 	
@@ -42,7 +43,7 @@ public class APIFolderManager {
 			return false;
 		if (isRegistered(parent)) {
 			FurkLabel nf = new FurkLabel(null, name);
-			if ((nf = API.Label.add(nf)) != null) {
+			if ((nf = API_Label.add(nf)) != null) {
 				APIFolder child = new APIFolder(nf);
 				register(child);
 				parent.addItem(child);
@@ -77,7 +78,7 @@ public class APIFolderManager {
 			FurkLabel nf = folder.getLabel();
 			String old = nf.getName();
 			nf.setName(name);
-			if (API.Label.update(nf)) {
+			if (API_Label.update(nf)) {
 				sort();
 				return true;
 			}
@@ -94,7 +95,7 @@ public class APIFolderManager {
 	public static boolean delete(APIFolder folder) {
 		if (isRegistered(folder)) {
 			FurkLabel l = folder.getLabel();
-			if (move(folder, null) && API.Label.delete(l)){
+			if (move(folder, null) && API_Label.delete(l)){
 				return true;
 			}
 		}
@@ -133,18 +134,18 @@ public class APIFolderManager {
 					System.out.println("Updating Folder Label Details...");
 					FurkLabel l = ((APIFolder) obj).getLabel();
 					l.setParentID(dest.getID());
-					API.Label.update(l);
+					API_Label.update(l);
 				} else if (obj instanceof FurkFile) {
 					String[] labels = ((FurkFile) obj).getIdLabels();
 					String id = obj.getID();
 					if (labels != null && labels.length != 0) {// Already In A
 																// Folder
-						API.Label.unlinkFromFiles(src.getID(),
+						API_Label.unlinkFromFiles(src.getID(),
 								new String[] { id });
 					}
 					if (!dest.equals(root)) {// New Folder Is Not Root (null)
 												// Folder
-						if(API.Label.linkToFiles(dest.getID(), new String[] { id })){
+						if(API_Label.linkToFiles(dest.getID(), new String[] { id })){
 							((FurkFile) obj).setIdLabels(new String[]{dest.getID()});
 						}
 					}

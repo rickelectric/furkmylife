@@ -23,7 +23,7 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.models.NodeImageObserver;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_TFile;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.icons.TFileTreeNode;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
@@ -48,7 +48,7 @@ public class TFileTreePanel extends JPanel {
 	}
 
 	public static DefaultMutableTreeNode getTFileTree(FurkFile ff) {
-		ArrayList<FurkTFile> files = API.TFile.getFrom(ff);
+		ArrayList<FurkTFile> files = API_TFile.getFrom(ff);
 		if (ff == null)
 			return null;
 

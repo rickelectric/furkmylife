@@ -23,8 +23,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.ConsoleWin;
 

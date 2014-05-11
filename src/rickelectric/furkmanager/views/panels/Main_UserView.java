@@ -22,7 +22,7 @@ import javax.swing.border.TitledBorder;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
@@ -311,7 +311,7 @@ public class Main_UserView extends TranslucentPane {
 					label_loading_tab_3.setVisible(true);
 					
 					Thread.sleep(time);
-					if(time>50) API.UserData.loadUserData();
+					if(time>50) API_UserData.loadUserData();
 					
 					input_username.setText(FurkUserData.User.login);
 					input_email.setText(FurkUserData.User.email);

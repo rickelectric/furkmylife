@@ -28,7 +28,8 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
@@ -214,7 +215,7 @@ public class SearchPanel extends JPanel implements ActionListener {
 		else if (searchMode == METASEARCH)
 			ffarray = API.search(txt, API.METASEARCH);
 		else if (searchMode == FILESEARCH)
-			ffarray = API.File.find(txt);
+			ffarray = API_File.find(txt);
 		for (APIObject o : ffarray) {
 			populateResultField(new APIObject[] { o }, true);
 			numResults++;

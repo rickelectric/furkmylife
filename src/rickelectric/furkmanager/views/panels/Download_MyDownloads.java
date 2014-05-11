@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkDownload;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.DownloadIcon;
@@ -81,12 +81,12 @@ public class Download_MyDownloads extends JPanel {
 
 			public void run() {
 				try {
-					API.Download.GET_STATUS stat = API.Download.STATUS_ACTIVE;
+					API_Download.GET_STATUS stat = API_Download.STATUS_ACTIVE;
 					if (mode == FAILED)
-						stat = API.Download.STATUS_FAILED;
-					ArrayList<FurkDownload> fdarray = hardReload ? API.Download
-							.getAll(stat) : mode == FAILED ? API.Download
-							.getAll(stat) : API.Download.getAllCached();
+						stat = API_Download.STATUS_FAILED;
+					ArrayList<FurkDownload> fdarray = hardReload ? API_Download
+							.getAll(stat) : mode == FAILED ? API_Download
+							.getAll(stat) : API_Download.getAllCached();
 
 					resultPanel.removeAll();
 					resultPanel.setLayout(new BoxLayout(resultPanel,

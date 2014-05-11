@@ -10,11 +10,13 @@ import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
 import rickelectric.furkmanager.idownloader.DownloadManager;
-import rickelectric.furkmanager.network.API;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.network.InstanceConn;
 import rickelectric.furkmanager.network.RequestCache;
+import rickelectric.furkmanager.network.api.API_File;
+import rickelectric.furkmanager.network.api.API_Label;
+import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -179,16 +181,16 @@ public class FurkManager {
 			
 			loading();
 			load.setText("Loading User Data...");
-			if(!API.UserData.isLoaded())
-				API.UserData.loadUserData();
+			if(!API_UserData.isLoaded())
+				API_UserData.loadUserData();
 			load.setText("Loading Files...");
-			if(API.File.getAllCached()==null)
-				API.File.getAllFinished();
+			if(API_File.getAllCached()==null)
+				API_File.getAllFinished();
 			load.setText("Loading Folders...");
-			if(API.Label.getAllCached()==null){
-				API.Label.getAll();
+			if(API_Label.getAllCached()==null){
+				API_Label.getAll();
 				load.setText("Folder Manager Initializing...");
-				APIFolderManager.init(API.Label.root());
+				APIFolderManager.init(API_Label.root());
 			}
 			load.setText("Launching...");
 			

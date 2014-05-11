@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.models.FurkFile;
-import rickelectric.furkmanager.network.API;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.File_FolderView;
@@ -222,7 +222,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						if (src.equals(recycle)) {
 							// Recycle
 							String id = cFile.getID();
-							API.File.unlink(new String[] { id });
+							API_File.unlink(new String[] { id });
 							parentRef(true);
 						}
 					} catch (Exception e) {
