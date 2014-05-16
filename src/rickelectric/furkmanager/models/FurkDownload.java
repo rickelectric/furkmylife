@@ -1,8 +1,8 @@
 package rickelectric.furkmanager.models;
 
 /**
- * Representation of an item currently being downloaded on Furk.net
- * (Also includes failed downloads)
+ * Representation of a <i>dl</i> API Object. <br/>
+ * (A currently downloading/failed Download to Furk.net servers) 
  * @author Rick Lewis
  * @version 1.0 
  */

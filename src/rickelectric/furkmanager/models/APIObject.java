@@ -1,8 +1,9 @@
 package rickelectric.furkmanager.models;
 
 import java.awt.Color;
+import java.util.Observable;
 
-public class APIObject {
+public class APIObject extends Observable{
 	
 	private String 
 		name,

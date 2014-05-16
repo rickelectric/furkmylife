@@ -80,7 +80,7 @@ public class CrxSocketLink extends WebSocketServer {
 			}
 			else if(type.equals("view")){
 				int num=o.getInt("num");
-				List<APIObject> files=API_File.getAllCached();
+				List<FurkFile> files=API_File.getAllCached();
 				if(files!=null){
 					APIObject a=files.get(num-1);
 					if(a instanceof FurkFile)

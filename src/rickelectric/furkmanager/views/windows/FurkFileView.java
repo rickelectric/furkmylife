@@ -25,6 +25,7 @@ import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.ScreenshotViewPanel;
 import rickelectric.furkmanager.views.panels.TFileTreePanel;
+import java.awt.Font;
 
 public class FurkFileView extends AppFrameClass {
 
@@ -69,10 +70,12 @@ public class FurkFileView extends AppFrameClass {
 		contentPane.setLayout(null);
 
 		JLabel label_id = new JLabel("File ID:");
+		label_id.setFont(new Font("Dialog", Font.PLAIN, 12));
 		label_id.setBounds(10, 10, 84, 17);
 		contentPane.add(label_id);
 
 		input_id = new JTextField();
+		input_id.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_id.setBackground(Color.WHITE);
 		input_id.setEditable(false);
 		input_id.setBounds(92, 8, 200, 20);
@@ -83,10 +86,12 @@ public class FurkFileView extends AppFrameClass {
 		input_id.setColumns(10);
 
 		JLabel label_name = new JLabel("Filename:");
+		label_name.setFont(new Font("Dialog", Font.PLAIN, 12));
 		label_name.setBounds(10, 38, 64, 16);
 		contentPane.add(label_name);
 
 		input_name = new JTextField();
+		input_name.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_name.setBackground(Color.WHITE);
 		input_name.setEditable(false);
 		input_name.setBounds(92, 36, 340, 20);
@@ -95,10 +100,12 @@ public class FurkFileView extends AppFrameClass {
 		input_name.setColumns(10);
 
 		JLabel label_size = new JLabel("File Size: ");
+		label_size.setFont(new Font("Dialog", Font.PLAIN, 12));
 		label_size.setBounds(10, 77, 64, 16);
 		contentPane.add(label_size);
 
 		input_size = new JTextField();
+		input_size.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_size.setBackground(Color.WHITE);
 		input_size.setEditable(false);
 		input_size.setBounds(92, 75, 114, 20);
@@ -107,10 +114,12 @@ public class FurkFileView extends AppFrameClass {
 		input_size.setColumns(10);
 
 		JLabel label_type = new JLabel("Type:");
+		label_type.setFont(new Font("Dialog", Font.PLAIN, 12));
 		label_type.setBounds(251, 77, 49, 16);
 		contentPane.add(label_type);
 
 		input_type = new JTextField();
+		input_type.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_type.setBackground(Color.WHITE);
 		input_type.setEditable(false);
 		input_type.setBounds(318, 75, 114, 20);
@@ -121,10 +130,12 @@ public class FurkFileView extends AppFrameClass {
 		input_type.setColumns(10);
 
 		JLabel label_hash = new JLabel("Info Hash: ");
+		label_hash.setFont(new Font("Dialog", Font.PLAIN, 12));
 		label_hash.setBounds(10, 109, 64, 16);
 		contentPane.add(label_hash);
 
 		input_hash = new JTextField();
+		input_hash.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_hash.setBackground(Color.WHITE);
 		input_hash.setEditable(false);
 		input_hash.setBounds(92, 107, 340, 20);
@@ -171,6 +182,7 @@ public class FurkFileView extends AppFrameClass {
 				}
 			}
 		});
+		
 		if (ff.getUrlDl() == null || ff.getUrlDl().equals("")){
 			if(ff.isLinked()) btn_linkfile.setText("Re-Add To My Downloads");
 			else btn_linkfile.setText("Add To My Downloads");
@@ -182,23 +194,14 @@ public class FurkFileView extends AppFrameClass {
 
 		btn_linkfile.setBounds(10, 459, 162, 20);
 		contentPane.add(btn_linkfile);
-
-		setVisible(true);
 		
-		boolean showScreenshots=(ff.getType() != null && ff.getType().equals("video")
-				&& ff.getThumbs() != null);
-		if (showScreenshots) {
-			ss_panel=new ScreenshotViewPanel(ff);
-			ss_panel.setBounds(10, 191, 414, 157);
-			contentPane.add(ss_panel);
-		}
-		
-
 		JLabel label_url = new JLabel("URL:");
+		label_url.setFont(new Font("Dialog", Font.PLAIN, 12));
 		label_url.setBounds(10, 137, 64, 16);
 		contentPane.add(label_url);
 
 		input_url = new JTextField();
+		input_url.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_url.setBackground(Color.WHITE);
 		input_url.setEditable(false);
 		input_url.setBounds(92, 135, 340, 20);
@@ -238,6 +241,17 @@ public class FurkFileView extends AppFrameClass {
 		btn_changeview = new JButton("Show File Tree");
 		btn_changeview.setHorizontalAlignment(SwingConstants.LEFT);
 		btn_changeview.setIcon(new ImageIcon(FurkManager.class.getResource("img/arrow_double_right.png")));
+		
+		setVisible(true);
+		
+		boolean showScreenshots=(ff.getType() != null && ff.getType().equals("video")
+				&& ff.getThumbs() != null);
+		if (showScreenshots) {
+			ss_panel=new ScreenshotViewPanel(ff);
+			ss_panel.setBounds(10, 191, 414, 157);
+			contentPane.add(ss_panel);
+		}
+		
 		final JPanel tmp=new JPanel();
 		tmp.setLayout(new GridBagLayout());
 		tmp.add(new JLabel(new ImageIcon(FurkManager.class.getResource("img/ajax-loader.gif"))));

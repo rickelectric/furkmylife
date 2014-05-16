@@ -27,7 +27,7 @@ public class API_File extends API {
 	public static final GET_TYPE GET_DELETED = GET_TYPE.GET_DELETED,
 			GET_FINISHED = GET_TYPE.GET_FINISHED;
 
-	private static ArrayList<APIObject> fileList;
+	private static ArrayList<FurkFile> fileList;
 
 	public static ArrayList<APIObject> jsonFiles(JSONArray files) {
 
@@ -120,20 +120,20 @@ public class API_File extends API {
 		return fl;
 	}
 
-	public static ArrayList<APIObject> getAllCached() {
+	public static ArrayList<FurkFile> getAllCached() {
 		return fileList;
 	}
 
-	public static ArrayList<APIObject> getAllFinished() {
+	public static ArrayList<FurkFile> getAllFinished() {
 		fileList = get(GET_FINISHED, -1, -1);
 		return fileList;
 	}
 
-	public static ArrayList<APIObject> getAllDeleted() {
+	public static ArrayList<FurkFile> getAllDeleted() {
 		return get(GET_DELETED, -1, -1);
 	}
 
-	public static ArrayList<APIObject> get(GET_TYPE type, int limit,
+	public static ArrayList<FurkFile> get(GET_TYPE type, int limit,
 			int offset) {
 		int[] limoffs = null;
 		if (limit > 0 && offset >= 0) {
@@ -156,10 +156,20 @@ public class API_File extends API {
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return null;
-		Object m = re.get("messages");
-		if (m != null && m instanceof JSONArray)
-			setMessages((JSONArray) m);
-		return jsonFiles(re.getJSONArray("files"));
+		try{
+			Object m = re.get("messages");
+			if (m != null && m instanceof JSONArray)
+				setMessages((JSONArray) m);
+		}catch(Exception e){
+			
+		}
+		ArrayList<APIObject> f=jsonFiles(re.getJSONArray("files"));
+		ArrayList<FurkFile> ff=new ArrayList<FurkFile>();
+		
+		for(APIObject o:f){
+			ff.add((FurkFile)o);
+		}
+		return ff;
 	}
 
 	public static APIObject get(String fileID) {
@@ -190,7 +200,7 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return false;
 		for (String id : fileIDs)
-			fileList.add(info(id));
+			fileList.add((FurkFile)info(id));
 		return true;
 	}
 
@@ -201,7 +211,7 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return false;
 		for (String fid : fileIDs) {
-			Iterator<APIObject> i = fileList.iterator();
+			Iterator<FurkFile> i = fileList.iterator();
 			while (i.hasNext()) {
 				APIObject f = i.next();
 				if (f instanceof FurkFile) {

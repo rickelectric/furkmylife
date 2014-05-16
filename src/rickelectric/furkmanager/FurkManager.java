@@ -1,9 +1,11 @@
 package rickelectric.furkmanager;
 
 import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -28,7 +30,7 @@ import rickelectric.furkmanager.views.windows.LoginWindow;
 import rickelectric.furkmanager.views.windows.MainWindow;
 
 public class FurkManager {
-
+	
 	private static boolean tray = false;
 	private static String addString = null;
 
@@ -40,7 +42,7 @@ public class FurkManager {
 	private static APIConsole console = null;
 	private static ImgCacheViewer cache = null;
 
-	private static JFrame frame;
+	private static JDialog frame;
 	private static JLabel load;
 
 	private static enum AlertType {
@@ -73,10 +75,17 @@ public class FurkManager {
 		else
 			JOptionPane.showMessageDialog(null, s);
 	}
-
+	
+	public static void LAF(int i){
+		try {
+			if(i==0) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			else UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+	    } catch (Exception evt) {}
+	}
+	
 	public static void loading() {
-		
-		frame = new JFrame();
+		LAF(1);
+		frame = new JDialog();
 		frame.setLayout(null);
 		frame.setSize(420, 100);
 		frame.setLocationRelativeTo(null);
@@ -84,7 +93,11 @@ public class FurkManager {
 		frame.setIconImage(new ImageIcon(FurkManager.class
 				.getResource("img/fr.png")).getImage());
 		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				exit();
+			}
+		});
 		load = new JLabel("Loading...");
 		load.setBounds(20, 10, 375, 20);
 		load.setHorizontalAlignment(JLabel.CENTER);
@@ -98,15 +111,11 @@ public class FurkManager {
 		bLoad.setIndeterminate(true);
 		frame.add(bLoad);
 		frame.setVisible(!tray);
+		LAF(0);
 	}
 
 	public static void main(String[] args) {
-		
 		loading();
-		
-		try {
-	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	    } catch (Exception evt) {}
 		
 		int len = args.length;
 		int iter = 0;
@@ -178,21 +187,26 @@ public class FurkManager {
 		if (APIBridge.key() == null)
 			login();
 		else {
-			
-			loading();
-			load.setText("Loading User Data...");
-			if(!API_UserData.isLoaded())
-				API_UserData.loadUserData();
-			load.setText("Loading Files...");
-			if(API_File.getAllCached()==null)
-				API_File.getAllFinished();
-			load.setText("Loading Folders...");
-			if(API_Label.getAllCached()==null){
-				API_Label.getAll();
-				load.setText("Folder Manager Initializing...");
-				APIFolderManager.init(API_Label.root());
+			try{
+				loading();
+				frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+				load.setText("Loading User Data...");
+				if(!API_UserData.isLoaded())
+					API_UserData.loadUserData();
+				load.setText("Loading Files...");
+				if(API_File.getAllCached()==null)
+					API_File.getAllFinished();
+				load.setText("Loading Folders...");
+				if(API_Label.getAllCached()==null){
+					API_Label.getAll();
+					load.setText("Folder Manager Initializing...");
+					APIFolderManager.init(API_Label.root());
+				}
+				load.setText("Launching...");
+			}catch(Exception e){
+				frame.dispose();
+				throw e;
 			}
-			load.setText("Launching...");
 			
 			mainWin();
 			frame.dispose();
@@ -261,7 +275,12 @@ public class FurkManager {
 		if (b)
 			console.toFront();
 	}
-
+	
+	/**
+	 * Saves Everything That Needs Saving.<br/>
+	 * Flushes All Caches.<br/>
+	 * Sends a logout request to the Furk API.
+	 */
 	public static void logout() {
 		Thread t = new Thread() {
 			public void run() {
@@ -293,13 +312,12 @@ public class FurkManager {
 		};
 		t.start();
 	}
-
+	
 	public static void exit() {
 		Thread t = new Thread() {
 			public void run() {
 				try {
 					DownloadManager.persist();
-					APIBridge.userLogout();
 					System.exit(0);
 				} catch (Exception e) {
 					System.exit(e.hashCode());

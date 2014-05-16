@@ -25,6 +25,7 @@ import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
+import rickelectric.furkmanager.views.windows.FurkDownloadView;
 
 public class DownloadIcon extends JPanel implements
 		Comparable<DownloadIcon> {
@@ -118,6 +119,7 @@ public class DownloadIcon extends JPanel implements
 						thisPanel.repaint();
 						if (src.equals(view)) {
 							// View Details
+							new FurkDownloadView(cDownload);
 						}
 						if(src.equals(retry)){
 							API_Download.addHash(cDownload.getInfoHash());
@@ -156,6 +158,10 @@ public class DownloadIcon extends JPanel implements
 
 		UtilBox.addMouseListenerToAll(this, new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1
+						&& e.getClickCount() == 2) {
+					new FurkDownloadView(cDownload);
+				}
 				if (e.getButton() == MouseEvent.BUTTON3)
 					new ContextMenu().show(e.getComponent(), e.getX(), e.getY());
 			}

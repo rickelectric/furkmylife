@@ -22,10 +22,10 @@ import javax.swing.tree.TreePath;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
-import rickelectric.furkmanager.models.NodeImageObserver;
 import rickelectric.furkmanager.network.api.API_TFile;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.icons.TFileTreeNode;
+import rickelectric.furkmanager.views.iconutil.NodeImageObserver;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class TFileTreePanel extends JPanel {

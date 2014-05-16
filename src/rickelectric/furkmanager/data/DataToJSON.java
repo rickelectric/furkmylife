@@ -36,7 +36,7 @@ public class DataToJSON {
 			root.put("status", "error");
 			root.put("error", "Limit is Zero");
 		}
-		ArrayList<APIObject> files = API_File.getAllCached();
+		ArrayList<FurkFile> files = API_File.getAllCached();
 		if(files==null) files = API_File.getAllFinished();
 		if (files == null){
 			root.put("status", "error");

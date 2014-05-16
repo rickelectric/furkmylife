@@ -13,9 +13,9 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
@@ -31,9 +31,10 @@ import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Main_FileView;
+import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 
-public class FileIcon extends JPanel implements Comparable<FileIcon> {
+public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -67,6 +68,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 
 	private int mode;
 	private JLabel label_loading;
+	private JFadeLabel num;
 	
 	private void parentRefresh(){
 		Container parent = thisPanel;
@@ -161,21 +163,34 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 				FurkFile cfFile=(FurkFile)cFile;
 				
 				if(cfFile.getDeletedReason()==null||cfFile.getDeletedReason().equals("")){
+					//Not In My Recycle Bin
 					add(view);
+					
+					if(!cfFile.isLinked()) //Not In My Files 
+						add(add);
+					
 					add(fview);
-					
-					if(!cfFile.isLinked()) add(add);
-					
 					add(cp);
 					
 					if(cfFile.getUrlPage()==null||cfFile.getUrlPage().length()<4)
 						fview.setEnabled(false);
 					
-					if (cfFile.isReady()) add(download);
-					if(cfFile.isLinked()) add(recycle);
+					if (cfFile.isReady()) //Ready For Download
+						add(download);
+					
+					if(cfFile.isLinked()) //In My Files
+						add(recycle);
 				}
 				else{
-					add(add);
+					//In Recycle Bin
+					if(((FurkFile) cFile).isReady()){ //File Not Yet Purged
+						add.setText("Restore");
+						add(add);
+					}
+					else{ //Not Ready -- Needs To Be Downloaded
+						add_dl.setText("Re-Download");
+						add(add_dl);
+					}
 					add(delete);
 				}
 			} else {
@@ -222,6 +237,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 								"File '" + cFile.getName()+ "' Added To My Files",
 								null);
 							if(mode==WIDE_MODE){
+								((FurkFile) cFile).setLinked(true);
 								check_linked.setSelected(true);
 							}
 							parentRefresh();
@@ -297,7 +313,10 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 			t.start();
 		}
 	}
-	
+
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public FileIcon(APIObject o){
 		this.cFile = o;
 		this.mode = WIDE_MODE;
@@ -330,6 +349,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 	}
 	
 	public FileIcon(FurkFile o){
+		setOpaque(true);
 		this.cFile = o;
 		this.mode = SMALL_MODE;
 		this.thisPanel = this;
@@ -358,45 +378,18 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 				}
 			}
 		});
+		
+		num = new JFadeLabel();
+		setLayer(num, 12);
+		num.setAlpha(0.6f);
+		num.setHorizontalAlignment(SwingConstants.CENTER);
+		num.setFont(new Font("Tahoma", Font.BOLD, 24));
+		num.setBounds(12, 12, 50, 50);
+		add(num);
 	}
-
-	public FileIcon(int mode, APIObject o) {
-		this.cFile = o;
-		this.mode = mode;
-		this.thisPanel = this;
-
-		setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-
-		bgc = UtilBox.getColor(Math.abs(o.getInfoHash().hashCode()));
-		setBackground(bgc);
-
-		if (mode == SMALL_MODE) {
-			initSmallMode(o);
-			// return;
-		} else {
-			initWideMode(o);
-		}
-
-		UtilBox.addMouseListenerToAll(this, new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent evt) {
-				if (evt.getButton() == MouseEvent.BUTTON1
-						&& evt.getClickCount() == 2) {
-					if (cFile instanceof FurkFile)
-						if(
-							((FurkFile) cFile).getDeletedReason()==null||
-							((FurkFile) cFile).getDeletedReason().equals("")
-						)//Not Deleted
-						new FurkFileView((FurkFile) cFile);
-				}
-				if (evt.getButton() == MouseEvent.BUTTON3
-						&& evt.getClickCount() == 1) {
-					ContextMenu c = new ContextMenu();
-					c.show(evt.getComponent(), evt.getX(), evt.getY());
-				}
-			}
-		});
-
+	
+	public void num(int num){
+		this.num.setText(""+num);
 	}
 
 	public void initSmallMode(final APIObject o) {
@@ -404,11 +397,13 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 			return;
 		}
 		setPreferredSize(new Dimension(145, 120));
+		setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		setLayout(null);
 
 		final FurkFile f = (FurkFile) o;
 
 		icon_type = new JLabel();
+		setLayer(icon_type, 10);
 		icon_type.setHorizontalAlignment(SwingConstants.CENTER);
 		String ty = f.getType();
 		ImageIcon icon = null;
@@ -460,7 +455,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 
 	public void initWideMode(final APIObject o) {
 
-		setPreferredSize(new Dimension(510, 99));
+		setPreferredSize(new Dimension(506, 88));
 		setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		setLayout(null);
 
@@ -474,38 +469,40 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 		add(input_name);
 
 		input_size = new JLabel();
+		input_size.setFont(new Font("Dialog", Font.BOLD, 12));
 		input_size
 				.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		input_size.setText(o.getSizeString());
-		input_size.setBounds(78, 67, 96, 20);
+		input_size.setBounds(78, 57, 125, 20);
 		add(input_size);
 
 		input_hash = new JLabel();
+		input_hash.setFont(new Font("Dialog", Font.BOLD, 12));
 		input_hash
 				.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		input_hash.setText(o.getInfoHash());
-		input_hash.setBounds(78, 40, 311, 20);
+		input_hash.setBounds(78, 35, 311, 20);
 		add(input_hash);
 
 		label_name = new JLabel("Name:");
-		label_name.setBounds(12, 14, 38, 16);
+		label_name.setBounds(12, 14, 64, 16);
 		add(label_name);
 
 		label_hash = new JLabel("Info Hash:");
-		label_hash.setBounds(12, 42, 64, 16);
+		label_hash.setBounds(12, 37, 64, 16);
 		add(label_hash);
 
 		label_size = new JLabel("Size: ");
-		label_size.setBounds(12, 69, 55, 16);
+		label_size.setBounds(12, 59, 64, 16);
 		add(label_size);
 
 		label_loading = new JLabel();
-		label_loading.setBounds(394, 40, 48, 48);
+		label_loading.setBounds(393, 35, 48, 48);
 		label_loading.setIcon(new ImageIcon(FurkManager.class.getResource("img/ajax-loader-48.gif")));
 		label_loading.setVisible(false);
 		add(label_loading);
 
-		if (o instanceof FurkFile) {
+		if (/*o instanceof FurkFile*/true) {
 
 			label_furkview = new JLabel();
 			label_furkview.setToolTipText("Double Click To View On Furk.net");
@@ -530,7 +527,7 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 			});
 			label_furkview.setIcon(new ImageIcon(FurkManager.class.getResource("img/fr-16.png")));
 			label_furkview.setBorder(new BevelBorder(BevelBorder.RAISED));
-			label_furkview.setBounds(453, 67, 20, 20);
+			label_furkview.setBounds(450, 35, 20, 20);
 			add(label_furkview);
 
 			label_open = new JLabel();
@@ -555,12 +552,12 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 			label_open.setIcon(new ImageIcon(getClass().getResource(
 					"/javax/swing/plaf/metal/icons/ocean/maximize.gif")));
 			label_open.setBorder(new BevelBorder(BevelBorder.RAISED));
-			label_open.setBounds(478, 67, 20, 20);
+			label_open.setBounds(476, 35, 20, 20);
 			add(label_open);
 
 			check_linked = new JCheckBox("In My Files");
 			check_linked.setOpaque(false);
-			check_linked.setBounds(188, 67, 115, 20);
+			check_linked.setBounds(208, 56, 83, 20);
 			check_linked.setSelected(((FurkFile) o).isLinked());
 			check_linked.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -568,6 +565,17 @@ public class FileIcon extends JPanel implements Comparable<FileIcon> {
 				}
 			});
 			add(check_linked);
+			
+			check_ready = new JCheckBox("Ready");
+			check_ready.setOpaque(false);
+			check_ready.setBounds(306, 56, 83, 20);
+			check_ready.setSelected(((FurkFile) o).isReady());
+			check_ready.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					check_ready.setSelected(((FurkFile) o).isReady());
+				}
+			});
+			add(check_ready);
 		}
 	}
 

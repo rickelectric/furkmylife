@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.models;
+package rickelectric.furkmanager.views.iconutil;
 
 import java.awt.Image;
 import java.awt.Rectangle;

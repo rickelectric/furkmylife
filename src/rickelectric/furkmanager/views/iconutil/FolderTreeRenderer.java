@@ -11,7 +11,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
-import rickelectric.furkmanager.models.NodeImageObserver;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FolderTreeNode;
 import rickelectric.furkmanager.views.icons.TFileTreeNode;

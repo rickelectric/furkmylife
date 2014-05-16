@@ -226,7 +226,6 @@ public class LoginWindow extends AppFrameClass {
 		contentPane.add(btn_settings);
 		
 		addConsole();
-		
 	}
 	
 	boolean loggingIn=false;
@@ -236,9 +235,9 @@ public class LoginWindow extends AppFrameClass {
 		public void run(){
 			if(loggingIn) return;
 			String key=input_apikey.getText();
-			if(key.length()==0||key.contains(" ")){
+			if(key.length()==0||key.length()<39||key.contains(" ")){
 				setStatus("Blank Or Invalid API Key");
-				return;//Key may not contain spaces
+				return;
 			}
 			loggingIn=true;
 			furkAnimate(4);
@@ -247,9 +246,9 @@ public class LoginWindow extends AppFrameClass {
 				if(keyPing){
 					APIBridge.initialize(key);
 					API_UserData.loadUserData();
-					dispose();
-					loggingIn=false;
 					FurkManager.appRun();
+					loggingIn=false;
+					dispose();
 				}
 				else{
 					throw new Exception("Invalid API Key");

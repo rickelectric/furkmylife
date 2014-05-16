@@ -1,8 +1,6 @@
 package rickelectric.furkmanager.views.panels;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -34,7 +32,7 @@ import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
-public class SearchPanel extends JPanel implements ActionListener {
+public class SearchPanel extends JPanel implements ActionListener,Runnable {
 	private static final long serialVersionUID = 1L;
 
 	public static final int FILESEARCH = 100, FURKSEARCH = 101,
@@ -145,10 +143,6 @@ public class SearchPanel extends JPanel implements ActionListener {
 		mod_no.setBounds(219, 21, 68, 24);
 		panel.add(mod_no);
 
-		JLabel lblSearch = new JLabel("Search");
-		lblSearch.setBounds(10, 12, 46, 14);
-		// add(lblSearch);
-
 		resultScroller = new JScrollPane(
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -162,40 +156,41 @@ public class SearchPanel extends JPanel implements ActionListener {
 		resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		resultPanel.setBackground(getBackground());
 		resultScroller.setViewportView(resultPanel);
+		
+	}
+	
+	public void run() {
+		try {
+			resultPanel.removeAll();
+			resultPanel.setBounds(10, 115, 574, 42);
+
+			int numResults = furkSearch();
+			if (numResults <= 2) {
+				int delnum = 2 - numResults;
+				int structsize = (delnum * 88) - 5;
+				resultPanel.add(Box.createVerticalStrut(structsize));
+				resultPanel.setLocation(0, 0);
+				resultScroller.repaint();
+			}
+			if (numResults > 0) {
+				setStatus("Displaying " + numResults + " Found Files");
+				resultScroller.getVerticalScrollBar()
+						.setBlockIncrement(200);
+				resultScroller.getVerticalScrollBar().setUnitIncrement(
+						50);
+			} else
+				setStatus("No Files Found.");
+			isSearching(false);
+		} catch (Exception e) {
+			isSearching(false);
+		}
 	}
 
 	private void search() {
 		if (isSearching)
 			return;
 		isSearching(true);
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					resultPanel.removeAll();
-					resultPanel.setBounds(10, 115, 574, 42);
-
-					int numResults = furkSearch();
-					if (numResults <= 2) {
-						int delnum = 2 - numResults;
-						int structsize = (delnum * 99) - 5;
-						resultPanel.add(Box.createVerticalStrut(structsize));
-						resultPanel.setLocation(0, 0);
-						resultScroller.repaint();
-					}
-					if (numResults > 0) {
-						setStatus("Displaying " + numResults + " Found Files");
-						resultScroller.getVerticalScrollBar()
-								.setBlockIncrement(200);
-						resultScroller.getVerticalScrollBar().setUnitIncrement(
-								50);
-					} else
-						setStatus("No Files Found.");
-					isSearching(false);
-				} catch (Exception e) {
-					isSearching(false);
-				}
-			}
-		}).start();
+		new Thread(this).start();
 	}
 
 	private void setStatus(String s) {
@@ -217,28 +212,15 @@ public class SearchPanel extends JPanel implements ActionListener {
 		else if (searchMode == FILESEARCH)
 			ffarray = API_File.find(txt);
 		for (APIObject o : ffarray) {
-			populateResultField(new APIObject[] { o }, true);
+			populateResultField(o, true);
 			numResults++;
 		}
 		return numResults;
 	}
 
-	private void populateResultField(APIObject[] o, boolean wide) {
-		JPanel pane;
-		if (wide)
-			pane = new FileIcon(FileIcon.WIDE_MODE, o[0]);
-		else {
-			pane = new JPanel();
-			pane.setLayout(new FlowLayout(FlowLayout.LEFT, 17, 3));
-			pane.setPreferredSize(new Dimension(510, 142));
-			int i = 0;
-			while (i < 3 && i < o.length && o[i] != null) {
-				pane.add(new FileIcon(FileIcon.SMALL_MODE, o[i]));
-				i++;
-			}
-			pane.setBackground(resultPanel.getBackground());
-		}
-
+	private void populateResultField(APIObject o, boolean wide) {
+		FileIcon pane = new FileIcon(o);
+		
 		resultPanel.add(pane);
 		resultPanel.add(Box.createVerticalStrut(5));
 	}

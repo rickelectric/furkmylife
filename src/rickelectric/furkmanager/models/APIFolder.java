@@ -8,6 +8,11 @@ import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.network.api.API_Label;
 
+/**
+ * A Folder construct that uses <b>FurkLabel</b>s to organize <b>FurkFile</b>s into folders. 
+ * @author Rick Lewis (Ionicle)
+ *
+ */
 public class APIFolder implements MoveableItem{
 	
 	private ArrayList<MoveableItem> files;
@@ -114,7 +119,7 @@ public class APIFolder implements MoveableItem{
 	public FurkLabel getLabel() {
 		return fsync;
 	}
-
+	
 	public boolean contains(MoveableItem obj){
 		for(MoveableItem f:files){
 			if(f.getID()!=null && obj.getID()!=null)
