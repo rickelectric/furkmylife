@@ -205,7 +205,7 @@ public class FurkManager {
 				load.setText("Launching...");
 			}catch(Exception e){
 				frame.dispose();
-				throw e;
+				throw new RuntimeException(e);
 			}
 			
 			mainWin();

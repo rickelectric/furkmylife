@@ -245,7 +245,6 @@ public class FurkFile extends APIObject implements MoveableItem{
 				+ isProtected + "]";
 	}
 
-	@Override
 	public int compareTo(Object o) {
 		if(o instanceof MoveableItem){
 			return getName().compareTo(((MoveableItem) o).getName());

@@ -29,7 +29,6 @@ public class ClientLink implements Runnable{
 		else if(type==ADD_TORRENT) text="torrent\r\n"+t;
 	}
 	
-	@Override
 	public void run(){
 		Socket socket = null;
 		PrintWriter out = null;

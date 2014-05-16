@@ -54,7 +54,6 @@ public class ImgRequest implements Comparable<Object>{
 		cVal=by;
 	}
 
-	@Override
 	public int compareTo(Object o) {
 		if(cVal==TIME){
 			if(o instanceof ImgRequest){

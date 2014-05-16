@@ -59,7 +59,6 @@ public class FurkTrayIcon {
 			MenuItem addDl = new MenuItem("Add Furk Download");
 			addDl.addActionListener(new ActionListener() {
 
-				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					new AddDownloadFrame().setVisible(true);
 				}
@@ -77,7 +76,6 @@ public class FurkTrayIcon {
 
 			MenuItem anim = new MenuItem("Test Loading Animation");
 			anim.addActionListener(new ActionListener() {
-				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					loading();
 					UtilBox.pause(2000);

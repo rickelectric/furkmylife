@@ -23,32 +23,26 @@ public class IconArray extends Observable implements List<FileIcon>{
 		notifyObservers();
 	}
 	
-	@Override
 	public int size() {
 		return icons.size();
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return icons.isEmpty();
 	}
 
-	@Override
 	public boolean contains(Object o) {
 		return icons.contains(o);
 	}
 
-	@Override
 	public Iterator<FileIcon> iterator() {
 		return icons.iterator();
 	}
 
-	@Override
 	public Object[] toArray() {
 		return icons.toArray();
 	}
 
-	@Override
 	public <T> T[] toArray(T[] a) {
 		return icons.toArray(a);
 	}

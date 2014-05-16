@@ -178,7 +178,7 @@ public class Main_UserView extends TranslucentPane {
 				String host=choice_host.getSelectedItem().toString();
 				String port=choice_port.getSelectedItem().toString();
 				String scheme=choice_scheme.getSelectedItem().toString();
-				int linkKey=(int)spinner_linkkey.getValue();
+				int linkKey=(Integer)spinner_linkkey.getValue();
 				
 				FurkUserData.User.dlHost=URI_Enums.URI_Host.eval(host);
 				FurkUserData.User.dlPort=URI_Enums.URI_Port.eval(port);
@@ -188,7 +188,7 @@ public class Main_UserView extends TranslucentPane {
 				if(check_noadult.isSelected()) FurkUserData.User.flags=URI_Enums.Prefs_Flags.MODERATED_FULL;
 				else FurkUserData.User.flags=URI_Enums.Prefs_Flags.NONE;
 				
-				SettingsManager.searchResultsPerPage((int)spinner_ppresults.getValue());
+				SettingsManager.searchResultsPerPage((Integer)spinner_ppresults.getValue());
 				
 				FurkUserData.User.save(new Runnable(){
 					public void run(){

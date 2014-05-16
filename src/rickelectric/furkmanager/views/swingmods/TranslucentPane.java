@@ -115,7 +115,6 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 
 	private Thread slidingThread = null;
 
-	@Override
 	public void setSlidingThread(Thread t) {
 		while (t.isAlive())
 			;
@@ -123,14 +122,12 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 		slidingThread = t;
 	}
 
-	@Override
 	public Thread getSlidingThread() {
 		return slidingThread;
 	}
 
 	Timer t;
 
-	@Override
 	public void setSlidingTimer(Timer t) {
 		this.t = t;
 

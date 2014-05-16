@@ -121,7 +121,6 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 
 		}
 
-		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
@@ -205,12 +204,10 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 		}
 	}
 
-	@Override
 	public JPopupMenu popupMenu() {
 		return new ContextMenu();
 	}
 
-	@Override
 	public void action() {
 		isAction = true;
 		action=true;
@@ -250,12 +247,10 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 		}).start();
 	}
 
-	@Override
 	public boolean draggable() {
 		return false;
 	}
 
-	@Override
 	public boolean droppable() {
 		return false;
 	}

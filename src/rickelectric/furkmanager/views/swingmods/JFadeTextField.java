@@ -77,13 +77,11 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 
 	private boolean isSliding;
 
-	@Override
 	public boolean isSliding() {
 		return t.isRunning();
 		//return isSliding;
 	}
 
-	@Override
 	public void setSliding(boolean b) {
 		isSliding = true;
 	}
@@ -189,19 +187,16 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 
 	private Thread slidingThread = null;
 
-	@Override
 	public void setSlidingThread(Thread t) {
 		slidingThread = t;
 	}
 
-	@Override
 	public Thread getSlidingThread() {
 		return slidingThread;
 	}
 
 	Timer t;
 
-	@Override
 	public void setSlidingTimer(Timer t) {
 		// TODO Auto-generated method stub
 		this.t = t;

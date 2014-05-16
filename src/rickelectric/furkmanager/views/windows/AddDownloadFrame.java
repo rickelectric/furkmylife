@@ -292,7 +292,9 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		APIObject o=new APIObject(name,hash,size);
 		input_name.setText(o.getName());
 		input_size.setText(o.getSizeString());
-		} catch (IllegalArgumentException | IOException e) {
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IOException e){
 			e.printStackTrace();
 		}
 		gLink=link;

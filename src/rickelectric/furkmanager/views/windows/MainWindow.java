@@ -329,7 +329,6 @@ public class MainWindow extends AppFrameClass{
 			mnHelp.add(mi_about);
 		}
 
-		@Override
 		public void actionPerformed(ActionEvent e){
 			Object src=e.getSource();
 			if(src.equals(mi_addfdownload)){

@@ -94,7 +94,6 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 
 	private Thread slidingThread = null;
 
-	@Override
 	public void setSlidingThread(Thread t) {
 		while (t.isAlive())
 			;
@@ -102,14 +101,12 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 		slidingThread = t;
 	}
 
-	@Override
 	public Thread getSlidingThread() {
 		return slidingThread;
 	}
 
 	private Timer t;
 
-	@Override
 	public void setSlidingTimer(Timer t) {
 		this.t = t;
 	}

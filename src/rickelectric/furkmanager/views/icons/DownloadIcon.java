@@ -320,7 +320,6 @@ public class DownloadIcon extends JPanel implements
 
 	}
 
-	@Override
 	public int compareTo(DownloadIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
 	}

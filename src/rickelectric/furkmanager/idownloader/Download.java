@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.xerces.impl.dv.util.Base64;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
@@ -180,7 +181,7 @@ public class Download extends Observable implements Runnable, Serializable {
 					SettingsManager.getProxyHost(),
 					Integer.parseInt(SettingsManager.getProxyPort()));
 			String encoded = new String(
-					new sun.misc.BASE64Encoder().encode(new String(
+					Base64.encode(new String(
 							SettingsManager.getProxyUser() + ":"
 									+ SettingsManager.getProxyPassword())
 							.getBytes()));
@@ -346,7 +347,6 @@ public class Download extends Observable implements Runnable, Serializable {
 			}
 		}
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src=e.getSource();
 			if(src==start||src==resume) resume();

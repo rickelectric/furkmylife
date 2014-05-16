@@ -217,7 +217,6 @@ public class Settings_ProxyPorts extends JPanel {
 	public void closeOnSave(final JFrame f) {
 		button_prox_save.addActionListener(new ActionListener(){
 
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				f.dispose();
 			}

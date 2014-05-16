@@ -113,7 +113,7 @@ public class ImgCacheViewer extends JFrame {
 		button_SaveNewCapacity = new JButton("Save New Capacity");
 		button_SaveNewCapacity.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0){
-				SettingsManager.numCachedImages((int)spinner_capacity.getValue());
+				SettingsManager.numCachedImages((Integer)spinner_capacity.getValue());
 				SettingsManager.save();
 			}
 		});
@@ -160,7 +160,6 @@ public class ImgCacheViewer extends JFrame {
 		
 		Thread action;
 
-		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if(action==null)
 			action=new Thread(new Runnable(){

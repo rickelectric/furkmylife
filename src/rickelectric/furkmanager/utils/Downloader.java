@@ -14,7 +14,6 @@ public class Downloader implements Runnable{
 	
 	Runnable term=new Runnable(){
 
-		@Override
 		public void run() {
 			
 		}

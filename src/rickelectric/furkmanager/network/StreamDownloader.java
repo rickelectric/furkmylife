@@ -34,6 +34,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.xerces.impl.dv.util.Base64;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.ImgRequest;
@@ -63,7 +64,7 @@ public class StreamDownloader {
 			if (SettingsManager.proxyEnabled()) {
 				client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
 				String encoded = new String(
-						new sun.misc.BASE64Encoder().encode(new String(
+						Base64.encode(new String(
 								SettingsManager.getProxyUser() + ":"
 										+ SettingsManager.getProxyPassword())
 								.getBytes()));
@@ -98,7 +99,7 @@ public class StreamDownloader {
 		if (SettingsManager.proxyEnabled()) {
 			client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
 			String encoded = new String(
-					new sun.misc.BASE64Encoder().encode(new String(
+					Base64.encode(new String(
 							SettingsManager.getProxyUser() + ":"
 									+ SettingsManager.getProxyPassword())
 							.getBytes()));
@@ -291,7 +292,7 @@ public class StreamDownloader {
 		if (SettingsManager.proxyEnabled()) {
 			client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
 			String encoded = new String(
-					new sun.misc.BASE64Encoder().encode(new String(
+					Base64.encode(new String(
 							SettingsManager.getProxyUser() + ":"
 									+ SettingsManager.getProxyPassword())
 							.getBytes()));
@@ -346,7 +347,7 @@ public class StreamDownloader {
 		if (SettingsManager.proxyEnabled()) {
 			client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
 			String encoded = new String(
-					new sun.misc.BASE64Encoder().encode(new String(
+					Base64.encode(new String(
 							SettingsManager.getProxyUser() + ":"
 									+ SettingsManager.getProxyPassword())
 							.getBytes()));

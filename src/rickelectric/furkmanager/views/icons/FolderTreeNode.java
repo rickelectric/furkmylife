@@ -87,7 +87,6 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 			
 		}
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object src=e.getSource();
 			if(src.equals(folder_new)){
@@ -149,12 +148,10 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 		}
 	}
 
-	@Override
 	public boolean draggable() {
 		return true;
 	}
 
-	@Override
 	public boolean droppable() {
 		return true;
 	}

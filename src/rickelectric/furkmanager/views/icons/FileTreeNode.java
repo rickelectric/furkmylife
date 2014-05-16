@@ -163,7 +163,6 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 			add(recycle);
 		}
 
-		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
@@ -248,7 +247,6 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		}
 	}
 
-	@Override
 	public boolean draggable() {
 		return true;
 	}

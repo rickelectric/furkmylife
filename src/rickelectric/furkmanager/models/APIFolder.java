@@ -60,7 +60,6 @@ public class APIFolder implements MoveableItem{
 		files.remove(f);
 	}
 
-	@Override
 	public String getName(){
 		return fsync.getName();
 	}

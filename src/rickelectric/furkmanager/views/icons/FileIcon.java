@@ -199,7 +199,6 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 
 		}
 
-		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
@@ -579,7 +578,6 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		}
 	}
 
-	@Override
 	public int compareTo(FileIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
 	}
