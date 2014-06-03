@@ -193,7 +193,9 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 							Runtime.getRuntime().exec(new String[]{
 								path,
 								"-d",
-								cFile.getUrlDl()
+								cFile.getUrlDl(),
+								"/p",
+								SettingsManager.getDownloadFolder()
 							});
 						}
 						if (src.equals(internal)) {

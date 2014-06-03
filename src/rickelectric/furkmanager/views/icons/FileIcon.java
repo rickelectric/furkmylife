@@ -257,8 +257,10 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 							String path=SettingsManager.idmPath();
 							Runtime.getRuntime().exec(new String[]{
 								path,
-								"-d",
-								((FurkFile)cFile).getUrlDl()
+								"/d",
+								((FurkFile)cFile).getUrlDl(),
+								"/p",
+								SettingsManager.getDownloadFolder()
 							});
 						}
 						if (src.equals(internal)) {
@@ -317,6 +319,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 	 * @wbp.parser.constructor
 	 */
 	public FileIcon(APIObject o){
+		setOpaque(true);
 		this.cFile = o;
 		this.mode = WIDE_MODE;
 		this.thisPanel = this;

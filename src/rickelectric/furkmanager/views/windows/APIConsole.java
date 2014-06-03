@@ -26,9 +26,8 @@ import javax.swing.border.TitledBorder;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.ConsoleWin;
 
-public class APIConsole extends JFrame implements ConsoleWin {
+public class APIConsole extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPane;

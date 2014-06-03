@@ -9,8 +9,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.DropMode;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -27,9 +26,11 @@ import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.iconutil.FolderTreeRenderer;
 import rickelectric.furkmanager.views.iconutil.FolderTreeTransferHandler;
+import rickelectric.furkmanager.views.swingmods.JFadeLabel;
+import rickelectric.furkmanager.views.swingmods.OpacEffects;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
-public class File_FolderView extends JPanel implements MouseListener,
+public class File_FolderView extends JLayeredPane implements MouseListener,
 		KeyListener {
 	private static final long serialVersionUID = 1L;
 	private static JTree folder_tree;
@@ -37,7 +38,7 @@ public class File_FolderView extends JPanel implements MouseListener,
 	private JScrollPane scroller;
 	private TransferHandler transferer;
 	private TreeCellRenderer renderer;
-	private JLabel loading;
+	private JFadeLabel loading;
 	private JPopupMenu menu;
 
 	public static JTree currTree() {
@@ -52,11 +53,14 @@ public class File_FolderView extends JPanel implements MouseListener,
 
 		add(scroller);
 
-		loading = new JLabel(
+		loading = new JFadeLabel(
 				new ImageIcon(
 						File_FolderView.class
 								.getResource("/rickelectric/furkmanager/img/ajax-loader.gif")));
-		loading.setBounds(132, 136, 54, 55);
+		loading.setAlpha(1.0f);
+		setLayer(loading, 10);
+		loading.setBounds(225, 137, 54, 55);
+		add(loading);
 
 		transferer = new FolderTreeTransferHandler();
 		renderer = new FolderTreeRenderer();
@@ -82,26 +86,37 @@ public class File_FolderView extends JPanel implements MouseListener,
 	public void refreshMyFolders(final boolean hardReload) {
 		thisRun = new Thread(new Runnable() {
 			public void run() {
-				scroller.setViewportView(loading);
-				
-				folder_tree = new JTree();
-				folder_tree.setModel(getTreeModel(hardReload));
-				
-				folder_tree.addMouseListener(File_FolderView.this);
-				folder_tree.addKeyListener(File_FolderView.this);
-
-				folder_tree.setDragEnabled(true);
-				folder_tree.setDropMode(DropMode.ON_OR_INSERT);
-
-				folder_tree.setTransferHandler(transferer);
-				folder_tree.setCellRenderer(renderer);
-
-				folder_tree.putClientProperty("JTree.lineStyle", "Angled");
-				folder_tree.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-				folder_tree.getSelectionModel().setSelectionMode(
-						TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-				scroller.setViewportView(folder_tree);
+				loading.setVisible(true);
+				loading.setAlpha(1.0f);
+				if(folder_tree!=null) folder_tree.setEnabled(false);
+				try{
+					JTree folder_tree = new JTree();
+					folder_tree.setModel(getTreeModel(hardReload));
+					
+					File_FolderView.folder_tree=folder_tree;
+					
+					folder_tree.addMouseListener(File_FolderView.this);
+					folder_tree.addKeyListener(File_FolderView.this);
+	
+					folder_tree.setDragEnabled(true);
+					folder_tree.setDropMode(DropMode.ON_OR_INSERT);
+	
+					folder_tree.setTransferHandler(transferer);
+					folder_tree.setCellRenderer(renderer);
+	
+					folder_tree.putClientProperty("JTree.lineStyle", "Angled");
+					folder_tree.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+					folder_tree.getSelectionModel().setSelectionMode(
+							TreeSelectionModel.SINGLE_TREE_SELECTION);
+	
+					OpacEffects.fadeOut(loading, 20);
+					scroller.setViewportView(folder_tree);
+					
+					folder_tree.requestFocus();
+				}catch(Exception e){
+					folder_tree.setEnabled(true);
+					OpacEffects.fadeOut(loading, 40);
+				}
 				repaint();
 			}
 		});

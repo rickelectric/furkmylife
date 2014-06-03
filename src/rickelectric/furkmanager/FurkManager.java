@@ -16,6 +16,7 @@ import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.network.InstanceConn;
 import rickelectric.furkmanager.network.RequestCache;
+import rickelectric.furkmanager.network.StreamDownloader;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.network.api.API_Label;
 import rickelectric.furkmanager.network.api.API_UserData;
@@ -24,7 +25,6 @@ import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.windows.APIConsole;
 import rickelectric.furkmanager.views.windows.AddDownloadFrame;
-import rickelectric.furkmanager.views.windows.FurkFileView;
 import rickelectric.furkmanager.views.windows.ImgCacheViewer;
 import rickelectric.furkmanager.views.windows.LoginWindow;
 import rickelectric.furkmanager.views.windows.MainWindow;
@@ -83,7 +83,8 @@ public class FurkManager {
 	    } catch (Exception evt) {}
 	}
 	
-	public static void loading() {
+	public static boolean loading() {
+		if(frame!=null && frame.isShowing()) return false;
 		LAF(1);
 		frame = new JDialog();
 		frame.setLayout(null);
@@ -93,11 +94,7 @@ public class FurkManager {
 		frame.setIconImage(new ImageIcon(FurkManager.class
 				.getResource("img/fr.png")).getImage());
 		frame.setResizable(false);
-		frame.addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent e){
-				exit();
-			}
-		});
+		
 		load = new JLabel("Loading...");
 		load.setBounds(20, 10, 375, 20);
 		load.setHorizontalAlignment(JLabel.CENTER);
@@ -112,10 +109,16 @@ public class FurkManager {
 		frame.add(bLoad);
 		frame.setVisible(!tray);
 		LAF(0);
+		return true;
 	}
 
 	public static void main(String[] args) {
 		loading();
+		frame.addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				exit();
+			}
+		});
 		
 		int len = args.length;
 		int iter = 0;
@@ -188,23 +191,34 @@ public class FurkManager {
 			login();
 		else {
 			try{
-				loading();
-				frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-				load.setText("Loading User Data...");
-				if(!API_UserData.isLoaded())
-					API_UserData.loadUserData();
-				load.setText("Loading Files...");
-				if(API_File.getAllCached()==null)
-					API_File.getAllFinished();
-				load.setText("Loading Folders...");
-				if(API_Label.getAllCached()==null){
-					API_Label.getAll();
-					load.setText("Folder Manager Initializing...");
-					APIFolderManager.init(API_Label.root());
+				if(loading()){
+					frame.setTitle("FurkManager Loading...");
+					frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+					frame.addWindowListener(new WindowAdapter(){
+						public void windowClosing(WindowEvent e){
+							load.setText("Aborting...");
+							StreamDownloader.interrupt();
+						}
+					});
+					load.setText("Loading User Data...");
+					if(!API_UserData.isLoaded())
+						API_UserData.loadUserData();
+					load.setText("Loading Files...");
+					if(API_File.getAllCached()==null)
+						API_File.getAllFinished();
+					load.setText("Loading Folders...");
+					if(API_Label.getAllCached()==null){
+						API_Label.getAll();
+						load.setText("Folder Manager Initializing...");
+						APIFolderManager.init(API_Label.root());
+					}
+					load.setText("Launching...");
 				}
-				load.setText("Launching...");
 			}catch(Exception e){
 				frame.dispose();
+				if(load.getText().equals("Aborting...")){
+					throw new RuntimeException("Aborted By User");
+				}
 				throw new RuntimeException(e);
 			}
 			
@@ -293,7 +307,7 @@ public class FurkManager {
 					showImgCache(false);
 					RequestCache.ImageR.flush();
 
-					FurkFileView.disposeAll();
+					//FurkFileView.disposeAll();
 
 					if (dwm != null)
 						DownloadManager.persist();
@@ -329,6 +343,10 @@ public class FurkManager {
 
 	public static void log(String str) {
 		System.err.println(str);
+	}
+
+	public static MainWindow getMainWindow() {
+		return mWin;
 	}
 
 }

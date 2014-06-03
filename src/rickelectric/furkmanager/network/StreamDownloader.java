@@ -35,12 +35,13 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.xerces.impl.dv.util.Base64;
-import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.ImgRequest;
 import rickelectric.furkmanager.utils.SettingsManager;
 
 public class StreamDownloader {
+	
+	private static boolean interrupt=false;
 
 	public static String fileToString(String filepath) throws IOException {
 		FileReader f = new FileReader(filepath);
@@ -61,7 +62,7 @@ public class StreamDownloader {
 		try {
 			
 			PostMethod filePost = new PostMethod(fileURL);
-			if (SettingsManager.proxyEnabled()) {
+			if (SettingsManager.proxyEnabled()){
 				client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
 				String encoded = new String(
 						Base64.encode(new String(
@@ -72,14 +73,20 @@ public class StreamDownloader {
 				filePost.addRequestHeader("Proxy-Authorization", "Basic "
 						+ encoded);
 			}
-
+			
 			filePost.setRequestEntity(new MultipartRequestEntity(parts,
 					filePost.getParams()));
-
-			int response = client.executeMethod(filePost);
-			System.out.println("Response : " + response);
-			JSONObject o = new JSONObject(filePost.getResponseBodyAsString());
-			return o.toString(4);
+			if(interrupt){
+				interrupt=false;
+				return null;
+			}
+			client.executeMethod(filePost);
+			if(interrupt){
+				filePost.abort();
+				interrupt=false;
+				return null;
+			}
+			return filePost.getResponseBodyAsString();
 		}
 		catch(HttpException e){e.printStackTrace();}
 		catch(IOException e){e.printStackTrace();}
@@ -107,15 +114,27 @@ public class StreamDownloader {
 			get.addRequestHeader("Proxy-Authorization", "Basic "
 					+ encoded);
 		}
-
+		if(interrupt){
+			interrupt=false;
+			return null;
+		}
 		try {
 			client.executeMethod(get);
+			if(interrupt){
+				get.abort();
+				interrupt=false;
+				return null;
+			}
 		} catch (ConnectException e) {
 			out.close();
 			throw new IOException("ConnectionException trying to GET "
 					+ fileURL, e);
 		}
-
+		if(interrupt){
+			interrupt=false;
+			return null;
+		}
+		
 		if (get.getStatusCode() < 200||get.getStatusCode()>299) {
 			out.close();
 			throw new FileNotFoundException("Server returned "
@@ -123,10 +142,19 @@ public class StreamDownloader {
 		}
 		BufferedInputStream bis = new BufferedInputStream(
 				get.getResponseBodyAsStream());
-
+		if(interrupt){
+			interrupt=false;
+			return null;
+		}
+		
 		byte[] b = new byte[batchWriteSize];
 		int bytesRead = bis.read(b, 0, batchWriteSize);
 		while (bytesRead != -1) {
+			if(interrupt){
+				out.close();
+				interrupt=false;
+				return null;
+			}
 			out.write(b, 0, bytesRead);
 			bytesRead = bis.read(b, 0, batchWriteSize);
 		}
@@ -161,6 +189,10 @@ public class StreamDownloader {
 		con.setRequestMethod("POST");
 		con.setRequestProperty("User-Agent", "Mozilla/5.0");
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		if(interrupt){
+			interrupt=false;
+			return null;
+		}
 		/*
 		if (SettingsManager.proxyEnabled()) {
 			String encoded = new String(
@@ -177,19 +209,33 @@ public class StreamDownloader {
 		// Send post request
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		if(interrupt){
+			interrupt=false;
+			return null;
+		}
 		wr.writeBytes(urli[1]);
 		wr.flush();
 		wr.close();
 		int responseCode = con.getResponseCode();
 		if (responseCode < 200||responseCode>299)
 			throw new Exception("Server Error: Code " + responseCode);
-
+		
+		if(interrupt){
+			interrupt=false;
+			return null;
+		}
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				con.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
 
 		while ((inputLine = in.readLine()) != null) {
+			if(interrupt){
+				in.close();
+				interrupt=false;
+				return null;
+			}
 			response.append(inputLine);
 			response.append("\n");
 		}
@@ -382,5 +428,9 @@ public class StreamDownloader {
 
 		out.flush();
 		out.close();
+	}
+
+	public static void interrupt() {
+		interrupt=true;
 	}
 }

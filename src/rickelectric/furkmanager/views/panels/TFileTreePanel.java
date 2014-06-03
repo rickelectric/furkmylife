@@ -23,10 +23,10 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.network.api.API_TFile;
+import rickelectric.furkmanager.views.Statable;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.icons.TFileTreeNode;
 import rickelectric.furkmanager.views.iconutil.NodeImageObserver;
-import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class TFileTreePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -205,7 +205,7 @@ public class TFileTreePanel extends JPanel {
 			FurkTFile f = (FurkTFile) src.getUserObject();
 			String s = "[size=" + f.getSizeString() + ", type="
 					+ f.getContentType().split("/")[0] + "]";
-			((AppFrameClass) getTopLevelAncestor()).setStatus(s);
+			((Statable) getTopLevelAncestor()).setStatus(s);
 			if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
 				src.action();
 			} else if (e.getButton() == MouseEvent.BUTTON3

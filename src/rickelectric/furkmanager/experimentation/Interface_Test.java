@@ -1,4 +1,4 @@
-package org.rickelectric.furkmanager.experimentation;
+package rickelectric.furkmanager.beta;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -18,14 +18,18 @@ import javax.swing.ScrollPaneConstants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.rickelectric.furkmanager.FurkManager;
-import org.rickelectric.furkmanager.models.APIObject;
-import org.rickelectric.furkmanager.models.FurkFile;
-import org.rickelectric.furkmanager.network.API;
-import org.rickelectric.furkmanager.network.APIBridge;
-import org.rickelectric.furkmanager.utils.ThreadPool;
-import org.rickelectric.furkmanager.utils.UtilBox;
-import org.rickelectric.furkmanager.views.windows.FurkFileView;
+
+import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.models.APIObject;
+import rickelectric.furkmanager.models.FurkFile;
+import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.RequestCache;
+import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.API_File;
+import rickelectric.furkmanager.utils.SettingsManager;
+import rickelectric.furkmanager.utils.ThreadPool;
+import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.furkmanager.views.windows.FurkFileView;
 
 
 public class Interface_Test {
@@ -40,11 +44,17 @@ public class Interface_Test {
 		EventQueue.invokeLater(new Runnable() {
 			public void run(){
 				try{
-					APIBridge.initialize("5323228d687ed9f7f1bdf9ce87050a1fa672e485");
-					/*if(!APIBridge.ping()){
+					ThreadPool.init();
+					SettingsManager.init();
+					UtilBox.init();
+					RequestCache.init();
+					
+					API.init("5323228d687ed9f7f1bdf9ce87050a1fa672e485");
+					
+					if(!APIBridge.ping()){
 						JOptionPane.showMessageDialog(null, "Furk Is Not Accessible");
 						return;
-					}*/
+					}
 					new Interface_Test();
 					Interface_Test.frmTestWindow.setVisible(true);
 					Interface_Test.frmTestWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -99,17 +109,17 @@ public class Interface_Test {
 		});
 		frmTestWindow.getContentPane().setLayout(null);
 		
-		ImageIcon fr=new ImageIcon("img/fr.png");
+		ImageIcon fr=new ImageIcon(FurkManager.class.getResource("img/fr.png"));
 		frmTestWindow.setIconImage(fr.getImage());
 		
 		JLabel label = new JLabel("");
-		label.setIcon(new ImageIcon("img/furk_logo.png"));
+		label.setIcon(new ImageIcon(FurkManager.class.getResource("img/furk_logo.png")));
 		label.setBounds(10, 11, 250, 69);
 		frmTestWindow.getContentPane().add(label);
 		
 		JLabel label_1 = new JLabel("");
 		label_1.setBounds(470, 11, 69, 69);
-		label_1.setIcon(new ImageIcon("img/rls-68x68.png"));
+		label_1.setIcon(new ImageIcon(FurkManager.class.getResource("img/rls-68x68.png")));
 		frmTestWindow.getContentPane().add(label_1);
 		
 		final JButton btnGetFiles = new JButton("Get File(s)");
@@ -174,7 +184,7 @@ public class Interface_Test {
 							JSONObject js=new JSONObject(json);
 							if(js.getString("status").equals("ok")){
 								JSONArray files=js.getJSONArray("files");
-								ArrayList<APIObject> fs=API.File.jsonFiles(files);
+								ArrayList<APIObject> fs=API_File.jsonFiles(files);
 								if(fs.size()>0){
 									APIObject o=fs.get(0);
 									if(o instanceof FurkFile){

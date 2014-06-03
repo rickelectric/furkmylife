@@ -201,18 +201,17 @@ public class OpacEffects {
 					return;
 				}
 				o.setAlpha(o.getAlpha()+0.01f);
-				
 			}
 		}).start();
 	}
 
 	public static void fadeOut(final Opacible o, int speed) {
-		if(o.isVisible()||o.getAlpha()!=0) return;
+		if(!o.isVisible()||o.getAlpha()==0) return;
 		int delay=100/speed;
 		
 		new Timer(delay,new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				if(o.isVisible()==false||o.getAlpha()==0){
+				if(!o.isVisible()||o.getAlpha()==0){
 					((Timer)e.getSource()).stop();
 					return;
 				}

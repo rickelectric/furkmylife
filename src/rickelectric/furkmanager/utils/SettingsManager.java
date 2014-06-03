@@ -101,7 +101,7 @@ public class SettingsManager implements Serializable {
 		proxyPassword="";
 		
 		askFolderOnDownload=true;
-		downloadFolder=System.getProperty("user.home");
+		downloadFolder=System.getProperty("user.home")+"/FurkDownloads";
 		
 		autoLogin=false;
 		apiKey="";

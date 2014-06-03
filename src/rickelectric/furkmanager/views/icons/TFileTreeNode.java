@@ -165,7 +165,9 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 							Runtime.getRuntime().exec(new String[]{
 								path,
 								"-d",
-								(tfile).getUrlDl()
+								(tfile).getUrlDl(),
+								"/p",
+								SettingsManager.getDownloadFolder()
 							});
 						}
 						if (src.equals(internal)) {
