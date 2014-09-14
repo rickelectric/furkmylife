@@ -4,12 +4,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.FurkUserData;
+import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.utils.SettingsManager;
+import rickelectric.furkmanager.utils.UtilBox;
 
 public class API_UserData extends API {
 
+	private static LoginModel currentLogin;
 	private static boolean isLoaded = false;
 
 	public static void loadUserData() {
@@ -75,6 +79,39 @@ public class API_UserData extends API {
 
 	public static boolean isLoaded() {
 		return isLoaded;
+	}
+
+	public static boolean login(LoginModel login) {
+		boolean isValid=false;
+		switch(login.mode()){
+		case LoginModel.APIKEY:
+			isValid=APIBridge.ping(login.apiKey());
+			if(isValid){
+				API.init(login.apiKey());
+			}
+			break;
+		case LoginModel.CREDENTIALS:
+			isValid=APIBridge.userLogin(login.username(), UtilBox.charToString(login.password()));
+			if(isValid){
+				login.setApiKey(API.key());
+			}
+			break;
+		default:
+			return false;
+		}
+		if(isValid){
+			if(login.save()){
+				SettingsManager.loginModel(login);
+				currentLogin=login;
+				SettingsManager.save();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public static LoginModel currentLoginModel() {
+		return currentLogin;
 	}
 
 }

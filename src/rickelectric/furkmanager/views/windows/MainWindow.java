@@ -401,4 +401,8 @@ public class MainWindow extends AppFrameClass{
 			}
 		}).start();;
 	}
+	
+	public void settings() {
+		changeViewSection(4);
+	}
 }

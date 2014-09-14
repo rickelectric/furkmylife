@@ -1,14 +1,6 @@
 package rickelectric.furkmanager;
 
-import java.awt.Color;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
 import rickelectric.furkmanager.idownloader.DownloadManager;
@@ -23,6 +15,8 @@ import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.furkmanager.views.FMTrayBox;
+import rickelectric.furkmanager.views.Splash;
 import rickelectric.furkmanager.views.windows.APIConsole;
 import rickelectric.furkmanager.views.windows.AddDownloadFrame;
 import rickelectric.furkmanager.views.windows.ImgCacheViewer;
@@ -34,16 +28,17 @@ public class FurkManager {
 	private static boolean tray = false;
 	private static String addString = null;
 
+	private static FurkTrayIcon trayIcon = null;
+	private static FMTrayBox trayBox = null;
+	
 	private static LoginWindow lWin = null;
-	private static FurkTrayIcon fIcon = null;
 	private static MainWindow mWin = null;
 	private static DownloadManager dwm = null;
 
 	private static APIConsole console = null;
 	private static ImgCacheViewer cache = null;
 
-	private static JDialog frame;
-	private static JLabel load;
+	private static Splash splash;
 
 	private static enum AlertType {
 		MESSAGE, WARNING, ERROR, INFO
@@ -55,23 +50,23 @@ public class FurkManager {
 
 	public static void trayAlert(AlertType type, String title, String msg,
 			Runnable action) {
-		if (fIcon == null)
+		if (trayIcon == null)
 			return;
 		if (type == null)
 			return;
 		if (type == TRAY_ERROR)
-			fIcon.popupError(title, msg, action);
+			trayIcon.popupError(title, msg, action);
 		else if (type == TRAY_WARNING)
-			fIcon.popupWarning(title, msg, action);
+			trayIcon.popupWarning(title, msg, action);
 		else if (type == TRAY_INFO)
-			fIcon.popupInfo(title, msg, action);
+			trayIcon.popupInfo(title, msg, action);
 		else
-			fIcon.popupMessage(title, msg, action);
+			trayIcon.popupMessage(title, msg, action);
 	}
 
 	public static void alerts(String s) {
-		if (fIcon != null)
-			fIcon.popupMessage("Alert", s, null);
+		if (trayIcon != null)
+			trayIcon.popupMessage("Alert", s, null);
 		else
 			JOptionPane.showMessageDialog(null, s);
 	}
@@ -79,47 +74,40 @@ public class FurkManager {
 	public static void LAF(int i){
 		try {
 			if(i==0) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			else UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			else if(i==1) UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			else if(i==2) UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 	    } catch (Exception evt) {}
 	}
 	
-	public static boolean loading() {
-		if(frame!=null && frame.isShowing()) return false;
-		LAF(1);
-		frame = new JDialog();
-		frame.setLayout(null);
-		frame.setSize(420, 100);
-		frame.setLocationRelativeTo(null);
-		frame.setTitle("FurkManager Starting Up...");
-		frame.setIconImage(new ImageIcon(FurkManager.class
-				.getResource("img/fr.png")).getImage());
-		frame.setResizable(false);
-		
-		load = new JLabel("Loading...");
-		load.setBounds(20, 10, 375, 20);
-		load.setHorizontalAlignment(JLabel.CENTER);
-		frame.add(load);
-		JProgressBar bLoad = new JProgressBar();
-		bLoad.setBounds(20, 40, 375, 20);
-		bLoad.setForeground(Color.BLUE);
-		bLoad.setOpaque(false);// setBackground(Color.GRAY);
-		bLoad.setStringPainted(true);
-		bLoad.setString("Please Wait...");
-		bLoad.setIndeterminate(true);
-		frame.add(bLoad);
-		frame.setVisible(!tray);
+	public static boolean loadingSplash(boolean btns){
+		if(splash!=null && splash.isShowing()){
+			return false;
+		}
+		LAF(2);
+		splash=new Splash();
+		splash.showClose(btns);
+		splash.setVisible(true);
 		LAF(0);
 		return true;
 	}
-
+	
 	public static void main(String[] args) {
-		loading();
-		frame.addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent e){
+		//Show Loading Splash, Exit Application On Close
+		loadingSplash(true);
+		splash.onClose(new Runnable(){
+			public void run(){
+				splash.setVisible(false);
+				while (splash.isVisible()) {
+					splash.setText("Exiting...");
+					try {
+						Thread.sleep(100);
+					} catch (Exception e) {}
+				}
 				exit();
 			}
 		});
 		
+		//Parse Arguments
 		int len = args.length;
 		int iter = 0;
 		while (iter < len) {
@@ -131,10 +119,8 @@ public class FurkManager {
 			}
 			iter++;
 		}
-
 		
-
-		InstanceConn ic;
+		
 		ThreadPool.init();
 		SettingsManager.init();
 
@@ -142,36 +128,39 @@ public class FurkManager {
 		RequestCache.init();
 
 		try {
-			load.setText("Initializing...");
-			ic = new InstanceConn();
-			load.setText("Initialization Complete");
+			splash.setText("Initializing...");
+			InstanceConn ic = new InstanceConn();
+			splash.setText("Initialization Complete");
 			if (!ic.appStart()) {
 				if (addString != null) {
-					load.setText("Opening Torrent...");
+					splash.setText("Opening Torrent...");
 					ic.transmit(addString);
 					addString = null;
 				}
-				load.setText("Restoring FurkManager...");
-				frame.dispose();
+				splash.setText("Restoring FurkManager...");
+				splash.setVisible(false);
 				return;
 			}
 		} catch (InterruptedException e) {
-			load.setText("Fatal Error. Exiting...");
+			splash.setText("Fatal Error. Exiting...");
 			UtilBox.pause(800);
 			e.printStackTrace();
-			frame.dispose();
+			splash.setVisible(false);
 			return;
 		}
 
 		UtilBox.pause(400);
-		load.setText("Launching FurkManager...");
+		splash.setText("Launching FurkManager...");
 		UtilBox.pause(400);
+		trayBox=new FMTrayBox();
+		trayBox.setMoveable(true);
 		trayRun();
 		if (!tray) {
 			appRun();
 		}
 
-		frame.dispose();
+		splash.setVisible(false);
+		splash=null;
 	}
 
 	public static void login() {
@@ -184,6 +173,7 @@ public class FurkManager {
 		lWin = new LoginWindow();
 		lWin.setLocationRelativeTo(null);
 		lWin.setVisible(true);
+		lWin.toFront();
 	}
 
 	public static void appRun() {
@@ -191,39 +181,45 @@ public class FurkManager {
 			login();
 		else {
 			try{
-				if(loading()){
-					frame.setTitle("FurkManager Loading...");
-					frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-					frame.addWindowListener(new WindowAdapter(){
-						public void windowClosing(WindowEvent e){
-							load.setText("Aborting...");
+				if(loadingSplash(false)){
+					//frame.setTitle("FurkManager Loading...");
+					//frame.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+					splash.onClose(new Runnable(){
+						public void run(){
+							while (splash.isVisible()) {
+								splash.setText("Aborting...");
+								try {
+									Thread.sleep(100);
+								} catch (Exception e) {
+								}
+							}
 							StreamDownloader.interrupt();
 						}
 					});
-					load.setText("Loading User Data...");
+					splash.setText("Loading User Data...");
 					if(!API_UserData.isLoaded())
 						API_UserData.loadUserData();
-					load.setText("Loading Files...");
+					splash.setText("Loading Files...");
 					if(API_File.getAllCached()==null)
 						API_File.getAllFinished();
-					load.setText("Loading Folders...");
+					splash.setText("Loading Folders...");
 					if(API_Label.getAllCached()==null){
 						API_Label.getAll();
-						load.setText("Folder Manager Initializing...");
+						splash.setText("Folder Manager Initializing...");
 						APIFolderManager.init(API_Label.root());
 					}
-					load.setText("Launching...");
+					splash.setText("Launching...");
 				}
 			}catch(Exception e){
-				frame.dispose();
-				if(load.getText().equals("Aborting...")){
+				splash.setVisible(false);
+				if(splash.getText().equals("Aborting...")){
 					throw new RuntimeException("Aborted By User");
 				}
 				throw new RuntimeException(e);
 			}
-			
+			lWin.setVisible(false);
 			mainWin();
-			frame.dispose();
+			splash.setVisible(false);
 			
 			dwm = new DownloadManager();
 			dwm.setVisible(false);
@@ -249,11 +245,17 @@ public class FurkManager {
 	}
 
 	public static void trayRun() {
-		if (fIcon == null)
-			fIcon = new FurkTrayIcon();
+		if (trayIcon == null)
+			trayIcon = new FurkTrayIcon();
 		else
 			trayAlert(TRAY_INFO, "Minimized",
-					"I'm Here,\nMinimized To The Tray", null);
+					"Looking For Me? I'm Down Here.", null);
+	}
+	
+	public static void trayBox() {
+		if(!trayBox.isShowing())
+			trayBox.position();
+		trayBox.setVisible(!trayBox.isShowing());
 	}
 
 	public static void downloader(boolean b) {

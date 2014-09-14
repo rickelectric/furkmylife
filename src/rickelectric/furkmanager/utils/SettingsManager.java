@@ -8,32 +8,41 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.apache.xerces.impl.dv.util.Base64;
+
+import rickelectric.furkmanager.models.LoginModel;
+
 public class SettingsManager implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	private static float version=1.3f;
+
+	private static float version = 1.3f;
 
 	private static File sFile;
 	private static SettingsManager sMan;
+
+	private int localPort = 33250, webSockPort = 33251, timeout = 20000;
+	private String apiKey = "", username = "", password = "";
+
+	private String proxyHost = "", proxyPort = "", proxyUser = "",
+			proxyPassword = "";
+	private boolean proxyRequired = false;
 	
-	private int localPort=33250, webSockPort=33251, timeout = 20000;
-	private String apiKey="", username="", password="";
-	
-	private String proxyHost="",proxyPort="",proxyUser="",proxyPassword="";
-	private boolean proxyRequired=false;
-	
+	private boolean useTunnel = false;
+
 	private String downloadFolder;
 	private boolean askFolderOnDownload;
 
-	private int numCachedImages=50;
-	private int searchResultsPerPage=20;
-	
-	private int downloadBuffer=1024;
+	private int numCachedImages = 50;
+	private int searchResultsPerPage = 20;
 
-	private boolean autoLogin=false;
+	private int downloadBuffer = 1024;
+
+	private boolean autoLogin = false, userRemember = false, apiRemember = false;
 
 	private boolean idm;
 	private String idmPath;
+
+	private LoginModel loginModel;
 
 	public static void init() {
 		sFile = new File("settings.db");
@@ -42,31 +51,30 @@ public class SettingsManager implements Serializable {
 				sFile.createNewFile();
 				sMan = new SettingsManager();
 				save();
-			} catch (IOException e) {}
-		}
-		else{
-			sMan=load();
+			} catch (IOException e) {
+			}
+		} else {
+			sMan = load();
 		}
 	}
-	
-	private static SettingsManager load(){
-		try{
-			FileInputStream i=new FileInputStream(sFile);
-			ObjectInputStream ois=new ObjectInputStream(i);
-			float version=ois.readFloat();
-			if(version==SettingsManager.version){
-				SettingsManager s=(SettingsManager)ois.readObject();
+
+	private static SettingsManager load() {
+		try {
+			FileInputStream i = new FileInputStream(sFile);
+			ObjectInputStream ois = new ObjectInputStream(i);
+			float version = ois.readFloat();
+			if (version == SettingsManager.version) {
+				SettingsManager s = (SettingsManager) ois.readObject();
 				ois.close();
 				i.close();
 				return s;
-			}
-			else{
-				SettingsManager s=new SettingsManager();
+			} else {
+				SettingsManager s = new SettingsManager();
 				ois.close();
 				return s;
 			}
-		}catch(Exception e){
-			SettingsManager s=new SettingsManager();
+		} catch (Exception e) {
+			SettingsManager s = new SettingsManager();
 			return s;
 		}
 	}
@@ -74,67 +82,78 @@ public class SettingsManager implements Serializable {
 	public static boolean save() {
 		try {
 			FileOutputStream o = new FileOutputStream(sFile);
-			ObjectOutputStream oos=new ObjectOutputStream(o);
+			ObjectOutputStream oos = new ObjectOutputStream(o);
 			oos.writeFloat(version);
 			oos.writeObject(sMan);
 			oos.close();
 			return true;
-		} catch (Exception e) {return false;}
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
-	public SettingsManager(){
-		localPort=33250;
-		webSockPort=33251;
-		numCachedImages=50;
-		searchResultsPerPage=20;
-		timeout=20000;
-		downloadBuffer=1024;
+	public SettingsManager() {
+		localPort = 33250;
+		webSockPort = 33251;
+		numCachedImages = 50;
+		searchResultsPerPage = 20;
+		timeout = 20000;
+		downloadBuffer = 1024;
+
+		idmPath = checkPaths();
+		idm = true;
+		if (idmPath == null)
+			idm = false;
+
+		proxyRequired = false;
+		proxyHost = "";
+		proxyPort = "";
+		proxyUser = "";
+		proxyPassword = "";
+
+		askFolderOnDownload = true;
+		downloadFolder = System.getProperty("user.home") + "/FurkDownloads";
+
+		autoLogin = false;
+
+		apiRemember = false;
+		apiKey = "";
+
+		userRemember = false;
+		username = "";
+		password = "";
 		
-		idmPath=checkPaths();
-		idm=true;
-		if(idmPath==null) idm=false;
+		loginModel=null;
 		
-		proxyRequired=false;
-		proxyHost="";
-		proxyPort="";
-		proxyUser="";
-		proxyPassword="";
-		
-		askFolderOnDownload=true;
-		downloadFolder=System.getProperty("user.home")+"/FurkDownloads";
-		
-		autoLogin=false;
-		apiKey="";
-		username="";
-		password="";
+		useTunnel = false;
 	}
-	
+
 	private String checkPaths() {
-		String[] paths={
-			"C:\\Program Files\\Internet Download Manager\\IDMan.exe",
-			"C:\\Program Files (x86)\\Internet Download Manager\\IDMan.exe",
-		};
-		for(String s:paths){
-			File f=new File(s);
-			if(f.exists()) return s;
+		String[] paths = {
+				"C:\\Program Files\\Internet Download Manager\\IDMan.exe",
+				"C:\\Program Files (x86)\\Internet Download Manager\\IDMan.exe", };
+		for (String s : paths) {
+			File f = new File(s);
+			if (f.exists())
+				return s;
 		}
 		return null;
 	}
 
-	public static int timeout(){
+	public static int timeout() {
 		return sMan.timeout;
 	}
-	
-	public static void timeout(int t){
-		sMan.timeout=t;
+
+	public static void timeout(int t) {
+		sMan.timeout = t;
 	}
-	
-	public static int numCachedImages(){
+
+	public static int numCachedImages() {
 		return sMan.numCachedImages;
 	}
-	
-	public static void numCachedImages(int num){
-		sMan.numCachedImages=num;
+
+	public static void numCachedImages(int num) {
+		sMan.numCachedImages = num;
 	}
 
 	public static int getLocalPort() {
@@ -149,7 +168,8 @@ public class SettingsManager implements Serializable {
 		sMan.localPort = local;
 		sMan.webSockPort = webSock;
 	}
-
+	
+	
 	public static String getApiKey() {
 		return sMan.apiKey;
 	}
@@ -163,45 +183,49 @@ public class SettingsManager implements Serializable {
 	}
 
 	public static String getPassword() {
-		return sMan.password;
+		byte[] pass=Base64.decode(sMan.password);
+		String s=new String(pass);
+		return s;
 	}
 
 	public static void setLogin(String username, String password) {
 		sMan.username = username;
-		sMan.password = password;
-	}
-	
-	public static boolean autoLogin(){
-		return sMan.autoLogin;
-	}
-	
-	public static void autoLogin(boolean al){
-		sMan.autoLogin=al;
+		sMan.password = Base64.encode(password.getBytes());
 	}
 
-	public static void searchResultsPerPage(int val){
-		sMan.searchResultsPerPage=val;
+	public static boolean autoLogin() {
+		return sMan.autoLogin;
+	}
+
+	public static void autoLogin(boolean al) {
+		sMan.autoLogin = al;
 	}
 	
-	public static int searchResultsPerPage(){
+	
+	public static void searchResultsPerPage(int val) {
+		sMan.searchResultsPerPage = val;
+	}
+
+	public static int searchResultsPerPage() {
 		return sMan.searchResultsPerPage;
 	}
-	
-	public static void enableProxy(boolean on){
-		sMan.proxyRequired=on;
+
+	public static void enableProxy(boolean on) {
+		sMan.proxyRequired = on;
 	}
-	
-	public static boolean proxyEnabled(){
+
+	public static boolean proxyEnabled() {
 		return sMan.proxyRequired;
 	}
 
-	public static void setProxy(String host,String port, String user, String pass){
+	public static void setProxy(String host, String port, String user,
+			String pass) {
 		sMan.proxyHost = host;
-		sMan.proxyPort=port;
-		sMan.proxyUser=user;
-		sMan.proxyPassword=pass;
+		sMan.proxyPort = port;
+		sMan.proxyUser = user;
+		sMan.proxyPassword = pass;
 	}
-	
+
 	public static String getProxyHost() {
 		return sMan.proxyHost;
 	}
@@ -242,18 +266,53 @@ public class SettingsManager implements Serializable {
 		sMan.downloadBuffer = downloadBuffer;
 	}
 
-	public static boolean idm(){
+	public static boolean idm() {
 		return sMan.idm;
 	}
-	
-	public static String idmPath(){
+
+	public static String idmPath() {
 		return sMan.idmPath;
 	}
+
+	public static void idmPath(String s) {
+		if (s == null)
+			sMan.idm = false;
+		else
+			sMan.idm = true;
+		sMan.idmPath = s;
+	}
 	
-	public static void idmPath(String s){
-		if(s==null) sMan.idm=false;
-		else sMan.idm=true;
-		sMan.idmPath=s;
+	public static boolean isUserRemember() {
+		return sMan.userRemember;
+	}
+
+	public static void setUserRemember(boolean userRemember) {
+		sMan.userRemember = userRemember;
+	}
+
+	public static boolean isApiRemember() {
+		return sMan.apiRemember;
+	}
+	
+	public static void setApiRemember(boolean apiRemember) {
+		sMan.apiRemember = apiRemember;
+	}
+	
+	
+	public static void loginModel(LoginModel loginModel) {
+		sMan.loginModel=loginModel;
+	}
+	
+	public static LoginModel loginModel(){
+		return sMan.loginModel;
+	}
+
+	public static boolean useTunnel() {
+		return sMan.useTunnel;
+	}
+
+	public static void useTunnel(boolean useTunnel) {
+		sMan.useTunnel = useTunnel;
 	}
 
 }

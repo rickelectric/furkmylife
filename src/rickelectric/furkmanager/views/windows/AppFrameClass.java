@@ -20,8 +20,9 @@ import javax.swing.border.EmptyBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.furkmanager.views.Statable;
 
-public abstract class AppFrameClass extends JFrame {
+public abstract class AppFrameClass extends JFrame implements Statable {
 	private static final long serialVersionUID = 1L;
 
 	protected JPanel afContentPane;
@@ -123,6 +124,9 @@ public abstract class AppFrameClass extends JFrame {
 
 	public void windowClose() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		for(WindowListener w:getWindowListeners()){
+			removeWindowListener(w);
+		}
 		WindowListener wl = new WindowAdapter() {
 			@Override
 			public void windowIconified(WindowEvent e) {
@@ -136,6 +140,20 @@ public abstract class AppFrameClass extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				windowExit();
+			}
+		};
+		addWindowListener(wl);
+	}
+	
+	public void exitOnClose(){
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		for(WindowListener w:getWindowListeners()){
+			removeWindowListener(w);
+		}
+		WindowListener wl = new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				FurkManager.exit();
 			}
 		};
 		addWindowListener(wl);

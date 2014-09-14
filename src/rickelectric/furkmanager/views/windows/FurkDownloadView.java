@@ -3,6 +3,7 @@ package rickelectric.furkmanager.views.windows;
 import java.awt.Color;
 import java.awt.Font;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,7 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 import rickelectric.furkmanager.models.FurkDownload;
 
-public class FurkDownloadView extends AppFrameClass {
+public class FurkDownloadView extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	

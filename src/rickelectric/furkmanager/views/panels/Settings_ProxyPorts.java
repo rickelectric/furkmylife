@@ -35,6 +35,7 @@ public class Settings_ProxyPorts extends JPanel {
 	private JButton button_ext_save;
 	private JButton button_ext_revert;
 	private JPanel panel_socks;
+	private JCheckBox check_tunnel;
 	
 	public Settings_ProxyPorts() {
 		setPreferredSize(new Dimension(336, 260));
@@ -52,6 +53,7 @@ public class Settings_ProxyPorts extends JPanel {
 		panel_proxy.setLayout(null);
 
 		check_proxy = new JCheckBox("Proxy Required");
+		check_proxy.setFont(new Font("Dialog", Font.BOLD, 12));
 		check_proxy.setOpaque(false);
 		check_proxy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -59,7 +61,7 @@ public class Settings_ProxyPorts extends JPanel {
 				proxyEnabled(sel);
 			}
 		});
-		check_proxy.setBounds(10, 23, 141, 20);
+		check_proxy.setBounds(10, 23, 128, 20);
 		panel_proxy.add(check_proxy);
 
 		JLabel lblHostIp = new JLabel("Host IP: ");
@@ -107,6 +109,7 @@ public class Settings_ProxyPorts extends JPanel {
 					input_prox_username.getText(),
 					UtilBox.charToString(input_prox_password.getPassword())
 				);
+				SettingsManager.useTunnel(check_tunnel.isSelected());
 				SettingsManager.save();
 			}
 		});
@@ -121,6 +124,13 @@ public class Settings_ProxyPorts extends JPanel {
 		});
 		button_prox_revert.setBounds(114, 182, 88, 20);
 		panel_proxy.add(button_prox_revert);
+		
+		check_tunnel = new JCheckBox("Enable Tunneled API");
+		check_tunnel.setFont(new Font("Dialog", Font.BOLD, 12));
+		check_tunnel.setOpaque(false);
+		check_tunnel.setBounds(140, 22, 160, 23);
+		check_tunnel.setSelected(SettingsManager.useTunnel());
+		panel_proxy.add(check_tunnel);
 
 		panel_socks = new JPanel();
 		panel_socks.setOpaque(false);

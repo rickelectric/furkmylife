@@ -34,8 +34,8 @@ import rickelectric.furkmanager.views.panels.TFileTreePanel;
 public class FurkFileView extends JDialog implements Statable {
 
 	private static final long serialVersionUID = 1L;
-	
-	//private static ArrayList<FurkFileView> windowlist=null;
+
+	// private static ArrayList<FurkFileView> windowlist=null;
 
 	private JPanel centerPane;
 	private JTextField input_id;
@@ -44,7 +44,7 @@ public class FurkFileView extends JDialog implements Statable {
 	private JTextField input_type;
 	private JTextField input_hash;
 	private JPanel ss_panel;
-	
+
 	private JTextField input_url;
 	private JButton btn_viewfurk;
 	private JButton btn_close;
@@ -60,39 +60,44 @@ public class FurkFileView extends JDialog implements Statable {
 
 	private JLabel statusBar;
 
-	public FurkFileView(final FurkFile ff){
+	public FurkFileView(final FurkFile ff) {
 		super(FurkManager.getMainWindow());
-		setIconImage(Toolkit.getDefaultToolkit().getImage(FurkFileView.class.getResource("/rickelectric/furkmanager/img/dash/Files-16.png")));
+		setIconImage(Toolkit
+				.getDefaultToolkit()
+				.getImage(
+						FurkFileView.class
+								.getResource("/rickelectric/furkmanager/img/dash/Files-16.png")));
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setModal(true);
 		this.ff = ff;
-		//if(windowlist==null) windowlist=new ArrayList<FurkFileView>();
-		//int i=windowlist.indexOf(this);
-		//if(i>=0){
-		//	windowlist.get(i).setVisible(true);
-		//	return;
-		//}
-		
+		// if(windowlist==null) windowlist=new ArrayList<FurkFileView>();
+		// int i=windowlist.indexOf(this);
+		// if(i>=0){
+		// windowlist.get(i).setVisible(true);
+		// return;
+		// }
+
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout());
 		setContentPane(contentPane);
-		
+
 		setResizable(false);
 		setTitle(ff.getName());
 		setBounds(100, 100, 450, 541);
 		centerPane = new JPanel();
-		contentPane.add(centerPane,BorderLayout.CENTER);
+		contentPane.add(centerPane, BorderLayout.CENTER);
 		centerPane.setLayout(null);
-		
+
 		statusBar = new JLabel();
 		statusBar.setFont(new Font("Dialog", Font.BOLD, 12));
-		statusBar.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		statusBar.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null,
+				null, null));
 		statusBar.setPreferredSize(new Dimension(0, 20));
 		statusBar.setText("Ready");
 		contentPane.add(statusBar, BorderLayout.SOUTH);
 
 		JLabel label_id = new JLabel("File ID:");
-		label_id.setFont(new Font("Dialog", Font.PLAIN, 12));
+		label_id.setFont(new Font("Dialog", Font.BOLD, 12));
 		label_id.setBounds(10, 10, 84, 17);
 		centerPane.add(label_id);
 
@@ -108,12 +113,12 @@ public class FurkFileView extends JDialog implements Statable {
 		input_id.setColumns(10);
 
 		JLabel label_name = new JLabel("Filename:");
-		label_name.setFont(new Font("Dialog", Font.PLAIN, 12));
+		label_name.setFont(new Font("Dialog", Font.BOLD, 12));
 		label_name.setBounds(10, 38, 64, 16);
 		centerPane.add(label_name);
 
 		input_name = new JTextField();
-		input_name.setFont(new Font("Dialog", Font.PLAIN, 12));
+		input_name.setFont(new Font("Dialog", Font.BOLD, 12));
 		input_name.setBackground(Color.WHITE);
 		input_name.setEditable(false);
 		input_name.setBounds(92, 36, 340, 20);
@@ -122,7 +127,7 @@ public class FurkFileView extends JDialog implements Statable {
 		input_name.setColumns(10);
 
 		JLabel label_size = new JLabel("File Size: ");
-		label_size.setFont(new Font("Dialog", Font.PLAIN, 12));
+		label_size.setFont(new Font("Dialog", Font.BOLD, 12));
 		label_size.setBounds(10, 77, 64, 16);
 		centerPane.add(label_size);
 
@@ -130,7 +135,7 @@ public class FurkFileView extends JDialog implements Statable {
 		input_size.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_size.setBackground(Color.WHITE);
 		input_size.setEditable(false);
-		input_size.setBounds(92, 75, 114, 20);
+		input_size.setBounds(92, 75, 124, 20);
 		input_size.setText(ff.getSizeString());
 		centerPane.add(input_size);
 		input_size.setColumns(10);
@@ -144,7 +149,7 @@ public class FurkFileView extends JDialog implements Statable {
 		input_type.setFont(new Font("Dialog", Font.PLAIN, 12));
 		input_type.setBackground(Color.WHITE);
 		input_type.setEditable(false);
-		input_type.setBounds(318, 75, 114, 20);
+		input_type.setBounds(310, 75, 122, 20);
 		input_type.setText(ff.getType());
 		if (ff.getType() == null)
 			input_type.setEnabled(false);
@@ -152,7 +157,7 @@ public class FurkFileView extends JDialog implements Statable {
 		input_type.setColumns(10);
 
 		JLabel label_hash = new JLabel("Info Hash: ");
-		label_hash.setFont(new Font("Dialog", Font.PLAIN, 12));
+		label_hash.setFont(new Font("Dialog", Font.BOLD, 12));
 		label_hash.setBounds(10, 109, 64, 16);
 		centerPane.add(label_hash);
 
@@ -204,21 +209,24 @@ public class FurkFileView extends JDialog implements Statable {
 				}
 			}
 		});
-		
-		if (ff.getUrlDl() == null || ff.getUrlDl().equals("")){
-			if(ff.isLinked()) btn_linkfile.setText("Re-Add To My Downloads");
-			else btn_linkfile.setText("Add To My Downloads");
-		}
-		else{
-			if(ff.isLinked()) btn_linkfile.setText("Remove From My Files");
-			else btn_linkfile.setText("Add To My Files");
+
+		if (ff.getUrlDl() == null || ff.getUrlDl().equals("")) {
+			if (ff.isLinked())
+				btn_linkfile.setText("Re-Add To My Downloads");
+			else
+				btn_linkfile.setText("Add To My Downloads");
+		} else {
+			if (ff.isLinked())
+				btn_linkfile.setText("Remove From My Files");
+			else
+				btn_linkfile.setText("Add To My Files");
 		}
 
 		btn_linkfile.setBounds(10, 459, 162, 20);
 		centerPane.add(btn_linkfile);
-		
+
 		JLabel label_url = new JLabel("URL:");
-		label_url.setFont(new Font("Dialog", Font.PLAIN, 12));
+		label_url.setFont(new Font("Dialog", Font.BOLD, 12));
 		label_url.setBounds(10, 137, 64, 16);
 		centerPane.add(label_url);
 
@@ -233,9 +241,11 @@ public class FurkFileView extends JDialog implements Statable {
 
 		JButton btn_copyLink = new JButton("Copy URL");
 		btn_copyLink.setBounds(334, 159, 98, 20);
-		btn_copyLink.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
+		btn_copyLink.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				UtilBox.sendToClipboard(ff.getUrlDl());
+				FurkManager.trayAlert(FurkManager.TRAY_INFO, "Copied",
+						"URL Copied To Clipboard", null);
 			}
 		});
 		centerPane.add(btn_copyLink);
@@ -244,7 +254,7 @@ public class FurkFileView extends JDialog implements Statable {
 		btn_viewfurk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String url = ff.getUrlPage();
-				UtilBox.openUrl("https://www.furk.net"+url);
+				UtilBox.openUrl("https://www.furk.net" + url);
 			}
 		});
 		btn_viewfurk.setBounds(10, 427, 124, 20);
@@ -259,100 +269,106 @@ public class FurkFileView extends JDialog implements Statable {
 		});
 		btn_close.setBounds(308, 459, 124, 20);
 		centerPane.add(btn_close);
-		
+
 		btn_changeview = new JButton("Show File Tree");
 		btn_changeview.setHorizontalAlignment(SwingConstants.LEFT);
-		btn_changeview.setIcon(new ImageIcon(FurkManager.class.getResource("img/arrow_double_right.png")));
-		
-		boolean showScreenshots=(ff.getType() != null && ff.getType().equals("video")
-				&& ff.getThumbs() != null);
+		btn_changeview.setIcon(new ImageIcon(FurkManager.class
+				.getResource("img/arrow_double_right.png")));
+
+		boolean showScreenshots = (ff.getType() != null
+				&& ff.getType().equals("video") && ff.getThumbs() != null);
 		System.out.println(showScreenshots);
 		if (showScreenshots) {
-			ss_panel=new ScreenshotViewPanel(ff);
+			ss_panel = new ScreenshotViewPanel(ff);
 			ss_panel.setBounds(10, 191, 414, 157);
 			centerPane.add(ss_panel);
 		}
-		
-		final JPanel tmp=new JPanel();
+
+		final JPanel tmp = new JPanel();
 		tmp.setLayout(new GridBagLayout());
-		tmp.add(new JLabel(new ImageIcon(FurkManager.class.getResource("img/ajax-loader.gif"))));
+		tmp.add(new JLabel(new ImageIcon(FurkManager.class
+				.getResource("img/ajax-loader.gif"))));
 		tmp.setBounds(10, 192, 418, 201);
 		tmp.setBorder(new LineBorder(Color.BLACK));
-		if(!showScreenshots) centerPane.add(tmp);
-		else tmp.setVisible(false);
-		
-		btn_changeview.addMouseListener(new MouseAdapter(){
-			public void mouseClicked(MouseEvent e){
-				if(tfile_scroll==null){
-					if(tmp.isVisible()){
+		if (!showScreenshots)
+			centerPane.add(tmp);
+		else
+			tmp.setVisible(false);
+
+		btn_changeview.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (tfile_scroll == null) {
+					if (tmp.isVisible()) {
 						tmp.setVisible(false);
-						if(ss_panel!=null) ss_panel.setVisible(true);
-					}
-					else{
+						if (ss_panel != null)
+							ss_panel.setVisible(true);
+					} else {
 						tmp.setVisible(true);
-						if(ss_panel!=null) ss_panel.setVisible(false);
+						if (ss_panel != null)
+							ss_panel.setVisible(false);
 					}
-				}
-				else{
-					if(tfile_scroll.isVisible()){
+				} else {
+					if (tfile_scroll.isVisible()) {
 						tfile_scroll.setVisible(false);
-						if(ss_panel!=null) ss_panel.setVisible(true);
-					}
-					else{
+						if (ss_panel != null)
+							ss_panel.setVisible(true);
+					} else {
 						tfile_scroll.setVisible(true);
-						if(ss_panel!=null) ss_panel.setVisible(false);
+						if (ss_panel != null)
+							ss_panel.setVisible(false);
 					}
 				}
-				if(btn_changeview.getText().equals("Show File Tree")){
-					btn_changeview.setIcon(new ImageIcon(FurkManager.class.getResource("img/arrow_double_left.png")));
+				if (btn_changeview.getText().equals("Show File Tree")) {
+					btn_changeview.setIcon(new ImageIcon(FurkManager.class
+							.getResource("img/arrow_double_left.png")));
 					btn_changeview.setText("Back To Screenshots");
-				}
-				else{
-					btn_changeview.setIcon(new ImageIcon(FurkManager.class.getResource("img/arrow_double_right.png")));
+				} else {
+					btn_changeview.setIcon(new ImageIcon(FurkManager.class
+							.getResource("img/arrow_double_right.png")));
 					btn_changeview.setText("Show File Tree");
 				}
-				
+
 			}
 		});
 		btn_changeview.setBounds(189, 427, 243, 20);
-		if(showScreenshots) 
+		if (showScreenshots)
 			centerPane.add(btn_changeview);
-		new Thread(new Runnable(){
-			public void run(){
+		new Thread(new Runnable() {
+			public void run() {
 				tfile_scroll = new TFileTreePanel(ff);
 				tfile_scroll.setBounds(10, 192, 418, 201);
 				tfile_scroll.setVisible(false);
 				centerPane.add(tfile_scroll);
-				if(tmp.isVisible()){
+				if (tmp.isVisible()) {
 					tmp.setVisible(false);
 					tfile_scroll.setVisible(true);
 				}
 			}
 		}).start();
-		
+
 		repaint();
 		setVisible(true);
 	}
-	
+
 	@Override
-	public boolean equals(Object o){
-		if(o instanceof FurkFileView)
-			return ff.getID().equals(((FurkFileView)o).ff.getID());
+	public boolean equals(Object o) {
+		if (o instanceof FurkFileView)
+			return ff.getID().equals(((FurkFileView) o).ff.getID());
 		return false;
 	}
-	
+
 	@Override
-	public void dispose(){
+	public void dispose() {
 		super.dispose();
-		//if(windowlist==null) return;
-		//windowlist.remove(this);
+		// if(windowlist==null) return;
+		// windowlist.remove(this);
 	}
 
-	//public static void disposeAll(){
-		//if(windowlist==null) return;
-		//while(windowlist.size()>0)
-		//	windowlist.get(0).dispose();
-	//}
+	// public static void disposeAll(){
+	// if(windowlist==null) return;
+	// while(windowlist.size()>0)
+	// windowlist.get(0).dispose();
+	// }
 
 	@Override
 	public void setStatus(String status) {

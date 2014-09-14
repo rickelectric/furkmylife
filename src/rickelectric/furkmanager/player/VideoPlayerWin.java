@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -27,6 +28,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.views.windows.FurkFileView;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
@@ -50,10 +52,22 @@ public class VideoPlayerWin extends JFrame {
 	private JLabel loading;
 	
 	public VideoPlayerWin(String mrl,final EmbeddedMediaPlayer player,MediaPlayerFactory factory) {
+		
+		for(Window w:getWindows()){
+			if(w instanceof FurkFileView){
+				((FurkFileView)w).setModal(false);
+			}
+		}
+		setAlwaysOnTop(true);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e){
 				player.stop();
+				for(Window w:getWindows()){
+					if(w instanceof FurkFileView){
+						((FurkFileView)w).setModal(true);
+					}
+				}
 				dispose();
 			}
 		});

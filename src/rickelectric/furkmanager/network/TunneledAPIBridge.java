@@ -1,15 +1,12 @@
 package rickelectric.furkmanager.network;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.json.JSONObject;
 
-public class APIBridge extends FurkBridge{
+public class TunneledAPIBridge extends FurkBridge {
 
 	private static String api_key = null;
 
@@ -19,14 +16,14 @@ public class APIBridge extends FurkBridge{
 		return "api_key=" + api_key;
 	}
 
-	public static final String API_BASE = "https://www.furk.net/api";
+	public static final String API_BASE = "https://www.trick.net16.net/fsapi";
 
 	public static void initialize(String api_key) {
-		APIBridge.api_key = api_key;
+		TunneledAPIBridge.api_key = api_key;
 	}
 
 	private static boolean overrideCache = false;
-	public static boolean dummy=false;
+	public static boolean dummy = false;
 
 	public static boolean overrideCache() {
 		return overrideCache;
@@ -39,22 +36,14 @@ public class APIBridge extends FurkBridge{
 	public static String dlAdd(int type, String link) {
 		if (api_key == null)
 			return null;
-		String dest = API_BASE + "/dl/add?" + key();
+		String dest = API_BASE + "/?object=dl&function=add&" + key();
 		if (type == DL_ADD_URL)
 			dest += "&url=";
 		else if (type == DL_ADD_INFO_HASH)
 			dest += "&info_hash=";
 		else if (type == DL_ADD_TORRENT) {
-			try {
-				Part[] parts = new Part[] { new StringPart("api_key", api_key),
-						new FilePart("file", new File(link)) };
-				String stream = StreamDownloader.postDataPartStream(API_BASE
-						+ "/dl/add", parts);
-				return stream;
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
+			throw new RuntimeException(
+					"Cannot Upload Torrent Files Over The Tunnel");
 		} else
 			throw new RuntimeException("Invalid Type Parameter");
 		dest += link;
@@ -82,15 +71,16 @@ public class APIBridge extends FurkBridge{
 			boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if(dummy){
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
 			}
 		}
-		String dest = API_BASE + "/dl/get?" + key();
+		String dest = API_BASE + "/?object=dl&function=get&" + key();
 		if (get == GET_ID)
 			dest += "&id=" + param;
 		else if (get == GET_STATUS)
@@ -115,8 +105,8 @@ public class APIBridge extends FurkBridge{
 			return null;
 		if (info_hash == null || info_hash.length() == 0)
 			return null;
-		String dest = API_BASE + "/file/info?" + key() + "&info_hash="
-				+ info_hash;
+		String dest = API_BASE + "/?object=file&function=info&" + key()
+				+ "&info_hash=" + info_hash;
 
 		return jsonPost(dest, true, true);
 	}
@@ -124,8 +114,8 @@ public class APIBridge extends FurkBridge{
 	public static String TFileInfo(String fileID) {
 		if (api_key == null)
 			return null;
-		String dest = API_BASE + "/file/get?" + key() + "&id=" + fileID
-				+ "&t_files=1";
+		String dest = API_BASE + "/?object=file&function=get&" + key() + "&id="
+				+ fileID + "&t_files=1";
 		return jsonPost(dest, true, true);
 	}
 
@@ -133,15 +123,16 @@ public class APIBridge extends FurkBridge{
 			String[] sort, boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if(dummy){
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
 			}
 		}
-		String dest = API_BASE + "/file/get?" + key();
+		String dest = API_BASE + "/?object=file&function=get&" + key();
 		if (get == GET_ID)
 			dest += "&id=" + param;
 		else if (get == GET_TYPE)
@@ -176,21 +167,21 @@ public class APIBridge extends FurkBridge{
 			return null;
 		if (ids.length == 0)
 			return null;
-		String destdl = API_BASE + "/dl/unlink";
+		String destdl = API_BASE + "?object=dl&function=unlink&" + key();
 		String jsil = "";
 		for (int i = 0; i < ids.length; i++) {
 			jsil += "id=" + ids[i];
 			if (i != ids.length - 1)
 				jsil += "&";
 		}
-		destdl += "?" + key() + "&" + jsil;
+		destdl += jsil;
 		return jsonGet(destdl, false, false);
 	}
 
 	public static String fileLinkstate(int action, String[] ids) {
 		if (api_key == null)
 			return null;
-		String destfile = API_BASE + "/file/";
+		String destfile = API_BASE + "/?object=file&function=";
 		switch (action) {
 		case LINK_LINK:
 			destfile += "link";
@@ -210,34 +201,35 @@ public class APIBridge extends FurkBridge{
 			if (i != ids.length - 1)
 				jsil += "&";
 		}
-		destfile += "?" + key() + "&" + jsil;
+		destfile += "&" + key() + "&" + jsil;
 		return jsonGet(destfile, false, false);
 	}
 
 	public static String msgGet(boolean checkCache) {
 		if (key() == null)
 			return null;
-		String dest = API_BASE + "/msg/get?" + key();
+		String dest = API_BASE + "/?object=msg&function=get&" + key();
 		return jsonGet(dest, checkCache, false);
 	}
 
 	public static String labelGet(boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if(dummy){
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
 			}
 		}
-		String dest = API_BASE + "/label/get?" + key();
+		String dest = API_BASE + "/?object=label&function=get&" + key();
 		return jsonGet(dest, checkCache, false);
 	}
 
 	public static String labelAdd(String name) {
-		String dest = API_BASE + "/label/upsert?" + key();
+		String dest = API_BASE + "/?object=label&function=upsert&" + key();
 		try {
 			name = URLEncoder.encode(name, "utf-8");
 		} catch (Exception e) {
@@ -253,7 +245,7 @@ public class APIBridge extends FurkBridge{
 		if (name == null && color == null && sorder == null
 				&& id_labels == null)
 			return null;
-		String dest = API_BASE + "/label/upsert?" + key();
+		String dest = API_BASE + "/?object=label&function=upsert&" + key();
 		dest += "&id=" + id;
 		if (name != null) {
 			try {
@@ -285,59 +277,31 @@ public class APIBridge extends FurkBridge{
 		}
 		return jsonPost(dest, false, false);
 	}
-
-	// Sets the api key and returns true if logged in sucessfully
+	
 	public static boolean userLogin(String username, String password) {
-		if (api_key != null)
-			throw new RuntimeException("Already Logged In. Log Out First.");
-		if (username == null || password == null)
-			throw new RuntimeException(
-					"Neither 'username' nor 'password' should be null.");
-		try {
-			username = URLEncoder.encode(username, "utf-8");
-		} catch (Exception e) {
-		}
-		try {
-			password = URLEncoder.encode(password, "utf-8");
-		} catch (Exception e) {
-		}
-		Part[] params = new Part[] { new StringPart("login", username),
-				new StringPart("pwd", password) };
-
-		String url = API_BASE + "/login/login";// ?login="+username+"&pwd="+password;
-		String json = null;
-		try {
-			json = StreamDownloader.postDataPartStream(url, params);
-		} catch (Exception e) {
-			throw new RuntimeException("Connection Error");
-		}
-		JSONObject j = new JSONObject(json);
-		if (j.getString("status").equals("error")) {
-			throw new RuntimeException(j.getString("error") + " Tries Left: "
-					+ j.getString("tries_left"));
-		}
-		api_key = j.getString("api_key");
-		return true;
+		throw new RuntimeException("Cannot User Login Over The Tunnel. Please Use API Login Instead.");
 	}
 
 	public static String userLoad() {
-		if(api_key==null) return null;
-		if(dummy){
+		if (api_key == null)
+			return null;
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
 			}
 		}
-		String dest = API_BASE + "/account/info?" + key();
+		String dest = API_BASE + "/object=account&function=info&" + key();
 		return jsonPost(dest, false, false);
 	}
 
 	public static boolean userLogout() {
 		if (api_key == null)
 			return true;
-		String url = API_BASE + "/login/logout?" + key();
+		String url = API_BASE + "/object=login&function=logout&" + key();
 		String json = jsonGet(url, false, false);
 		JSONObject j = new JSONObject(json);
 		if (j.getString("status").equals("error"))
@@ -369,17 +333,17 @@ public class APIBridge extends FurkBridge{
 		} catch (Exception e) {
 		}
 		if (sMode == 0) {
-			frag = "file/get";
+			frag = "?object=file&function=get";
 			txt = "&name_like=" + txt;
 		}
 		if (sMode == 1) {
-			frag = "search";
+			frag = "?object=search";
 			txt = "&q=" + txt;
 		} else if (sMode == 2) {
-			frag = "plugins/metasearch";
+			frag = "?object=plugins&function=metasearch";
 			txt = "&q=" + txt;
 		}
-		String url = API_BASE + "/" + frag + "?" + key();
+		String url = API_BASE + "/" + frag + "&" + key();
 		url += txt + "&limit=50";
 		return jsonPost(url, checkCache, true);
 	}
@@ -391,7 +355,7 @@ public class APIBridge extends FurkBridge{
 	public static boolean ping(String apiKey) {
 		if (apiKey == null)
 			return false;
-		String url = API_BASE + "/ping?api_key=" + apiKey;
+		String url = API_BASE + "/?object=ping&api_key=" + apiKey;
 		try {
 			String stat = StreamDownloader.getStringStream(url, 8);
 			JSONObject j = new JSONObject(stat);
@@ -405,7 +369,7 @@ public class APIBridge extends FurkBridge{
 		}
 	}
 
-	public static synchronized String jsonGet(String dest, boolean cacheCheck, boolean perm) {
+	public static String jsonGet(String dest, boolean cacheCheck, boolean perm) {
 		if (api_key == null)
 			return null;
 		if (!overrideCache && cacheCheck) {
@@ -424,7 +388,7 @@ public class APIBridge extends FurkBridge{
 		}
 	}
 
-	public static synchronized String jsonPost(String dest, boolean cacheCheck, boolean perm) {
+	public static String jsonPost(String dest, boolean cacheCheck, boolean perm) {
 		if (api_key == null)
 			return null;
 		if (!overrideCache && cacheCheck) {

@@ -1,17 +1,19 @@
 package rickelectric.furkmanager.utils;
 
-import java.awt.Color;//Toolkit,Color,Component,Container
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;//Clipboard
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.KeyListener;//Listeners (Key,Mouse,Acion)
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
-import java.io.File;//File/Folder Access
+import java.awt.event.MouseMotionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -25,9 +27,14 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FileUtils;
+//Toolkit,Color,Component,Container
+//Clipboard
+//Listeners (Key,Mouse,Acion)
+//File/Folder Access
 
 public class UtilBox {
 
@@ -89,7 +96,6 @@ public class UtilBox {
 		try {
 			return (String) t.getTransferData(DataFlavor.stringFlavor);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -200,20 +206,26 @@ public class UtilBox {
 
 	/**
 	 * 
-	 * @param mills Number Of Milliseconds To Pause For.
+	 * @param millis Number Of Milliseconds To Pause For.
 	 */
-	public static void pause(int mills) {
+	public static void pause(int millis) {
 		long base = System.currentTimeMillis();
-		while (System.currentTimeMillis() - base < mills)
+		while (System.currentTimeMillis() - base < millis)
 			;
+	}
+	
+	public static void wait(int millis){
+		try{Thread.sleep(millis);}
+		catch(InterruptedException e){}
 	}
 
 	public static String alphanum(String s) {
+		if(s==null) return "";
 		char[] str = s.toCharArray();
 		s = "";
-		for (int i = 0; i < str.length; i++) {
-			if (Character.isAlphabetic(str[i]) || Character.isDigit(str[i]))
-				s += str[i];
+		for (char p:str) {
+			if (Character.isAlphabetic(p) || Character.isDigit(p))
+				s += p;
 		}
 		return s;
 	}
@@ -346,6 +358,45 @@ public class UtilBox {
 			}
 		}
 	}
+	
+	public static void addMouseMotionListenerToAll(Component parent,
+			MouseMotionListener listener) {
+		if (parent instanceof AbstractButton) {
+			AbstractButton a = (AbstractButton) parent;
+			boolean is = false;
+			MouseListener[] kl = a.getMouseListeners();
+			for (MouseListener k : kl) {
+				if (k.equals(listener)) {
+					is = true;
+					break;
+				}
+			}
+			if (!is)
+				a.addMouseMotionListener(listener);
+		}
+
+		else if (parent instanceof JComponent) {
+			JComponent a = (JComponent) parent;
+			boolean is = false;
+			MouseListener[] kl = a.getMouseListeners();
+			for (MouseListener k : kl) {
+				if (k.equals(listener)) {
+					is = true;
+					break;
+				}
+			}
+			if (!is)
+				a.addMouseMotionListener(listener);
+		}
+
+		if (parent instanceof Container) {
+			Component[] comps = ((Container) parent).getComponents();
+			for (Component c : comps) {
+				if(!(c instanceof JScrollPane))
+				addMouseMotionListenerToAll(c, listener);
+			}
+		}
+	}
 
 	public static String openFile(String type) {
 		JFileChooser fc = null;
@@ -416,6 +467,46 @@ public class UtilBox {
 				Runtime.getRuntime().exec(cmdArray);
 			}
 		}catch(IOException ioe){}
+	}
+
+	public static String regex(String b4){
+		if(b4.contains("\\\\")) return b4;
+		String after;
+		String[] split=b4.split("\\\\");
+		after=split[0];
+		for(int i=1;i<split.length;i++)
+			after+="\\\\"+split[i];
+		return after;
+	}
+
+	public static void schedule(final int i, final Runnable runnable) {
+		new Thread(new Runnable(){
+			public void run(){
+				try{Thread.sleep(i);}
+				catch(InterruptedException e){}
+				runnable.run();
+			}
+		}).start();
+	}
+
+	public static int numberParse(String str, int i) {
+		char[] chars=str.toCharArray();
+		str="";
+		for(char c:chars){
+			if(Character.isDigit(c)){
+				str+=c;
+			}
+			else str="";
+			if(str.length()==4) break;
+		}
+		if(str.length()<4) return -1;
+		return Integer.parseInt(str);
+	}
+
+	public static void clearActionListeners(AbstractButton cmpt){
+		for (ActionListener a : cmpt.getActionListeners()) {
+			cmpt.removeActionListener(a);
+		}
 	}
 
 }

@@ -4,23 +4,22 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-import javax.swing.JPanel;
+import javax.swing.JLayeredPane;
 import javax.swing.Timer;
 
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 
-public class TranslucentPane extends JPanel implements Opacible,Slideable {
+public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 	private static final long serialVersionUID = 1L;
 	private float alpha;
-
-	public TranslucentPane() {
-		//setBackground(UtilBox.getRandomColor());
+	
+	public JFadeLayeredPane() {
 		alpha = 0;
 		setOpaque(false);
 		setDoubleBuffered(true);
 	}
-	
+
 	public void setAlpha(float value) {
 		if (value > 1 || value < 0)
 			return;
@@ -132,4 +131,5 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 		this.t = t;
 
 	}
+
 }

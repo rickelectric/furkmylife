@@ -1,10 +1,12 @@
 package rickelectric.furkmanager.utils;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
-import javax.imageio.*;
+import javax.imageio.ImageIO;
 
 public class ImageManager{
 	
@@ -18,15 +20,16 @@ public class ImageManager{
 	}
 	
 	public static BufferedImage resizeImage(BufferedImage img,int width,int height){
-		Image newImg=img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
-		BufferedImage buffered=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		buffered.getGraphics().drawImage(newImg,0,0,null);
-		return buffered;
+		Image newImg=img.getScaledInstance(width,height,Image.SCALE_AREA_AVERAGING);
+		if(width<=0) width=newImg.getWidth(null);
+		if(height<=0) height=newImg.getHeight(null);
+		return imageToBufferedImage(newImg);
 	}
 	
 	public static boolean saveImage(BufferedImage buffered,String destpath){
 		try {
-			ImageIO.write(buffered,"jpg",new File(destpath));
+			File dest=new File(destpath);
+			ImageIO.write(buffered,"png",dest);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -36,7 +39,7 @@ public class ImageManager{
 	
 	public static BufferedImage imageToBufferedImage(Image im){
 		BufferedImage bi = new BufferedImage
-	    		 (im.getWidth(null),im.getHeight(null),BufferedImage.TYPE_INT_RGB);
+	    		 (im.getWidth(null),im.getHeight(null),BufferedImage.TYPE_INT_ARGB);
 		Graphics bg = bi.getGraphics();
 		bg.drawImage(im, 0, 0, null);
 		bg.dispose();
