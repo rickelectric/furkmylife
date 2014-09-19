@@ -72,6 +72,7 @@ public class SDownload extends Observable implements Runnable, Serializable {
 			if(RequestCache.APIR.get(getUrl())!=null || RequestCache.ImageR.get(getUrl())!=null){
 				status=COMPLETE;
 				stateChanged();
+				return;
 			}
 			apacheDownload();
 		} catch (IOException e) {

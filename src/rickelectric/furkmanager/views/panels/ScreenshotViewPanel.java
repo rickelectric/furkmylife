@@ -1,12 +1,12 @@
 package rickelectric.furkmanager.views.panels;
 
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -19,12 +19,14 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
 import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.beta.SDownload;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.StreamDownloader;
 import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.utils.ThreadPool;
+import rickelectric.furkmanager.views.ImageViewer;
 
 public class ScreenshotViewPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
@@ -159,19 +161,8 @@ class ScreenshotIcon extends JLabel {
 						try {
 							if (currIcon == null)
 								loadImg();
-							BufferedImage ssFull = StreamDownloader
-									.getImageStream(ssFullUrl, 8);
-							float h = (float) (Toolkit.getDefaultToolkit()
-									.getScreenSize().getHeight() - 150);
-							if (ssFull.getHeight() > h)
-								ssFull = ImageManager.scaleImage(ssFull,
-										(h / ssFull.getHeight()) * 100f);
-							setIcon(new ImageIcon(
-									ScreenshotIcon.class
-											.getResource("/javax/swing/plaf/metal/icons/ocean/maximize.gif")));
-							JOptionPane.showMessageDialog(null, new JLabel(
-									new ImageIcon(ssFull)), "Full Screenshot",
-									-1);
+							SDownload d = new SDownload(new URL(ssFullUrl));
+							new ImageViewer(d).setVisible(true);
 						} catch (Exception ex) {
 						}
 						setIcon(currIcon);
