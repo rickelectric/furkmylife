@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.beta;
+package rickelectric.furkmanager.idownloader;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

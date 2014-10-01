@@ -25,7 +25,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.beta.SDownload;
+import rickelectric.furkmanager.idownloader.SDownload;
 import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;

@@ -11,8 +11,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.beta.SDownload;
 import rickelectric.furkmanager.idownloader.DownloadManager;
+import rickelectric.furkmanager.idownloader.SDownload;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.player.MediaStreamer;
 import rickelectric.furkmanager.utils.SettingsManager;

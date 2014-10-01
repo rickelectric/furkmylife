@@ -19,7 +19,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.beta.SDownload;
+import rickelectric.furkmanager.idownloader.SDownload;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.network.RequestCache;
