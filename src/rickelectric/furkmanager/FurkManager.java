@@ -132,21 +132,20 @@ public class FurkManager {
 			InstanceConn ic = new InstanceConn();
 			splash.setText("Initialization Complete");
 			if (!ic.appStart()) {
+				splash.setText("Restoring FurkManager...");
+				Thread.sleep(2000);
 				if (addString != null) {
 					splash.setText("Opening Torrent...");
 					ic.transmit(addString);
 					addString = null;
 				}
-				splash.setText("Restoring FurkManager...");
-				splash.setVisible(false);
-				return;
+				System.exit(0);
 			}
 		} catch (InterruptedException e) {
 			splash.setText("Fatal Error. Exiting...");
 			UtilBox.pause(800);
 			e.printStackTrace();
-			splash.setVisible(false);
-			return;
+			System.exit(0);
 		}
 
 		UtilBox.pause(400);

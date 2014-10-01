@@ -73,7 +73,7 @@ public class AudioPlayerWin extends JFrame {
 					}
 					
 					try {
-						Thread.sleep(500);
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						break;
 					}
