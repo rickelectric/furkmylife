@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -22,6 +23,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
 import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -135,6 +137,13 @@ public class MainWindow extends AppFrameClass {
 				JLabel src = (JLabel) e.getSource();
 				src.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null,
 						null, null));
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					for (int i = 0; i < 5; i++) {
+						if (e.getSource().equals(dashArray[1][i])) {
+							changeViewSection(i);
+						}
+					}
+				}
 			}
 
 			public void mouseReleased(MouseEvent e) {
@@ -150,7 +159,7 @@ public class MainWindow extends AppFrameClass {
 					return;
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					for (int i = 0; i < 5; i++) {
-
+						//changeViewSection(i);
 						if (e.getSource().equals(dashArray[1][i])) {
 							if (e.getClickCount() > 1 && cpNum == i) {
 								if (e.getClickCount() == 3) {
@@ -170,7 +179,6 @@ public class MainWindow extends AppFrameClass {
 											.refreshMyDownloads(true);
 								}
 							}
-							changeViewSection(i);
 						}
 					}
 				}
@@ -272,28 +280,39 @@ public class MainWindow extends AppFrameClass {
 		contentPane.add(curr);
 		currPanel[4] = curr;
 
-		label = new JLabel((API.getMessages() == null || API.getMessages()
-				.size() == 0) ? "" : API.getMessages().get(0).getText());
-		label.addMouseListener(new MouseAdapter() {
+		message = new JLabel();
+		loadMessages();
+		message.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				JOptionPane.showMessageDialog(
 						null,
-						(API.getMessages() == null || API.getMessages().size() == 0) ? ""
-								: API.getMessages().get(0).getText().replace(". ", ". \n"),
+						message.getText().replace(". ", ". \n"),
 						"Message", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setFont(new Font("Dialog", Font.BOLD, 14));
-		label.setBounds(10, 530, 563, 32);
-		contentPane.add(label);
+		message.setVerticalAlignment(SwingConstants.TOP);
+		message.setHorizontalAlignment(SwingConstants.CENTER);
+		message.setFont(new Font("Dialog", Font.BOLD, 14));
+		message.setBounds(10, 530, 563, 32);
+		contentPane.add(message);
 
 		addConsole();
 		addImgCacheViewer();
 		setResizable(false);
 		setVisible(true);
+	}
+
+	public void loadMessages() {
+		try{
+			ArrayList<APIMessage> messages = API.getMessages();
+			if(messages==null || messages.size()==0) message.setText("");
+			String text = "";
+			for(APIMessage msg : messages){
+				text+=msg.getType().toUpperCase()+": \n"+msg.getText() + "\n\n";
+			}
+			message.setText(text);
+		}catch(Exception e){}
 	}
 
 	class TopMenuBar extends JMenuBar implements ActionListener {
@@ -389,7 +408,7 @@ public class MainWindow extends AppFrameClass {
 	}
 
 	private boolean paneChanging = false;
-	private JLabel label;
+	private JLabel message;
 
 	private void changeViewSection(final int sec) {
 		// TODO Invoke Panel Fade & Slide Out & In Change Depending On Current

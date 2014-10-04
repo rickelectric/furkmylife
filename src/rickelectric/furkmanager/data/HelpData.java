@@ -31,15 +31,15 @@ public class HelpData {
 		String link="http://www.furk.net/";
 		if(html) link="<a href=\""+link+"\" target=\"_blank\">this page</a>";
 		
-		String open=html?"<i>":"\"";
-		String close=html?"</i>":"\"";
+		String open=html?"<b><i>":"\"";
+		String close=html?"</i></b>":"\"";
 		
 		lines[0]="1. Go to "+link+" and log in using your username and password."+(html?"<br/>":"\n\t")+
 				"(or a third party login such as Facebook)";
 		lines[1]="2. Scroll down to the end of the page and click "+open+"Open API."+close;
-		lines[2]="3. Scroll to "+open+"API methods"+close+" in "+open+"Common parameters and response keys"+close;
+		lines[2]="3. Scroll to "+open+"API methods"+close+" under "+open+"Common parameters and response keys"+close;
 		lines[3]="4. Under Parameters, Look for "+open+"Your API key is:"+close+".";
-		lines[4]="5. Copy the 40-character hexadecimal string and paste into the box below.";
+		lines[4]="5. Copy the 40-character hexadecimal string and paste into the "+open+"API Key"+close+" field.";
 		if(html){
 			String ht="<html><body><h2>API Key Help</h3><ul>";
 			ht+="<li>"+lines[0]+"</li>";

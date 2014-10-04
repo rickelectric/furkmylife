@@ -144,8 +144,7 @@ public class FMTrayBox extends TrayWindow {
 			e.printStackTrace();
 		}
 
-		APIMessagePanel messages = API.getMessagePanel();
-
+		APIMessagePanel messages = new APIMessagePanel(API.getMessages());
 		tabbedPane
 				.addTab("Messages & Notifications",
 						new ImageIcon(

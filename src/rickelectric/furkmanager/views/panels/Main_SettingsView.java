@@ -137,7 +137,7 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_dwopt.add(lblBufferSize);
 		
 		spinner_buffsize = new JSpinner();
-		spinner_buffsize.setModel(new SpinnerNumberModel(1024, 8, 40960, 8));
+		spinner_buffsize.setModel(new SpinnerNumberModel(SettingsManager.downloadBuffer(), 8, 524288, 8));
 		spinner_buffsize.setBounds(12, 29, 68, 20);
 		panel_dwopt.add(spinner_buffsize);
 		
@@ -148,6 +148,13 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_dwopt.add(check_multipart);
 		
 		btn_optsave = new JButton("Save");
+		btn_optsave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int val = (int)spinner_buffsize.getValue();
+				SettingsManager.downloadBuffer(val);
+				SettingsManager.save();
+			}
+		});
 		btn_optsave.setBounds(12, 87, 98, 20);
 		panel_dwopt.add(btn_optsave);
 		
@@ -210,6 +217,7 @@ public class Main_SettingsView extends TranslucentPane {
 		btn_idmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SettingsManager.idmPath(input_idmexe.getText());
+				SettingsManager.save();
 			}
 		});
 		btn_idmSave.setBounds(6, 91, 83, 20);

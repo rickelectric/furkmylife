@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.network.APIBridge;
@@ -40,6 +41,7 @@ public class API {
 			msgCache.add(API.jsonMessage(j.getJSONObject(i)));
 		}
 		msgPanel.update();
+		try{FurkManager.getMainWindow().loadMessages();}catch(Exception e){}
 	}
 	
 	private static APIMessage jsonMessage(JSONObject o) {
