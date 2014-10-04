@@ -204,4 +204,9 @@ public class API_Label extends API{
 		return root;
 	}
 
+	public static void flush() {
+		try{allLabels.removeAll(allLabels);}catch(Exception e){}
+		allLabels=null;
+	}
+
 }

@@ -10,6 +10,8 @@ public class APIMessage {
 	public APIMessage(String type, String key) {
 		this.type = type;
 		this.key = key;
+		text = "";
+		code = 200;
 	}
 
 	@Override

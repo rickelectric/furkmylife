@@ -30,6 +30,13 @@ public class Main_SettingsView extends TranslucentPane {
 	private JCheckBox check_multipart;
 	private JSpinner spinner_buffsize;
 	private JButton button_dfsave;
+	private JPanel panel_idm;
+	private JCheckBox check_idm;
+	private JTextField input_idmexe;
+	private JButton btn_idmbrowse;
+	private JButton btn_idmdetect;
+	private JButton btn_optsave;
+	private JButton btn_idmSave;
 
 	public Main_SettingsView() {
 		super();
@@ -119,26 +126,94 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_dwfolder.add(button_dfsave);
 		
 		JPanel panel_dwopt = new JPanel();
-		panel_dwopt.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Optimization", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_dwopt.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Optimization (Internal Downloader)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_dwopt.setOpaque(false);
-		panel_dwopt.setBounds(12, 129, 229, 132);
+		panel_dwopt.setBounds(12, 129, 204, 128);
 		panel_downloader.add(panel_dwopt);
 		panel_dwopt.setLayout(null);
 		
 		JLabel lblBufferSize = new JLabel("Buffer Size (bytes): ");
-		lblBufferSize.setBounds(12, 25, 119, 16);
+		lblBufferSize.setBounds(12, 15, 119, 16);
 		panel_dwopt.add(lblBufferSize);
 		
 		spinner_buffsize = new JSpinner();
 		spinner_buffsize.setModel(new SpinnerNumberModel(1024, 8, 40960, 8));
-		spinner_buffsize.setBounds(149, 23, 68, 20);
+		spinner_buffsize.setBounds(12, 29, 68, 20);
 		panel_dwopt.add(spinner_buffsize);
 		
-		check_multipart = new JCheckBox("Use Multipartition Mode");
+		check_multipart = new JCheckBox("Use Multipart Mode");
 		check_multipart.setEnabled(false);
 		check_multipart.setOpaque(false);
-		check_multipart.setBounds(10, 64, 207, 24);
+		check_multipart.setBounds(12, 56, 161, 24);
 		panel_dwopt.add(check_multipart);
+		
+		btn_optsave = new JButton("Save");
+		btn_optsave.setBounds(12, 87, 98, 20);
+		panel_dwopt.add(btn_optsave);
+		
+		panel_idm = new JPanel();
+		panel_idm.setLayout(null);
+		panel_idm.setOpaque(false);
+		panel_idm.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "External Downloader (IDM)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_idm.setBounds(226, 129, 311, 128);
+		panel_downloader.add(panel_idm);
+		
+		check_idm = new JCheckBox("Enable IDM");
+		check_idm.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean b = check_idm.isSelected();
+				if(!b) input_idmexe.setText("");
+				input_idmexe.setEnabled(b);
+				btn_idmbrowse.setEnabled(b);
+				btn_idmdetect.setEnabled(b);
+				btn_idmSave.setEnabled(b);
+			}
+		});
+		check_idm.setOpaque(false);
+		check_idm.setBounds(6, 20, 97, 23);
+		panel_idm.add(check_idm);
+		
+		input_idmexe = new JTextField();
+		input_idmexe.setBounds(6, 60, 282, 20);
+		panel_idm.add(input_idmexe);
+		input_idmexe.setColumns(10);
+		
+		JLabel lblPathToExecutable = new JLabel("Path To Executable");
+		lblPathToExecutable.setBounds(10, 44, 120, 14);
+		panel_idm.add(lblPathToExecutable);
+		
+		btn_idmbrowse = new JButton("Browse...");
+		btn_idmbrowse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				String f=UtilBox.openFile("IDMExecutable");
+				if(f!=null&&!f.equals("")) input_idmexe.setText(f);
+			}
+		});
+		btn_idmbrowse.setBounds(205, 91, 83, 20);
+		panel_idm.add(btn_idmbrowse);
+		
+		btn_idmdetect = new JButton("Detect");
+		btn_idmdetect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idmPath = SettingsManager.checkPaths();
+				if(idmPath!=null){
+					input_idmexe.setText(idmPath);
+				}else{
+					btn_idmdetect.setEnabled(false);
+				}
+			}
+		});
+		btn_idmdetect.setBounds(106, 91, 83, 20);
+		panel_idm.add(btn_idmdetect);
+		
+		btn_idmSave = new JButton("Save");
+		btn_idmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SettingsManager.idmPath(input_idmexe.getText());
+			}
+		});
+		btn_idmSave.setBounds(6, 91, 83, 20);
+		panel_idm.add(btn_idmSave);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(UtilBox.getRandomColor());
@@ -183,5 +258,4 @@ public class Main_SettingsView extends TranslucentPane {
 		spinner_buffsize.setValue(SettingsManager.downloadBuffer());
 		
 	}
-	
 }

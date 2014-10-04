@@ -374,8 +374,10 @@ public class LoginWindow extends AppFrameClass {
 			furkAnimate(4);
 			try {
 				Thread.sleep(200);
-				boolean login = APIBridge.userLogin(username, password);
+				String key = APIBridge.userLogin(username, password);
+				boolean login=key!=null;
 				if (login) {
+					API.init(key);
 					boolean userRem = check_savecreds.isSelected();
 					SettingsManager.setUserRemember(userRem);
 					if (userRem) {

@@ -171,4 +171,10 @@ public class API_Download extends API{
 		return true;
 	}
 
+	public static void flush() {
+		try{downloadList.removeAll(downloadList);}catch(Exception e){}
+		downloadList=null;
+		lastError = "";
+	}
+
 }

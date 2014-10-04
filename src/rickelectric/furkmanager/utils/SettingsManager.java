@@ -128,7 +128,7 @@ public class SettingsManager implements Serializable {
 		useTunnel = false;
 	}
 
-	private String checkPaths() {
+	public static String checkPaths() {
 		String[] paths = {
 				"C:\\Program Files\\Internet Download Manager\\IDMan.exe",
 				"C:\\Program Files (x86)\\Internet Download Manager\\IDMan.exe", };
@@ -275,7 +275,7 @@ public class SettingsManager implements Serializable {
 	}
 
 	public static void idmPath(String s) {
-		if (s == null)
+		if (s == null || s.equals(""))
 			sMan.idm = false;
 		else
 			sMan.idm = true;

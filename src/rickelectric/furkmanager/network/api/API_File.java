@@ -30,13 +30,13 @@ public class API_File extends API {
 	private static ArrayList<FurkFile> fileList;
 
 	public static ArrayList<APIObject> jsonFiles(JSONArray files) {
-
+		
 		ArrayList<APIObject> fl = new ArrayList<APIObject>();
 
 		for (int i = 0; i < files.length(); i++) {
 			JSONObject x = (JSONObject) files.get(i);
-			Object tid = x.get("name");
-			if (tid != JSONObject.NULL) {
+			String tid = x.getString("name");
+			if (!tid.equals(JSONObject.NULL)) {
 
 				try {
 					Object fid = x.get("id");
@@ -54,13 +54,13 @@ public class API_File extends API {
 						try {
 							String t = keys.next();
 							if (t.equals("id"))
-								id = (String) x.get(t);
+								id = x.getString(t);
 							if (t.equals("name"))
-								name = (String) x.get(t);
+								name = x.getString(t);
 							if (t.equals("info_hash"))
-								info_hash = (String) x.get(t);
+								info_hash =x.getString(t);
 							if (t.equals("type"))
-								type = (String) x.get(t);
+								type = x.getString(t);
 							if (t.equals("size"))
 								size = x.getLong(t);
 							if (t.equals("is_linked"))
@@ -116,7 +116,7 @@ public class API_File extends API {
 				}
 			}
 		}
-
+		
 		return fl;
 	}
 
@@ -157,13 +157,13 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return null;
 		try{
-			Object m = re.get("messages");
-			if (m != null && m instanceof JSONArray)
-				setMessages((JSONArray) m);
+			JSONArray m = re.getJSONArray("messages");
+			setMessages(m);
 		}catch(Exception e){
-			
+			e.printStackTrace();
 		}
-		ArrayList<APIObject> f=jsonFiles(re.getJSONArray("files"));
+		JSONArray filesArr = re.getJSONArray("files");
+		ArrayList<APIObject> f=jsonFiles(filesArr);
 		ArrayList<FurkFile> ff=new ArrayList<FurkFile>();
 		
 		for(APIObject o:f){
@@ -271,6 +271,11 @@ public class API_File extends API {
 			}
 		}
 		return files;
+	}
+
+	public static void flush() {
+		try{fileList.removeAll(fileList);}catch(Exception e){}
+		fileList=null;
 	}
 
 }

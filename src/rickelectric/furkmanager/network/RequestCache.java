@@ -72,6 +72,7 @@ public class RequestCache {
 
 		public static void flush() {
 			requests.removeAll(requests);
+			System.gc();
 		}
 
 		public static Iterator<APIRequest> iterate() {

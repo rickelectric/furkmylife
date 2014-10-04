@@ -278,8 +278,8 @@ public class TunneledAPIBridge extends FurkBridge {
 		return jsonPost(dest, false, false);
 	}
 	
-	public static boolean userLogin(String username, String password) {
-		throw new RuntimeException("Cannot User Login Over The Tunnel. Please Use API Login Instead.");
+	public static String userLogin(String username, String password) {
+		throw new RuntimeException("Cannot User Login Over The Tunnel. Please Use API Login Instead, Or Turn Off Tunneled API.");
 	}
 
 	public static String userLoad() {

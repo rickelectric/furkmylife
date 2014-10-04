@@ -13,7 +13,7 @@ import rickelectric.furkmanager.utils.UtilBox;
 
 public class API_UserData extends API {
 
-	private static LoginModel currentLogin;
+	private static LoginModel currentLogin = null;
 	private static boolean isLoaded = false;
 
 	public static void loadUserData() {
@@ -89,11 +89,14 @@ public class API_UserData extends API {
 			if(isValid){
 				API.init(login.apiKey());
 			}
+			
 			break;
 		case LoginModel.CREDENTIALS:
-			isValid=APIBridge.userLogin(login.username(), UtilBox.charToString(login.password()));
+			String key=APIBridge.userLogin(login.username(), UtilBox.charToString(login.password()));
+			isValid = key!=null;
 			if(isValid){
-				login.setApiKey(API.key());
+				API.init(key);
+				login.setApiKey(key);
 			}
 			break;
 		default:
@@ -112,6 +115,11 @@ public class API_UserData extends API {
 
 	public static LoginModel currentLoginModel() {
 		return currentLogin;
+	}
+
+	public static void flush() {
+		currentLogin=null;
+		isLoaded=false;
 	}
 
 }

@@ -28,7 +28,7 @@ public class Main_FileView extends TranslucentPane {
 		tabbedPane.setBounds(4, 0, 554, 394);
 		add(tabbedPane);
 
-		pane_myfiles = new File_MyFiles(File_MyFiles.MYFILES);
+		pane_myfiles = new File_MyFiles(File_MyFiles.MYFILES,false);
 
 		tabbedPane.addTab(
 				"My Files",
@@ -56,7 +56,7 @@ public class Main_FileView extends TranslucentPane {
 		tabbedPane.addTab("Search Furk", null, pane_search, null);
 		pane_search.setLayout(null);
 
-		pane_recycler = new File_MyFiles(File_MyFiles.RECYCLER);
+		pane_recycler = new File_MyFiles(File_MyFiles.RECYCLER,true);
 		tabbedPane.addTab(
 				"Recycle Bin",
 				new ImageIcon(FurkManager.class

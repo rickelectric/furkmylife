@@ -16,24 +16,27 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.ImageManager;
+import rickelectric.furkmanager.views.panels.APIMessagePanel;
 
 public class FMTrayBox extends TrayWindow {
 	private static final long serialVersionUID = 1L;
 
 	private JTabbedPane tabbedPane;
-	private JPanel panel_functions, panel_stats;
-	private JLabel label_1, btn_showmm;
-	private JLabel btn_settings;
+	private JPanel panel_functions;
+	private JLabel btn_showmm, btn_settings;
 	private LoadingCircle loadingCircle;
+	private JLabel btn_userSettings;
 
 	public FMTrayBox() {
 		super("Movie Manager", new Font("Dialog", Font.BOLD | Font.ITALIC, 24));
 		setIconImage(new ImageIcon(
-				FurkManager.class.getResource("img/rickelectric.png")).getImage());
+				FurkManager.class.getResource("img/rickelectric.png"))
+				.getImage());
 		setTitle("Movie Manager - Tray Utility");
 		setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE);
-		
+
 		super.onClose(new Runnable() {
 			public void run() {
 				FurkManager.exit();
@@ -44,7 +47,7 @@ public class FMTrayBox extends TrayWindow {
 				FMTrayBox.this.setVisible(false);
 			}
 		});
-		
+
 		setMoveable(true);
 		setContentPane(contentPane);
 
@@ -83,7 +86,7 @@ public class FMTrayBox extends TrayWindow {
 											.getResource("/rickelectric/furkmanager/img/fr.png")),
 									32, -1)));
 
-			btn_settings = new JLabel("Change Settings");
+			btn_settings = new JLabel("Change App Settings");
 			btn_settings.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseReleased(MouseEvent e) {
@@ -114,32 +117,42 @@ public class FMTrayBox extends TrayWindow {
 			loadingCircle.setVisible(false);
 			loadingCircle.setBounds(74, 170, 126, 128);
 			panel_functions.add(loadingCircle);
-			
-			tabbedPane
-					.addTab("Quick Search",
-							new ImageIcon(
-									FMTrayBox.class
-											.getResource("/rickelectric/furkmanager/img/sm/web_view.png")),
-							new JPanel(), null);
 
-			panel_stats = new JPanel();
-			tabbedPane
-					.addTab("Stats",
-							new ImageIcon(
-									FMTrayBox.class
-											.getResource("/rickelectric/furkmanager/img/tree/text-16.png")),
-							panel_stats, null);
-			panel_stats.setLayout(new BorderLayout(0, 0));
-
-			label_1 = new JLabel("");
-			label_1.setIcon(new ImageIcon(
-					FMTrayBox.class
-							.getResource("/rickelectric/furkmanager/img/ajax-loader.gif")));
-			label_1.setHorizontalAlignment(SwingConstants.CENTER);
-			panel_stats.add(label_1, BorderLayout.CENTER);
+			btn_userSettings = new JLabel("Change User Settings");
+			btn_userSettings.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					FMTrayBox.this.setVisible(false);
+					FurkManager.getMainWindow().setVisible(true);
+					FurkManager.getMainWindow().toFront();
+					FurkManager.getMainWindow().userSettings();
+				}
+			});
+			btn_userSettings
+					.setIcon(new ImageIcon(
+							ImageManager.resizeImage(
+									ImageIO.read(FMTrayBox.class
+											.getResource("/rickelectric/furkmanager/img/dash/User-64.png")),
+									32, -1)));
+			btn_userSettings.setHorizontalAlignment(SwingConstants.LEFT);
+			btn_userSettings.setFont(new Font("Dialog", Font.BOLD, 14));
+			btn_userSettings
+					.setBorder(new BevelBorder(BevelBorder.RAISED));
+			btn_userSettings.setBounds(10, 109, 274, 40);
+			panel_functions.add(btn_userSettings);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		APIMessagePanel messages = API.getMessagePanel();
+
+		tabbedPane
+				.addTab("Messages & Notifications",
+						new ImageIcon(
+								FMTrayBox.class
+										.getResource("/rickelectric/furkmanager/img/sm/web_view.png")),
+						messages, "Notfications");
+
 		addListeners();
 	}
 

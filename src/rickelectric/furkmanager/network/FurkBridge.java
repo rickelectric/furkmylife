@@ -106,7 +106,7 @@ public class FurkBridge {
 				: APIBridge.labelSave(id, name, color, sorder, id_labels);
 	}
 
-	public static boolean userLogin(String username, String password) {
+	public static String userLogin(String username, String password) {
 		if(SettingsManager.useTunnel())
 			throw new RuntimeException(
 				"Cannot User Login Over The Tunnel. Please Use API Login Instead.");

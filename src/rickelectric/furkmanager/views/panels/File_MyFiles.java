@@ -1,8 +1,10 @@
 package rickelectric.furkmanager.views.panels;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -41,8 +43,14 @@ public class File_MyFiles extends JPanel implements Runnable{
 	private boolean loading;
 
 	private int numResults=0;
+	
+	public File_MyFiles(Mode mode,boolean hardReload){
+		this(mode);
+		
+		refreshMyFiles(hardReload);
+	}
 
-	public File_MyFiles(Mode mode) {
+	private File_MyFiles(Mode mode) {
 		super();
 		if (mode == null) {
 			return;
@@ -65,8 +73,6 @@ public class File_MyFiles extends JPanel implements Runnable{
 		resultPanel = new JPanel();
 		resultPanel.setBackground(getBackground());
 		resultScroller.setViewportView(resultPanel);
-
-		refreshMyFiles(true);
 	}
 
 	public void refreshMyFiles(final boolean hardReload){
@@ -120,7 +126,7 @@ public class File_MyFiles extends JPanel implements Runnable{
 					.getAllFinished() : API_File.getAllDeleted())
 					: (mode == RECYCLER ? API_File.getAllDeleted()
 							: API_File.getAllCached());
-
+			
 			resultPanel.removeAll();
 			resultPanel.setLayout(new BoxLayout(resultPanel,
 					BoxLayout.Y_AXIS));
@@ -133,10 +139,9 @@ public class File_MyFiles extends JPanel implements Runnable{
 			FurkFile[] oArr = new FurkFile[3];
 			int i = 0;
 			for (FurkFile o : ffarray) {
-				if (i < 3) {
-					oArr[i] = o;
-					i++;
-				} else {
+				oArr[i] = o;
+				i++;
+				if(i==3){
 					populateFileManager(oArr);
 					oArr = new FurkFile[3];
 					i = 0;
@@ -170,5 +175,67 @@ public class File_MyFiles extends JPanel implements Runnable{
 		} catch (Exception e) {
 		}
 		loading=false;
+	}
+
+	public void removeIcon(FileIcon icon) {
+		JPanel prev = null;
+		boolean propagate = false;
+		int prevNum = 0;
+		Component[] cpl = resultPanel.getComponents();
+		List<JPanel> cps = getPanels(cpl);
+		for(int i=0;i<cps.size();i++){
+			JPanel c = cps.get(i);
+			prev = c;
+			List<FileIcon> pIcons = getIcons(prev);
+			int index = pIcons.indexOf(icon);
+			if(index>=0){
+				prev.remove(icon);
+				prevNum = icon.num();
+				if(index==0){
+					pIcons.get(0).num(prevNum++);
+					pIcons.get(1).num(prevNum++);
+				}
+				if(index==1){
+					pIcons.get(1).num(prevNum++);
+				}
+				propagate = true;
+			}
+			if(propagate && i<cps.size()-1){
+				JPanel next = cps.get(i+1);
+				List<FileIcon> ics = getIcons(next);
+				for(FileIcon s:ics) s.num(prevNum++);
+				next.remove(ics.get(0));
+				prev.add(ics.get(0));
+				prev.repaint();
+				next.repaint();
+			}
+			if(i==cps.size()-1){
+				JPanel next = cps.get(i);
+				List<FileIcon> ics = getIcons(next);
+				if(ics.size()==0)
+					resultPanel.remove(next);
+			}
+		}
+		resultPanel.repaint();
+	}
+	
+	private List<JPanel> getPanels(Component[] cs){
+		ArrayList<JPanel> panel =new ArrayList<JPanel>();
+		for(Component c:cs){
+			if(c instanceof JPanel){
+				panel.add((JPanel) c);
+			}
+		}
+		return panel;
+	}
+
+	private List<FileIcon> getIcons(JPanel prev) {
+		ArrayList<FileIcon> icons = new ArrayList<FileIcon>();
+		for(Component c:prev.getComponents()){
+			if(c instanceof FileIcon){
+				icons.add((FileIcon)c);
+			}
+		}
+		return icons;
 	}
 }

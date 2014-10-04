@@ -171,6 +171,15 @@ public class FurkTrayIcon {
 
 			// construct a TrayIcon
 			trayIcon = new TrayIcon(image, "FurkManager", popup);
+			trayIcon.addMouseListener(new MouseAdapter(){
+				public void mouseClicked(MouseEvent e){
+					if(e.getButton()==MouseEvent.BUTTON1){
+						if(e.getClickCount()==1){
+							FurkManager.trayBox();
+						}
+					}
+				}
+			});
 			trayIcon.setImageAutoSize(true);
 
 			try {

@@ -103,7 +103,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		input_name = new JTextField();
 		input_name.setText("???");
 		input_name.setFont(new Font("Dialog", Font.BOLD, 12));
-		input_name.setBackground(Color.PINK);
+		input_name.setBackground(Color.WHITE);
 		input_name.setEditable(false);
 		input_name.setBounds(57, 91, 459, 22);
 		contentPane.add(input_name);
@@ -140,7 +140,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		input_size.setFont(new Font("Dialog", Font.BOLD, 12));
 		input_size.setEditable(false);
 		input_size.setColumns(10);
-		input_size.setBackground(Color.PINK);
+		input_size.setBackground(Color.WHITE);
 		input_size.setBounds(57, 124, 131, 22);
 		contentPane.add(input_size);
 		
@@ -160,6 +160,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		loading.setIcon(new ImageIcon(AddDownloadFrame.class.getResource("/rickelectric/furkmanager/img/ajax-loader.gif")));
 		loading.setHorizontalAlignment(SwingConstants.CENTER);
 		loading.setBounds(304, 124, 54, 55);
+		loading.setVisible(false);
 		contentPane.add(loading);
 	}
 	
@@ -206,6 +207,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		else if (link.endsWith(".torrent"))
 			addType = 1;
 		choice_type.setSelectedIndex(addType);
+		btn_add.setText("Check Download"); 
 	}
 	
 	private void addLink(final String link) {
@@ -332,7 +334,9 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 	}
 	
 	private void openFile() {
-		
+		String metafile = UtilBox.openFile("Torrent");
+		input_link.setText(metafile);
+		info();
 	}
 
 	private void close(){
@@ -346,7 +350,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		RequestCache.init();
 		
 		API.init("5323228d687ed9f7f1bdf9ce87050a1fa672e485");
-		AddDownloadFrame f=new AddDownloadFrame("C:\\Users\\Ionicle\\Torrents\\Jake 2.0.torrent");
+		AddDownloadFrame f=new AddDownloadFrame("G:\\Users\\Ionicle\\Torrents\\Jake 2.0.torrent");
 		f.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		f.setVisible(true);
 		;

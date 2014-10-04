@@ -30,7 +30,7 @@ import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.panels.Main_FileView;
+import rickelectric.furkmanager.views.panels.File_MyFiles;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 
@@ -69,17 +69,31 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 	private int mode;
 	private JLabel label_loading;
 	private JFadeLabel num;
-	
-	private void parentRefresh(){
+
+	private int number = 0;
+
+	private void parentRemoveIcon(FileIcon icon) {
 		Container parent = thisPanel;
 		try {
 			do {
 				parent = parent.getParent();
-			} while (!(parent instanceof Main_FileView));
-			((Main_FileView) parent).refreshMyFiles(false);
+			} while (!(parent instanceof File_MyFiles));
+			((File_MyFiles) parent).removeIcon(icon);
 		} catch (Exception e) {
-			System.err
-					.println("Could Not Find Proper Parent");
+			System.err.println("Could Not Find Proper Parent");
+			e.printStackTrace();
+		}
+	}
+
+	private void parentRefresh() {
+		Container parent = thisPanel;
+		try {
+			do {
+				parent = parent.getParent();
+			} while (!(parent instanceof File_MyFiles));
+			((File_MyFiles) parent).refreshMyFiles(false);
+		} catch (Exception e) {
+			System.err.println("Could Not Find Proper Parent");
 			e.printStackTrace();
 		}
 	}
@@ -102,92 +116,104 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 			super();
 
 			view = new JMenuItem("View Details");
-			view.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/arrow_expand.png")));
+			view.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/arrow_expand.png")));
 			view.addActionListener(this);
 
 			fview = new JMenuItem("Open Download Page");
-			fview.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/web_view.png")));
+			fview.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/web_view.png")));
 			fview.addActionListener(this);
 
 			add = new JMenuItem("Add To My Files");
-			add.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_add.png")));
+			add.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/edit_add.png")));
 			add.addActionListener(this);
 
 			add_dl = new JMenuItem("Add To My Downloads");
-			add_dl.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_add.png")));
+			add_dl.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/edit_add.png")));
 			add_dl.addActionListener(this);
-			
+
 			cp = new JMenuItem("Copy Download Page Link");
-			cp.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_icon.png")));
+			cp.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/edit_icon.png")));
 			cp.addActionListener(this);
 
 			JMenu download = new JMenu("Download File Using...");
-			download.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/download_gr.png")));
-			{	
+			download.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/download_gr.png")));
+			{
 				idm = new JMenuItem("Internet Download Manager");
-				idm.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/idm.png")));
+				idm.setIcon(new ImageIcon(FurkManager.class
+						.getResource("img/sm/idm.png")));
 				idm.addActionListener(this);
-				if(SettingsManager.idm()){ 
+				if (SettingsManager.idm()) {
 					download.add(idm);
 				}
-				
+
 				internal = new JMenuItem("Internal Downloader");
-				internal.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/file_download.png")));
+				internal.setIcon(new ImageIcon(FurkManager.class
+						.getResource("img/sm/file_download.png")));
 				internal.addActionListener(this);
-				if(cFile.getSize()>104857600L){
+				if (cFile.getSize() > 104857600L) {
 					internal.setEnabled(false);
 					internal.setToolTipText("For files <100MB in size");
 				}
 				download.add(internal);
-				
+
 				browser = new JMenuItem("Browser");
-				browser.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/internet_alt.png")));
+				browser.setIcon(new ImageIcon(FurkManager.class
+						.getResource("img/sm/internet_alt.png")));
 				browser.addActionListener(this);
 				download.add(browser);
-				
+
 				link = new JMenuItem("Link URL");
-				link.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_icon.png")));
+				link.setIcon(new ImageIcon(FurkManager.class
+						.getResource("img/sm/edit_icon.png")));
 				link.addActionListener(this);
 				download.add(link);
 			}
 
 			recycle = new JMenuItem("Send To Recycle Bin");
-			recycle.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/recycler.png")));
+			recycle.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/recycler.png")));
 			recycle.addActionListener(this);
 
 			delete = new JMenuItem("Delete Permanently");
-			delete.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_delete.png")));
+			delete.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/edit_delete.png")));
 			delete.addActionListener(this);
 
-			if (cFile instanceof FurkFile){
-				FurkFile cfFile=(FurkFile)cFile;
-				
-				if(cfFile.getDeletedReason()==null||cfFile.getDeletedReason().equals("")){
-					//Not In My Recycle Bin
+			if (cFile instanceof FurkFile) {
+				FurkFile cfFile = (FurkFile) cFile;
+
+				if (cfFile.getDeletedReason() == null
+						|| cfFile.getDeletedReason().equals("")) {
+					// Not In My Recycle Bin
 					add(view);
-					
-					if(!cfFile.isLinked()) //Not In My Files 
+
+					if (!cfFile.isLinked()) // Not In My Files
 						add(add);
-					
+
 					add(fview);
 					add(cp);
-					
-					if(cfFile.getUrlPage()==null||cfFile.getUrlPage().length()<4)
+
+					if (cfFile.getUrlPage() == null
+							|| cfFile.getUrlPage().length() < 4)
 						fview.setEnabled(false);
-					
-					if (cfFile.isReady()) //Ready For Download
+
+					if (cfFile.isReady()) // Ready For Download
 						add(download);
-					
-					if(cfFile.isLinked()) //In My Files
+
+					if (cfFile.isLinked()) // In My Files
 						add(recycle);
-				}
-				else{
-					//In Recycle Bin
-					if(((FurkFile) cFile).isReady()){ //File Not Yet Purged
+				} else {
+					// In Recycle Bin
+					if (((FurkFile) cFile).isReady()) { // File Not Yet Purged
 						add.setText("Restore");
 						add(add);
-					}
-					else{ //Not Ready -- Needs To Be Downloaded
+					} else { // Not Ready -- Needs To Be Downloaded
 						add_dl.setText("Re-Download");
 						add(add_dl);
 					}
@@ -209,7 +235,8 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 					action = true;
 					if (mode == SMALL_MODE) {
 						curr = icon_type.getIcon();
-						icon_type.setIcon(new ImageIcon(FurkManager.class.getResource("img/ajax-loader-48.gif")));
+						icon_type.setIcon(new ImageIcon(FurkManager.class
+								.getResource("img/ajax-loader-48.gif")));
 						icon_type.repaint();
 					} else if (mode == WIDE_MODE) {
 						label_loading.setVisible(true);
@@ -222,20 +249,21 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 						}
 						if (src.equals(fview)) {
 							// Furk View
-							UtilBox.openUrl("https://www.furk.net"+((FurkFile) cFile).getUrlPage());
+							UtilBox.openUrl("https://www.furk.net"
+									+ ((FurkFile) cFile).getUrlPage());
 						}
-						if(src.equals(cp)){
-							UtilBox.sendToClipboard("https://www.furk.net"+((FurkFile) cFile).getUrlPage());
+						if (src.equals(cp)) {
+							UtilBox.sendToClipboard("https://www.furk.net"
+									+ ((FurkFile) cFile).getUrlPage());
 						}
 						if (src.equals(add)) {
 							// Add To My Files
 							API_File.link(new String[] { ((FurkFile) cFile)
 									.getID() });
-							FurkManager.trayAlert(
-								FurkManager.TRAY_INFO,"Added",
-								"File '" + cFile.getName()+ "' Added To My Files",
-								null);
-							if(mode==WIDE_MODE){
+							FurkManager.trayAlert(FurkManager.TRAY_INFO,
+									"Added", "File '" + cFile.getName()
+											+ "' Added To My Files", null);
+							if (mode == WIDE_MODE) {
 								((FurkFile) cFile).setLinked(true);
 								check_linked.setSelected(true);
 							}
@@ -245,34 +273,47 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 							// Add To My Downloads
 							API_Download.addHash(cFile.getInfoHash());
 							FurkManager.trayAlert(FurkManager.TRAY_INFO,
-									"Download Added",
-									"'" + cFile.getName()+ "' Added To My Downloads",
-									null);
+									"Download Added", "'" + cFile.getName()
+											+ "' Added To My Downloads", null);
 						}
 						if (src.equals(browser)) {
 							// Browser Download
 							UtilBox.openUrl(((FurkFile) cFile).getUrlDl());
 						}
-						if(src.equals(idm)){
-							String path=SettingsManager.idmPath();
-							Runtime.getRuntime().exec(new String[]{
-								path,
-								"/d",
-								((FurkFile)cFile).getUrlDl(),
-								"/p",
-								SettingsManager.getDownloadFolder()
-							});
+						if (src.equals(idm)) {
+							try {
+								String path = SettingsManager.idmPath();
+								Runtime.getRuntime().exec(
+										new String[] {
+												path,
+												"-d",
+												((FurkFile) cFile).getUrlDl(),
+												"/p",
+												SettingsManager
+														.getDownloadFolder() });
+							} catch (Exception e) {
+								FurkManager
+										.trayAlert(
+												FurkManager.TRAY_ERROR,
+												"IDM Error",
+												"Could Not Find IDM Download Manager.\nIDM Will Be Disabled.",
+												null);
+								SettingsManager.idmPath(null);
+							}
 						}
 						if (src.equals(internal)) {
-							boolean dwld=DownloadManager.addDownload(
-									((FurkFile)cFile).getName(),
-								((FurkFile)cFile).getUrlDl(),
-								DownloadManager.actionSaveTo(true),true);
-							if(dwld) 
+							boolean dwld = DownloadManager.addDownload(
+									((FurkFile) cFile).getName(),
+									((FurkFile) cFile).getUrlDl(),
+									DownloadManager.actionSaveTo(true), true);
+							if (dwld)
 								FurkManager.trayAlert(
-									FurkManager.TRAY_INFO, "Downloading...",
-									"File "+cFile.getName()+
-									" is being downloaded uing the internal downloader.",null);
+										FurkManager.TRAY_INFO,
+										"Downloading...",
+										"File "
+												+ cFile.getName()
+												+ " is being downloaded uing the internal downloader.",
+										null);
 						}
 						if (src.equals(link)) {
 							// Copy Link To Clipboard
@@ -280,25 +321,24 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 									.getUrlDl());
 							FurkManager.trayAlert(FurkManager.TRAY_INFO,
 									"Link Copied",
-									"Download link to '" + cFile.getName()+ "' Copied To Clipboard",
-									null);
+									"Download link to '" + cFile.getName()
+											+ "' Copied To Clipboard", null);
 						}
 						if (src.equals(recycle)) {
 							// Recycle
 							String id = ((FurkFile) cFile).getID();
-							if(API_File.unlink(new String[] { id })){
+							if (API_File.unlink(new String[] { id })) {
 								FurkManager.trayAlert(FurkManager.TRAY_INFO,
-									"Deleted",
-									"File '" + cFile.getName()+ "' Sent To Recycle Bin",
-									null);
+										"Deleted", "File '" + cFile.getName()
+												+ "' Sent To Recycle Bin", null);
 							}
-							parentRefresh();
+							parentRemoveIcon(FileIcon.this);
 						}
 						if (src.equals(delete)) {
 							// Permanently Delete
 							String id = ((FurkFile) cFile).getID();
 							API_File.clear(new String[] { id });
-							parentRefresh();
+							parentRemoveIcon(FileIcon.this);
 						}
 					} catch (Exception e) {
 					}
@@ -318,28 +358,27 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public FileIcon(APIObject o){
+	public FileIcon(APIObject o) {
 		setOpaque(true);
 		this.cFile = o;
 		this.mode = WIDE_MODE;
 		this.thisPanel = this;
-		
+
 		bgc = UtilBox.getColor(Math.abs(o.getInfoHash().hashCode()));
 		setBackground(bgc);
-		
+
 		initWideMode(o);
-		
+
 		UtilBox.addMouseListenerToAll(this, new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
 				if (evt.getButton() == MouseEvent.BUTTON1
 						&& evt.getClickCount() == 2) {
 					if (cFile instanceof FurkFile)
-						if(
-							((FurkFile) cFile).getDeletedReason()==null||
-							((FurkFile) cFile).getDeletedReason().equals("")
-						)//Not Deleted
-						new FurkFileView((FurkFile) cFile);
+						if (((FurkFile) cFile).getDeletedReason() == null
+								|| ((FurkFile) cFile).getDeletedReason()
+										.equals(""))// Not Deleted
+							new FurkFileView((FurkFile) cFile);
 				}
 				if (evt.getButton() == MouseEvent.BUTTON3
 						&& evt.getClickCount() == 1) {
@@ -349,29 +388,28 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 			}
 		});
 	}
-	
-	public FileIcon(FurkFile o){
+
+	public FileIcon(FurkFile o) {
 		setOpaque(true);
 		this.cFile = o;
 		this.mode = SMALL_MODE;
 		this.thisPanel = this;
-		
+
 		bgc = UtilBox.getColor(Math.abs(o.getInfoHash().hashCode()));
 		setBackground(bgc);
-		
+
 		initSmallMode(o);
-		
+
 		UtilBox.addMouseListenerToAll(this, new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
 				if (evt.getButton() == MouseEvent.BUTTON1
 						&& evt.getClickCount() == 2) {
 					if (cFile instanceof FurkFile)
-						if(
-							((FurkFile) cFile).getDeletedReason()==null||
-							((FurkFile) cFile).getDeletedReason().equals("")
-						)//Not Deleted
-						new FurkFileView((FurkFile) cFile);
+						if (((FurkFile) cFile).getDeletedReason() == null
+								|| ((FurkFile) cFile).getDeletedReason()
+										.equals(""))// Not Deleted
+							new FurkFileView((FurkFile) cFile);
 				}
 				if (evt.getButton() == MouseEvent.BUTTON3
 						&& evt.getClickCount() == 1) {
@@ -380,7 +418,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 				}
 			}
 		});
-		
+
 		num = new JFadeLabel();
 		setLayer(num, 12);
 		num.setAlpha(0.6f);
@@ -389,9 +427,10 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		num.setBounds(12, 12, 50, 50);
 		add(num);
 	}
-	
-	public void num(int num){
-		this.num.setText(""+num);
+
+	public void num(int num) {
+		this.number = num;
+		this.num.setText(number + "");
 	}
 
 	public void initSmallMode(final APIObject o) {
@@ -412,11 +451,14 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		if (ty == null)
 			ty = "";
 		if (ty.equals("audio"))
-			icon = new ImageIcon(FurkManager.class.getResource("img/audio-48.png"));
+			icon = new ImageIcon(
+					FurkManager.class.getResource("img/audio-48.png"));
 		else if (ty.equals("video"))
-			icon = new ImageIcon(FurkManager.class.getResource("img/video-48.png"));
+			icon = new ImageIcon(
+					FurkManager.class.getResource("img/video-48.png"));
 		else if (ty.equals("image"))
-			icon = new ImageIcon(FurkManager.class.getResource("img/image-48.png"));
+			icon = new ImageIcon(
+					FurkManager.class.getResource("img/image-48.png"));
 		else
 			icon = new ImageIcon(FurkManager.class.getResource("img/fr-32.png"));
 		icon_type.setIcon(icon);
@@ -500,11 +542,12 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 
 		label_loading = new JLabel();
 		label_loading.setBounds(393, 35, 48, 48);
-		label_loading.setIcon(new ImageIcon(FurkManager.class.getResource("img/ajax-loader-48.gif")));
+		label_loading.setIcon(new ImageIcon(FurkManager.class
+				.getResource("img/ajax-loader-48.gif")));
 		label_loading.setVisible(false);
 		add(label_loading);
 
-		if (/*o instanceof FurkFile*/true) {
+		if (/* o instanceof FurkFile */true) {
 
 			label_furkview = new JLabel();
 			label_furkview.setToolTipText("Double Click To View On Furk.net");
@@ -527,7 +570,8 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 							.setBorder(new BevelBorder(BevelBorder.RAISED));
 				}
 			});
-			label_furkview.setIcon(new ImageIcon(FurkManager.class.getResource("img/fr-16.png")));
+			label_furkview.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/fr-16.png")));
 			label_furkview.setBorder(new BevelBorder(BevelBorder.RAISED));
 			label_furkview.setBounds(450, 35, 20, 20);
 			add(label_furkview);
@@ -567,13 +611,13 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 				}
 			});
 			add(check_linked);
-			
+
 			check_ready = new JCheckBox("Ready");
 			check_ready.setOpaque(false);
 			check_ready.setBounds(306, 56, 83, 20);
 			check_ready.setSelected(((FurkFile) o).isReady());
 			check_ready.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e){
+				public void actionPerformed(ActionEvent e) {
 					check_ready.setSelected(((FurkFile) o).isReady());
 				}
 			});
@@ -583,5 +627,9 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 
 	public int compareTo(FileIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
+	}
+
+	public int num() {
+		return number;
 	}
 }

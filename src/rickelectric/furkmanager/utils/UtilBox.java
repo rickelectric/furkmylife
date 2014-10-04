@@ -397,6 +397,48 @@ public class UtilBox {
 			}
 		}
 	}
+	
+	public static void addMouseMotionListenerToAll(Component parent,
+			MouseMotionListener listener,Class<?>[] exclude) {
+		for(Class<?> c:exclude){
+			if(parent.getClass() == c) return;
+		}
+		if (parent instanceof AbstractButton) {
+			AbstractButton a = (AbstractButton) parent;
+			boolean is = false;
+			MouseListener[] kl = a.getMouseListeners();
+			for (MouseListener k : kl) {
+				if (k.equals(listener)) {
+					is = true;
+					break;
+				}
+			}
+			if (!is)
+				a.addMouseMotionListener(listener);
+		}
+
+		else if (parent instanceof JComponent) {
+			JComponent a = (JComponent) parent;
+			boolean is = false;
+			MouseListener[] kl = a.getMouseListeners();
+			for (MouseListener k : kl) {
+				if (k.equals(listener)) {
+					is = true;
+					break;
+				}
+			}
+			if (!is)
+				a.addMouseMotionListener(listener);
+		}
+
+		if (parent instanceof Container) {
+			Component[] comps = ((Container) parent).getComponents();
+			for (Component c : comps) {
+				if(!(c instanceof JScrollPane))
+				addMouseMotionListenerToAll(c, listener,exclude);
+			}
+		}
+	}
 
 	public static String openFile(String type) {
 		JFileChooser fc = null;
@@ -404,8 +446,12 @@ public class UtilBox {
 		if (type.equals("Torrent")) {
 			fc = new JFileChooser(System.getProperty("user.home"));
 			fc.setFileFilter(new FileNameExtensionFilter(
-					"Torrent File (.torrent)", "torrent"));
-		} else {
+					"BitTorrent File (.torrent)", "torrent"));
+		} else if(type.equals("IDMExecutable")){
+			fc = new JFileChooser("C:\\");
+			fc.setFileFilter(new FileNameExtensionFilter(
+					"IDM Executable (IDMan.exe)", "exe"));
+		}else{
 			fc = new JFileChooser(System.getProperty("user.home"));
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		}

@@ -9,7 +9,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.json.JSONObject;
 
-public class APIBridge extends FurkBridge{
+public class APIBridge extends FurkBridge {
 
 	private static String api_key = null;
 
@@ -26,7 +26,7 @@ public class APIBridge extends FurkBridge{
 	}
 
 	private static boolean overrideCache = false;
-	public static boolean dummy=false;
+	public static boolean dummy = false;
 
 	public static boolean overrideCache() {
 		return overrideCache;
@@ -82,9 +82,10 @@ public class APIBridge extends FurkBridge{
 			boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if(dummy){
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -133,9 +134,10 @@ public class APIBridge extends FurkBridge{
 			String[] sort, boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if(dummy){
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -224,9 +226,10 @@ public class APIBridge extends FurkBridge{
 	public static String labelGet(boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if(dummy){
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -286,8 +289,8 @@ public class APIBridge extends FurkBridge{
 		return jsonPost(dest, false, false);
 	}
 
-	// Sets the api key and returns true if logged in sucessfully
-	public static boolean userLogin(String username, String password) {
+	// Sets the api key and returns if logged in sucessfully
+	public static String userLogin(String username, String password) {
 		if (api_key != null)
 			throw new RuntimeException("Already Logged In. Log Out First.");
 		if (username == null || password == null)
@@ -316,15 +319,16 @@ public class APIBridge extends FurkBridge{
 			throw new RuntimeException(j.getString("error") + " Tries Left: "
 					+ j.getString("tries_left"));
 		}
-		api_key = j.getString("api_key");
-		return true;
+		return j.getString("api_key");
 	}
 
 	public static String userLoad() {
-		if(api_key==null) return null;
-		if(dummy){
+		if (api_key == null)
+			return null;
+		if (dummy) {
 			try {
-				return StreamDownloader.fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -338,10 +342,11 @@ public class APIBridge extends FurkBridge{
 		if (api_key == null)
 			return true;
 		String url = API_BASE + "/login/logout?" + key();
-		String json = jsonGet(url, false, false);
-		JSONObject j = new JSONObject(json);
-		if (j.getString("status").equals("error"))
-			return false;
+		// String json =
+		jsonGet(url, false, false);
+		// JSONObject j = new JSONObject(json);
+		// if (j.getString("status").equals("error"))
+		// return false;
 		api_key = null;
 		return true;
 	}
@@ -405,7 +410,8 @@ public class APIBridge extends FurkBridge{
 		}
 	}
 
-	public static synchronized String jsonGet(String dest, boolean cacheCheck, boolean perm) {
+	public static synchronized String jsonGet(String dest, boolean cacheCheck,
+			boolean perm) {
 		if (api_key == null)
 			return null;
 		if (!overrideCache && cacheCheck) {
@@ -424,7 +430,8 @@ public class APIBridge extends FurkBridge{
 		}
 	}
 
-	public static synchronized String jsonPost(String dest, boolean cacheCheck, boolean perm) {
+	public static synchronized String jsonPost(String dest, boolean cacheCheck,
+			boolean perm) {
 		if (api_key == null)
 			return null;
 		if (!overrideCache && cacheCheck) {
