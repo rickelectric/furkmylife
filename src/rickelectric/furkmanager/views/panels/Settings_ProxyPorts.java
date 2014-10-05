@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -224,11 +224,10 @@ public class Settings_ProxyPorts extends JPanel {
 		button_ext_save.setEnabled(false);
 	}
 
-	public void closeOnSave(final JFrame f) {
+	public void closeOnSave(final JDialog sf) {
 		button_prox_save.addActionListener(new ActionListener(){
-
 			public void actionPerformed(ActionEvent arg0) {
-				f.dispose();
+				sf.dispose();
 			}
 		});
 	}

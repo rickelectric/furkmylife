@@ -16,7 +16,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.views.panels.APIMessagePanel;
 
@@ -28,9 +27,9 @@ public class FMTrayBox extends TrayWindow {
 	private JLabel btn_showmm, btn_settings;
 	private LoadingCircle loadingCircle;
 	private JLabel btn_userSettings;
-
+	
 	public FMTrayBox() {
-		super("Movie Manager", new Font("Dialog", Font.BOLD | Font.ITALIC, 24));
+		super("Furk Manager", new Font("Dialog", Font.BOLD | Font.ITALIC, 24));
 		setIconImage(new ImageIcon(
 				FurkManager.class.getResource("img/rickelectric.png"))
 				.getImage());
@@ -144,7 +143,7 @@ public class FMTrayBox extends TrayWindow {
 			e.printStackTrace();
 		}
 
-		APIMessagePanel messages = new APIMessagePanel(API.getMessages());
+		APIMessagePanel messages = new APIMessagePanel();
 		tabbedPane
 				.addTab("Messages & Notifications",
 						new ImageIcon(

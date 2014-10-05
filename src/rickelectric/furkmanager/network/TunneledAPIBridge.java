@@ -297,15 +297,17 @@ public class TunneledAPIBridge extends FurkBridge {
 		String dest = API_BASE + "/object=account&function=info&" + key();
 		return jsonPost(dest, false, false);
 	}
+	
+	public static void logout(){
+		api_key = null;
+	}
 
+	
 	public static boolean userLogout() {
 		if (api_key == null)
 			return true;
 		String url = API_BASE + "/object=login&function=logout&" + key();
-		String json = jsonGet(url, false, false);
-		JSONObject j = new JSONObject(json);
-		if (j.getString("status").equals("error"))
-			return false;
+		jsonGet(url, false, false);
 		api_key = null;
 		return true;
 	}

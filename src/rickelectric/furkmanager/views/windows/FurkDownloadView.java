@@ -82,7 +82,10 @@ public class FurkDownloadView extends JDialog {
 		contentPane.add(lblProgress);
 		
 		progress_have = new JProgressBar();
-		progress_have.setIndeterminate(true);
+		progress_have.setMaximum(100);
+		progress_have.setValue((int)Float.parseFloat(dl.getHave()));
+		progress_have.setStringPainted(true);
+		//progress_have.setIndeterminate(true);
 		progress_have.setBounds(114, 103, 342, 20);
 		contentPane.add(progress_have);
 		

@@ -337,16 +337,16 @@ public class APIBridge extends FurkBridge {
 		String dest = API_BASE + "/account/info?" + key();
 		return jsonPost(dest, false, false);
 	}
+	
+	public static void logout(){
+		api_key = null;
+	}
 
 	public static boolean userLogout() {
 		if (api_key == null)
 			return true;
 		String url = API_BASE + "/login/logout?" + key();
-		// String json =
 		jsonGet(url, false, false);
-		// JSONObject j = new JSONObject(json);
-		// if (j.getString("status").equals("error"))
-		// return false;
 		api_key = null;
 		return true;
 	}

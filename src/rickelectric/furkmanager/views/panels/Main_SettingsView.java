@@ -150,7 +150,7 @@ public class Main_SettingsView extends TranslucentPane {
 		btn_optsave = new JButton("Save");
 		btn_optsave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int val = (int)spinner_buffsize.getValue();
+				int val = (Integer)spinner_buffsize.getValue();
 				SettingsManager.downloadBuffer(val);
 				SettingsManager.save();
 			}

@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.SystemColor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -13,9 +11,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -27,6 +22,7 @@ import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.furkmanager.views.menus.Main_TopMenuBar;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
 import rickelectric.furkmanager.views.panels.Main_FeedView;
 import rickelectric.furkmanager.views.panels.Main_FileView;
@@ -53,7 +49,7 @@ public class MainWindow extends AppFrameClass {
 	public MainWindow() {
 		windowClose();
 
-		TopMenuBar bar = new TopMenuBar();
+		Main_TopMenuBar bar = new Main_TopMenuBar();
 		setJMenuBar(bar);
 
 		contentPane = new JPanel();
@@ -159,7 +155,7 @@ public class MainWindow extends AppFrameClass {
 					return;
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					for (int i = 0; i < 5; i++) {
-						//changeViewSection(i);
+						// changeViewSection(i);
 						if (e.getSource().equals(dashArray[1][i])) {
 							if (e.getClickCount() > 1 && cpNum == i) {
 								if (e.getClickCount() == 3) {
@@ -285,10 +281,11 @@ public class MainWindow extends AppFrameClass {
 		message.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				JOptionPane.showMessageDialog(
-						null,
-						message.getText().replace(". ", ". \n"),
-						"Message", JOptionPane.INFORMATION_MESSAGE);
+				if (message.getText().equals(""))
+					return;
+				JOptionPane.showMessageDialog(null,
+						message.getText().replace(". ", ". \n"), "Message",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		message.setVerticalAlignment(SwingConstants.TOP);
@@ -304,107 +301,18 @@ public class MainWindow extends AppFrameClass {
 	}
 
 	public void loadMessages() {
-		try{
+		try {
 			ArrayList<APIMessage> messages = API.getMessages();
-			if(messages==null || messages.size()==0) message.setText("");
+			if (messages == null || messages.size() == 0)
+				message.setText("");
 			String text = "";
-			for(APIMessage msg : messages){
-				text+=msg.getType().toUpperCase()+": \n"+msg.getText() + "\n\n";
+			for (APIMessage msg : messages) {
+				text += msg.getType().toUpperCase() + ": \n" + msg.getText()
+						+ "\n\n";
 			}
 			message.setText(text);
-		}catch(Exception e){}
-	}
-
-	class TopMenuBar extends JMenuBar implements ActionListener {
-		private static final long serialVersionUID = 1L;
-
-		private JMenuItem mi_addfdownload;
-		private JMenuItem mi_logout;
-
-		private JMenuItem mi_exit;
-
-		private JMenuItem mi_downloadman;
-
-		private JMenuItem mi_imgcache;
-
-		private JMenuItem mi_apiconsole;
-
-		private JMenuItem mi_topics;
-
-		private JMenuItem mi_about;
-
-		public TopMenuBar() {
-			JMenu mnFile = new JMenu("File");
-			add(mnFile);
-
-			mi_addfdownload = new JMenuItem("Add Furk Download");
-			mi_addfdownload.addActionListener(this);
-			mnFile.add(mi_addfdownload);
-
-			mi_logout = new JMenuItem("Log Out");
-			mi_logout.addActionListener(this);
-			mnFile.add(mi_logout);
-
-			mi_exit = new JMenuItem("Exit");
-			mi_exit.addActionListener(this);
-			mnFile.add(mi_exit);
-
-			JMenu mnTools = new JMenu("Tools");
-			add(mnTools);
-
-			mi_downloadman = new JMenuItem("File Download Manager");
-			mi_downloadman.addActionListener(this);
-			mnTools.add(mi_downloadman);
-
-			mi_imgcache = new JMenuItem("Image Cache Viewer");
-			mi_imgcache.addActionListener(this);
-			mnTools.add(mi_imgcache);
-
-			mi_apiconsole = new JMenuItem("API Console");
-			mi_apiconsole.addActionListener(this);
-			mnTools.add(mi_apiconsole);
-
-			JMenu mnHelp = new JMenu("Help");
-			add(mnHelp);
-
-			mi_topics = new JMenuItem("Topics");
-			mi_topics.addActionListener(this);
-			mnHelp.add(mi_topics);
-
-			mi_about = new JMenuItem("About");
-			mi_about.addActionListener(this);
-			mnHelp.add(mi_about);
+		} catch (Exception e) {
 		}
-
-		public void actionPerformed(ActionEvent e) {
-			Object src = e.getSource();
-			if (src.equals(mi_addfdownload)) {
-				new AddDownloadFrame().setVisible(true);
-			}
-			if (src.equals(mi_logout)) {
-				FurkManager.logout();
-			}
-			if (src.equals(mi_exit)) {
-				FurkManager.exit();
-			}
-			if (src.equals(mi_downloadman)) {
-				FurkManager.downloader(true);
-			}
-			if (src.equals(mi_apiconsole)) {
-				FurkManager.showConsole(true);
-			}
-			if (src.equals(mi_imgcache)) {
-				FurkManager.showImgCache(true);
-			}
-			if (src.equals(mi_topics)) {
-
-			}
-			if (src.equals(mi_about)) {
-
-			}
-
-		}
-
 	}
 
 	private boolean paneChanging = false;

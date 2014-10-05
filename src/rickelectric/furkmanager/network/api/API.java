@@ -10,6 +10,7 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.views.panels.APIMessagePanel;
 
 public class API {
@@ -20,7 +21,7 @@ public class API {
 	public static void init(String key) {
 		APIBridge.initialize(key);
 		msgCache = new ArrayList<APIMessage>();
-		msgPanel = new APIMessagePanel(msgCache);
+		msgPanel = new APIMessagePanel();
 	}
 
 	public static String key() {
@@ -97,6 +98,11 @@ public class API {
 
 	public static ArrayList<APIMessage> getMessages() {
 		return msgCache;
+	}
+
+	public static void clear() {
+		flushAll();
+		FurkBridge.userLogout();
 	}
 
 }

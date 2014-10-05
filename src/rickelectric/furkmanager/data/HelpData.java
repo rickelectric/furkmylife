@@ -29,7 +29,7 @@ public class HelpData {
 	public static String apiKey(boolean login,boolean html){
 		String[] lines=new String[5];
 		String link="http://www.furk.net/";
-		if(html) link="<a href=\""+link+"\" target=\"_blank\">this page</a>";
+		if(html) link = "<b>"+link+"</b> (<a href=\""+link+"\" target=\"_blank\">click here</a>)";
 		
 		String open=html?"<b><i>":"\"";
 		String close=html?"</i></b>":"\"";

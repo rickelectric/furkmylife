@@ -124,6 +124,12 @@ public class FurkBridge {
 				? TunneledAPIBridge.userLogout()
 				: APIBridge.userLogout();
 	}
+	
+	public static void logout(){
+		if(SettingsManager.useTunnel()) 
+			TunneledAPIBridge.logout();
+		else APIBridge.logout();
+	}
 
 	public static String searchFiles(String txt, boolean checkCache) {
 		return furkSearch(0, txt, checkCache);
