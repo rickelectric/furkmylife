@@ -173,7 +173,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 				APIFolderManager.move(item, parent.getUserObject());
 				if(nodes[i] instanceof FolderTreeNode){
 					APIFolder folder=((FolderTreeNode)nodes[i]).getUserObject();
-					nodes[i]=APIFolderManager.popTree(folder);
+					nodes[i]=APIFolderManager.populateTree(folder);
 				}
 			}
 			model.insertNodeInto(nodes[i], parent, index++);

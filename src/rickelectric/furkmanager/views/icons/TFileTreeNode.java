@@ -12,8 +12,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.idownloader.DownloadManager;
-import rickelectric.furkmanager.idownloader.SDownload;
 import rickelectric.furkmanager.models.FurkTFile;
+import rickelectric.furkmanager.network.ProxDownload;
 import rickelectric.furkmanager.player.MediaStreamer;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -148,7 +148,7 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(view)) {
 
-							SDownload d = new SDownload(new URL(tfile.getUrlDl()));
+							ProxDownload d = new ProxDownload(new URL(tfile.getUrlDl()));
 							new ImageViewer(d).setVisible(true);
 
 							/*
@@ -224,7 +224,7 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 			public void run() {
 				try {
 					if (tfile.getContentType().toLowerCase().contains("image")) {
-						SDownload d = new SDownload(new URL(tfile.getUrlDl()));
+						ProxDownload d = new ProxDownload(new URL(tfile.getUrlDl()));
 						new ImageViewer(d).setVisible(true);
 					}
 

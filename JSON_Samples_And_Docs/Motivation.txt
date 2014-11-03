@@ -1,7 +1,0 @@
-Millions of people use Furk.net on a daily basis. 
-If i could just get them to accept my API application, to post it on their site as a certified application for accessing Furk.
-
-Java Application - Free?.
-Android Application (If I ever get into Android programming) - $ per download maybe? Who knows?
-C# & .NET - Maybe I could pull it off.
-Windows 8 Metro App - Let's not get ahead of ourselves...

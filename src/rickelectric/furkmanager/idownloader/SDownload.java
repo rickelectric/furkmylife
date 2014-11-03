@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -186,9 +187,9 @@ public class SDownload extends Observable implements Runnable, Serializable {
 		}
 
 		if (SettingsManager.proxyEnabled()) {
-			client.getHostConfiguration().setProxy(
-					SettingsManager.getProxyHost(),
+			ProxyHost pHost = new ProxyHost(SettingsManager.getProxyHost(),
 					Integer.parseInt(SettingsManager.getProxyPort()));
+			client.getHostConfiguration().setProxyHost(pHost);
 			String encoded = new String(Base64.encode(new String(
 					SettingsManager.getProxyUser() + ":"
 							+ SettingsManager.getProxyPassword()).getBytes()));

@@ -1,9 +1,10 @@
 package rickelectric.furkmanager;
 
+import java.awt.Component;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import rickelectric.furkmanager.FurkTrayIcon;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.APIFolderManager;
@@ -21,7 +22,9 @@ import rickelectric.furkmanager.views.LoginSplashWindow;
 import rickelectric.furkmanager.views.windows.APIConsole;
 import rickelectric.furkmanager.views.windows.AddDownloadFrame;
 import rickelectric.furkmanager.views.windows.ImgCacheViewer;
+import rickelectric.furkmanager.views.windows.MainEnvironment;
 import rickelectric.furkmanager.views.windows.MainWindow;
+import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
 public class FurkManager {
 
@@ -32,7 +35,7 @@ public class FurkManager {
 	private static FMTrayBox trayBox = null;
 
 	private static LoginSplashWindow lWin = null;
-	private static MainWindow mWin = null;
+	private static PrimaryEnv mWin = null;
 	private static DownloadManager dwm = null;
 
 	private static APIConsole console = null;
@@ -100,6 +103,11 @@ public class FurkManager {
 		// Show Loading Splash, Exit Application On Close
 
 		LAF(0);
+		/**
+		 * Remove
+		 */
+		//APIBridge.dummy = true;
+
 		loadingSplash(true);
 
 		ThreadPool.init();
@@ -160,13 +168,13 @@ public class FurkManager {
 			lWin.loginMode();
 		else {
 			lWin.setText("Loading User Data...");
-			if(!API_UserData.isLoaded())
+			if (!API_UserData.isLoaded())
 				API_UserData.loadUserData();
 			lWin.setText("Loading Files...");
-			if(API_File.getAllCached()==null)
+			if (API_File.getAllCached() == null)
 				API_File.getAllFinished();
 			lWin.setText("Loading Folders...");
-			if(API_Label.getAllCached()==null){
+			if (API_Label.getAllCached() == null) {
 				API_Label.getAll();
 				lWin.setText("Folder Manager Initializing...");
 				APIFolderManager.init(API_Label.root());
@@ -193,7 +201,10 @@ public class FurkManager {
 				mWin.setVisible(true);
 			return;
 		}
-		mWin = new MainWindow();
+		if (SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE)
+			mWin = new MainEnvironment();
+		else
+			mWin = new MainWindow();
 		mWin.setLocationRelativeTo(lWin);
 		mWin.setVisible(true);
 	}
@@ -207,7 +218,8 @@ public class FurkManager {
 	}
 
 	public static void trayBox() {
-		if(API.key()==null || mWin==null) return;
+		if (API.key() == null || mWin == null)
+			return;
 		if (!trayBox.isShowing())
 			trayBox.position();
 		trayBox.setVisible(!trayBox.isShowing());
@@ -218,7 +230,7 @@ public class FurkManager {
 			if (!b)
 				return;
 			dwm = new DownloadManager();
-			dwm.setLocationRelativeTo(mWin);
+			dwm.setLocationRelativeTo((Component) mWin);
 		}
 		dwm.setVisible(b);
 		if (b)
@@ -264,14 +276,18 @@ public class FurkManager {
 					showImgCache(false);
 					RequestCache.ImageR.flush();
 
-					//RequestCache.init();
+					// RequestCache.init();
 					API.flushAll();
 					if (dwm != null)
 						DownloadManager.persist();
 					downloader(false);
 
 					mWin.setEnabled(false);
-					APIBridge.userLogout();
+					try {
+						APIBridge.userLogout();
+					} catch (Exception e) {
+						// TODO Log Errors
+					}
 					mWin.dispose();
 					mWin = null;
 
@@ -280,6 +296,8 @@ public class FurkManager {
 					lWin.setText("User Logged Out");
 					lWin.setVisible(true);
 				} catch (Exception e) {
+					if (mWin != null)
+						mWin.setEnabled(true);
 				}
 			}
 		};
@@ -291,9 +309,9 @@ public class FurkManager {
 			public void run() {
 				try {
 					DownloadManager.persist();
-					if(lWin.isShowing()){
+					if (lWin.isShowing()) {
 						lWin.setVisible(false);
-						while(lWin.isVisible()){
+						while (lWin.isVisible()) {
 							Thread.sleep(100);
 						}
 					}
@@ -310,8 +328,14 @@ public class FurkManager {
 		System.err.println(str);
 	}
 
-	public static MainWindow getMainWindow() {
+	public static PrimaryEnv getMainWindow() {
 		return mWin;
+	}
+
+	public static void mWinModeChanged() {
+		mWin.dispose();
+		mWin = null;
+		mainWin();
 	}
 
 }

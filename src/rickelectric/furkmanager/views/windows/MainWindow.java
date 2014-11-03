@@ -32,7 +32,7 @@ import rickelectric.furkmanager.views.swingmods.OpacEffects;
 import rickelectric.furkmanager.views.swingmods.Slideable;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
-public class MainWindow extends AppFrameClass {
+public class MainWindow extends AppFrameClass implements PrimaryEnv{
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPane;

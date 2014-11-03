@@ -35,7 +35,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 	}
 
 	public AppFrameClass() {
-		super.setTitle("Furk Manager");
+		super.setTitle("Furk My Life!");
 		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png")).getImage());
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -394,11 +394,12 @@ public class APIBridge extends FurkBridge {
 	}
 
 	public static boolean ping(String apiKey) {
+		if(dummy) return true;
 		if (apiKey == null)
 			return false;
 		String url = API_BASE + "/ping?api_key=" + apiKey;
 		try {
-			String stat = StreamDownloader.getStringStream(url, 8);
+			String stat = StreamDownloader.getStringStream(url);
 			JSONObject j = new JSONObject(stat);
 			String s = j.getString("status");
 			if (s.equals("ok"))
@@ -406,6 +407,7 @@ public class APIBridge extends FurkBridge {
 			else
 				return false;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException("Connection Error");
 		}
 	}
@@ -420,7 +422,7 @@ public class APIBridge extends FurkBridge {
 				return r;
 		}
 		try {
-			String s = StreamDownloader.getStringStream(dest, 4);
+			String s = StreamDownloader.getStringStream(dest);
 			if (s != null)
 				RequestCache.APIR.add(dest, s, perm);
 			return s;

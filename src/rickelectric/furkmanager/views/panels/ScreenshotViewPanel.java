@@ -19,9 +19,9 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.idownloader.SDownload;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
+import rickelectric.furkmanager.network.ProxDownload;
 import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.StreamDownloader;
 import rickelectric.furkmanager.utils.ImageManager;
@@ -161,7 +161,7 @@ class ScreenshotIcon extends JLabel {
 						try {
 							if (currIcon == null)
 								loadImg();
-							SDownload d = new SDownload(new URL(ssFullUrl));
+							ProxDownload d = new ProxDownload(new URL(ssFullUrl));
 							new ImageViewer(d).setVisible(true);
 						} catch (Exception ex) {
 						}

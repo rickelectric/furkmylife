@@ -37,36 +37,40 @@ public class Main_SettingsView extends TranslucentPane {
 	private JButton btn_idmdetect;
 	private JButton btn_optsave;
 	private JButton btn_idmSave;
+	private JTabbedPane tabbedPane;
 
 	public Main_SettingsView() {
 		super();
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
+		if(SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE)
+			setBackground(Color.lightGray);
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(4, 0, 554, 394);
 		add(tabbedPane);
-		
+
 		JPanel pane_connection = new Settings_ProxyPorts();
 		tabbedPane.addTab("Connection", null, pane_connection, null);
-		
+
 		JPanel panel_downloader = new JPanel();
 		panel_downloader.setBackground(UtilBox.getRandomColor());
 		tabbedPane.addTab("Downloader", null, panel_downloader, null);
 		panel_downloader.setLayout(null);
-		
+
 		JPanel panel_dwfolder = new JPanel();
 		panel_dwfolder.setOpaque(false);
-		panel_dwfolder.setBorder(new TitledBorder(null, "Default Folder", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_dwfolder.setBorder(new TitledBorder(null, "Default Folder",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_dwfolder.setBounds(12, 12, 525, 105);
 		panel_downloader.add(panel_dwfolder);
 		panel_dwfolder.setLayout(null);
-		
+
 		JLabel lblDefaultFolder = new JLabel("Default Destination Folder:");
 		lblDefaultFolder.setBounds(11, 18, 211, 16);
 		panel_dwfolder.add(lblDefaultFolder);
-		
+
 		input_dwFolder = new JTextField();
 		input_dwFolder.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 12));
 		input_dwFolder.setBackground(Color.WHITE);
@@ -75,101 +79,113 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_dwfolder.add(input_dwFolder);
 		input_dwFolder.setText(SettingsManager.getDownloadFolder());
 		input_dwFolder.setColumns(10);
-		
+
 		check_dwAsk = new JCheckBox("Ask Before Every Download");
 		check_dwAsk.setBounds(8, 64, 211, 20);
 		panel_dwfolder.add(check_dwAsk);
 		check_dwAsk.setOpaque(false);
 		check_dwAsk.setSelected(true);
-		
+
 		button_browse = new JButton("Browse...");
 		button_browse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-				String f=UtilBox.openFile(SettingsManager.getDownloadFolder());
-				if(f!=null&&!f.equals("")) input_dwFolder.setText(f);
+			public void actionPerformed(ActionEvent e) {
+				String f = UtilBox.openFile(SettingsManager.getDownloadFolder());
+				if (f != null && !f.equals(""))
+					input_dwFolder.setText(f);
 			}
 		});
 		button_browse.setBounds(415, 35, 98, 20);
 		panel_dwfolder.add(button_browse);
-		
+
 		button_dfsave = new JButton("Save");
 		button_dfsave.addActionListener(new ActionListener() {
-			boolean action=false;
-			public void actionPerformed(ActionEvent e){
-				if(action) return;
-				action=true;
+			boolean action = false;
+
+			public void actionPerformed(ActionEvent e) {
+				if (action)
+					return;
+				action = true;
 				button_dfsave.setText("Saving");
 				SettingsManager.setDownloadFolder(input_dwFolder.getText());
 				SettingsManager.askFolderOnDownload(check_dwAsk.isSelected());
 				SettingsManager.save();
-				new Thread(new Runnable(){
-					public void run(){
-						Color c=button_dfsave.getForeground();
-						Color b=button_dfsave.getBackground();
-						
+				new Thread(new Runnable() {
+					public void run() {
+						Color c = button_dfsave.getForeground();
+						Color b = button_dfsave.getBackground();
+
 						button_dfsave.setForeground(Color.GREEN);
 						button_dfsave.setBackground(Color.BLACK);
-						
+
 						button_dfsave.setText("Saved");
-						try{Thread.sleep(2000);}catch(Exception e){}
-						
+						try {
+							Thread.sleep(2000);
+						} catch (Exception e) {
+						}
+
 						button_dfsave.setText("Save");
 						button_dfsave.setForeground(c);
 						button_dfsave.setBackground(b);
-						
-						action=false;
+
+						action = false;
 					}
 				}).start();
 			}
 		});
 		button_dfsave.setBounds(415, 67, 98, 20);
 		panel_dwfolder.add(button_dfsave);
-		
+
 		JPanel panel_dwopt = new JPanel();
-		panel_dwopt.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Optimization (Internal Downloader)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_dwopt.setBorder(new TitledBorder(new LineBorder(new Color(184,
+				207, 229)), "Optimization (Internal Downloader)",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_dwopt.setOpaque(false);
 		panel_dwopt.setBounds(12, 129, 204, 128);
 		panel_downloader.add(panel_dwopt);
 		panel_dwopt.setLayout(null);
-		
+
 		JLabel lblBufferSize = new JLabel("Buffer Size (bytes): ");
 		lblBufferSize.setBounds(12, 15, 119, 16);
 		panel_dwopt.add(lblBufferSize);
-		
+
 		spinner_buffsize = new JSpinner();
-		spinner_buffsize.setModel(new SpinnerNumberModel(SettingsManager.downloadBuffer(), 8, 524288, 8));
+		spinner_buffsize.setModel(new SpinnerNumberModel(SettingsManager
+				.downloadBuffer(), 8, 524288, 8));
 		spinner_buffsize.setBounds(12, 29, 68, 20);
 		panel_dwopt.add(spinner_buffsize);
-		
+
 		check_multipart = new JCheckBox("Use Multipart Mode");
 		check_multipart.setEnabled(false);
 		check_multipart.setOpaque(false);
 		check_multipart.setBounds(12, 56, 161, 24);
 		panel_dwopt.add(check_multipart);
-		
+
 		btn_optsave = new JButton("Save");
 		btn_optsave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int val = (Integer)spinner_buffsize.getValue();
+				int val = (Integer) spinner_buffsize.getValue();
 				SettingsManager.downloadBuffer(val);
 				SettingsManager.save();
 			}
 		});
 		btn_optsave.setBounds(12, 87, 98, 20);
 		panel_dwopt.add(btn_optsave);
-		
+
 		panel_idm = new JPanel();
 		panel_idm.setLayout(null);
 		panel_idm.setOpaque(false);
-		panel_idm.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "External Downloader (IDM)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_idm.setBorder(new TitledBorder(new LineBorder(new Color(184, 207,
+				229)), "External Downloader (IDM)", TitledBorder.LEADING,
+				TitledBorder.TOP, null, null));
 		panel_idm.setBounds(226, 129, 311, 128);
 		panel_downloader.add(panel_idm);
-		
+
 		check_idm = new JCheckBox("Enable IDM");
 		check_idm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean b = check_idm.isSelected();
-				if(!b) input_idmexe.setText("");
+				if (!b)
+					input_idmexe.setText("");
 				input_idmexe.setEnabled(b);
 				btn_idmbrowse.setEnabled(b);
 				btn_idmdetect.setEnabled(b);
@@ -179,40 +195,41 @@ public class Main_SettingsView extends TranslucentPane {
 		check_idm.setOpaque(false);
 		check_idm.setBounds(6, 20, 97, 23);
 		panel_idm.add(check_idm);
-		
+
 		input_idmexe = new JTextField();
 		input_idmexe.setBounds(6, 60, 282, 20);
 		panel_idm.add(input_idmexe);
 		input_idmexe.setColumns(10);
-		
+
 		JLabel lblPathToExecutable = new JLabel("Path To Executable");
 		lblPathToExecutable.setBounds(10, 44, 120, 14);
 		panel_idm.add(lblPathToExecutable);
-		
+
 		btn_idmbrowse = new JButton("Browse...");
 		btn_idmbrowse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-				String f=UtilBox.openFile("IDMExecutable");
-				if(f!=null&&!f.equals("")) input_idmexe.setText(f);
+			public void actionPerformed(ActionEvent e) {
+				String f = UtilBox.openFile("IDMExecutable");
+				if (f != null && !f.equals(""))
+					input_idmexe.setText(f);
 			}
 		});
 		btn_idmbrowse.setBounds(205, 91, 83, 20);
 		panel_idm.add(btn_idmbrowse);
-		
+
 		btn_idmdetect = new JButton("Detect");
 		btn_idmdetect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String idmPath = SettingsManager.checkPaths();
-				if(idmPath!=null){
+				if (idmPath != null) {
 					input_idmexe.setText(idmPath);
-				}else{
+				} else {
 					btn_idmdetect.setEnabled(false);
 				}
 			}
 		});
 		btn_idmdetect.setBounds(106, 91, 83, 20);
 		panel_idm.add(btn_idmdetect);
-		
+
 		btn_idmSave = new JButton("Save");
 		btn_idmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -252,18 +269,18 @@ public class Main_SettingsView extends TranslucentPane {
 		label_2.setBounds(12, 44, 139, 16);
 		panel.add(label_2);
 
-		JPanel pane_ui = new JPanel();
+		JPanel pane_ui = new Settings_UIPanel();
 		tabbedPane.addTab("User Interface", null, pane_ui, null);
 		pane_ui.setLayout(null);
-		
+
 		load();
 	}
-	
-	private void load(){
+
+	private void load() {
 		input_dwFolder.setText(SettingsManager.getDownloadFolder());
 		check_dwAsk.setSelected(SettingsManager.askFolderOnDownload());
-		
+
 		spinner_buffsize.setValue(SettingsManager.downloadBuffer());
-		
+
 	}
 }

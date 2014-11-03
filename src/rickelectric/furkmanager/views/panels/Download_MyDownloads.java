@@ -18,12 +18,13 @@ import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.DownloadIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
+import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
-public class Download_MyDownloads extends JPanel implements Runnable{
+public class Download_MyDownloads extends JPanel implements Runnable {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel resultPanel;
-	private JScrollPane resultScroller;
+	protected JScrollPane resultScroller;
 	private boolean hardReload;
 
 	private enum Mode {
@@ -41,7 +42,7 @@ public class Download_MyDownloads extends JPanel implements Runnable{
 		if (mode == null)
 			throw new IllegalArgumentException("Mode Cannot Be Null");
 		this.mode = mode;
-		this.hardReload=false;
+		this.hardReload = false;
 		setLayout(null);
 		setBackground(UtilBox.getRandomColor());
 		resultScroller = new JScrollPane(
@@ -63,8 +64,8 @@ public class Download_MyDownloads extends JPanel implements Runnable{
 	public void refreshMyDownloads(final boolean hardReload) {
 		resultPanel.removeAll();
 		resultPanel.setLayout(null);
-		this.hardReload=hardReload;
-		
+		this.hardReload = hardReload;
+
 		label_loading = new JLabel();
 		label_loading.setHorizontalAlignment(SwingConstants.CENTER);
 		label_loading.setIcon(new ImageIcon(FurkManager.class
@@ -72,11 +73,11 @@ public class Download_MyDownloads extends JPanel implements Runnable{
 		label_loading.setBounds(200, 123, 107, 91);
 		resultPanel.add(label_loading);
 		repaint();
-		
+
 		new Thread(this).start();
 
 	}
-	
+
 	private void populateResultPanel(FurkDownload o) {
 		JPanel pane;
 		pane = new DownloadIcon(o);
@@ -91,14 +92,12 @@ public class Download_MyDownloads extends JPanel implements Runnable{
 			if (mode == FAILED)
 				stat = API_Download.STATUS_FAILED;
 			ArrayList<FurkDownload> fdarray = hardReload ? API_Download
-					.getAll(stat) : mode == FAILED ? API_Download
-					.getAll(stat) : API_Download.getAllCached();
+					.getAll(stat) : mode == FAILED ? API_Download.getAll(stat)
+					: API_Download.getAllCached();
 
 			resultPanel.removeAll();
-			resultPanel.setLayout(new BoxLayout(resultPanel,
-					BoxLayout.Y_AXIS));
-			resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3,
-					3, 3));
+			resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
+			resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 			if (fdarray == null)
 				return;
 
@@ -115,22 +114,22 @@ public class Download_MyDownloads extends JPanel implements Runnable{
 				resultScroller.repaint();
 			}
 			repaint();
-			((AppFrameClass) getTopLevelAncestor())
-					.setStatus("Loaded: "
-							+ numResults
-							+ " "
-							+ (mode == FAILED ? "Failed"
-									: "Active") + " Downloads");
+			((PrimaryEnv) getTopLevelAncestor()).setStatus("Loaded: "
+					+ numResults + " " + (mode == FAILED ? "Failed" : "Active")
+					+ " Downloads");
 		} catch (Exception e) {
 			label_loading.setIcon(new ImageIcon("img/remove.png"));
-			((AppFrameClass) getTopLevelAncestor())
-			.setStatus("Could Not Load "
-					+ " "
-					+ (mode == FAILED ? "Failed"
-							: "Active") + " Downloads");
+			((PrimaryEnv) getTopLevelAncestor()).setStatus("Could Not Load "
+					+ " " + (mode == FAILED ? "Failed" : "Active")
+					+ " Downloads");
 		}
-		((AppFrameClass) getTopLevelAncestor()).addConsole();
-		((AppFrameClass) getTopLevelAncestor()).addImgCacheViewer();
+		try {
+			if (getTopLevelAncestor() instanceof AppFrameClass) {
+				((AppFrameClass) getTopLevelAncestor()).addConsole();
+				((AppFrameClass) getTopLevelAncestor()).addImgCacheViewer();
+			}
+		} catch (Exception e) {
+		}
 	}
 
 }

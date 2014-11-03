@@ -70,7 +70,8 @@ public class Main_UserView extends TranslucentPane {
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
-		
+		if(SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE)
+			setBackground(Color.yellow);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(4, 0, 554, 394);

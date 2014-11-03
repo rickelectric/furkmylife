@@ -19,6 +19,11 @@ public class APIObject extends Observable{
 		this.size=size;
 	}
 	
+	public void stateChanged(){
+		setChanged();
+		notifyObservers(0);
+	}
+	
 	public String getName(){return name;}
 	public String getInfoHash(){return infoHash;}
 	

@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -61,7 +62,7 @@ public class FurkFileView extends JDialog implements Statable {
 	private JLabel statusBar;
 
 	public FurkFileView(final FurkFile ff) {
-		super(FurkManager.getMainWindow());
+		super((Window)FurkManager.getMainWindow());
 		setIconImage(Toolkit
 				.getDefaultToolkit()
 				.getImage(
@@ -370,7 +371,6 @@ public class FurkFileView extends JDialog implements Statable {
 	// windowlist.get(0).dispose();
 	// }
 
-	@Override
 	public void setStatus(String status) {
 		statusBar.setText(status);
 	}

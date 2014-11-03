@@ -119,6 +119,18 @@ public class FurkDownload extends APIObject {
 				+ (dateCompleted != null ? "dateCompleted=" + dateCompleted
 						: "") + "]";
 	}
+
+	public void pushClone(FurkDownload fd) {
+		dlStatus(fd.activeStatus, fd.peers, fd.seeders, fd.upSpeed, fd.downSpeed, fd.have);
+		bytes(fd.bytes,fd.upBytes);
+		
+		dlStatus=fd.dlStatus;
+		postProcStatus=fd.postProcStatus;
+		failReason=fd.failReason;
+		mtime=fd.mtime;
+		dateCompleted=fd.dateCompleted;
+		is_ready=fd.is_ready;
+	}
 	
 	
 }

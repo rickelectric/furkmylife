@@ -1,6 +1,5 @@
 package rickelectric.furkmanager.views.icons;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -8,7 +7,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import rickelectric.furkmanager.FurkManager;
@@ -30,14 +28,8 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 	private boolean isAction;
 	private FurkFile file;
 
-	private JTree parentTree;
-
 	public boolean isBusy() {
 		return isAction;
-	}
-
-	public void setParent(JTree parent) {
-		this.parentTree = parent;
 	}
 
 	public boolean expanded = false;
@@ -261,16 +253,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 	}
 
 	public void parentRef(boolean hard) {
-		Container parent = parentTree.getParent();
-		try {
-			while (!(parent instanceof File_FolderView)) {
-				parent = parent.getParent();
-			}
-			((File_FolderView) parent).refreshMyFolders(hard);
-		} catch (Exception e) {
-			System.err.println("Could Not Find Proper Parent");
-			e.printStackTrace();
-		}
+		File_FolderView.getInstance().refreshMyFolders(hard);
 	}
 
 	public boolean draggable() {

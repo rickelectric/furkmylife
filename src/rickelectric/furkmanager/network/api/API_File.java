@@ -211,13 +211,12 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return false;
 		for (String fid : fileIDs) {
-			Iterator<FurkFile> i = fileList.iterator();
-			while (i.hasNext()) {
-				APIObject f = i.next();
-				if (f instanceof FurkFile) {
-					String id = ((FurkFile) f).getID();
-					if (id.equals(fid))
-						i.remove();
+			for(int i=0;i<fileList.size();i++){
+				FurkFile f = fileList.get(i);
+				String id = f.getID();
+				if (id.equals(fid)){
+					fileList.remove(i);
+					break;
 				}
 			}
 		}

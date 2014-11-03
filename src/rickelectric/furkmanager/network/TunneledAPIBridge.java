@@ -1,6 +1,5 @@
 package rickelectric.furkmanager.network;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 
 import org.apache.commons.httpclient.methods.multipart.Part;
@@ -23,7 +22,6 @@ public class TunneledAPIBridge extends FurkBridge {
 	}
 
 	private static boolean overrideCache = false;
-	public static boolean dummy = false;
 
 	public static boolean overrideCache() {
 		return overrideCache;
@@ -71,15 +69,6 @@ public class TunneledAPIBridge extends FurkBridge {
 			boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if (dummy) {
-			try {
-				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
-		}
 		String dest = API_BASE + "/?object=dl&function=get&" + key();
 		if (get == GET_ID)
 			dest += "&id=" + param;
@@ -123,15 +112,6 @@ public class TunneledAPIBridge extends FurkBridge {
 			String[] sort, boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if (dummy) {
-			try {
-				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
-		}
 		String dest = API_BASE + "/?object=file&function=get&" + key();
 		if (get == GET_ID)
 			dest += "&id=" + param;
@@ -215,15 +195,6 @@ public class TunneledAPIBridge extends FurkBridge {
 	public static String labelGet(boolean checkCache) {
 		if (api_key == null)
 			return null;
-		if (dummy) {
-			try {
-				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
-		}
 		String dest = API_BASE + "/?object=label&function=get&" + key();
 		return jsonGet(dest, checkCache, false);
 	}
@@ -285,15 +256,6 @@ public class TunneledAPIBridge extends FurkBridge {
 	public static String userLoad() {
 		if (api_key == null)
 			return null;
-		if (dummy) {
-			try {
-				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
-		}
 		String dest = API_BASE + "/object=account&function=info&" + key();
 		return jsonPost(dest, false, false);
 	}

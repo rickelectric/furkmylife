@@ -1,10 +1,12 @@
 package rickelectric.furkmanager.views.panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
 public class Main_FeedView extends TranslucentPane {
@@ -16,6 +18,8 @@ public class Main_FeedView extends TranslucentPane {
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
+		if(SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE)
+			setBackground(Color.orange);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(4, 0, 554, 394);

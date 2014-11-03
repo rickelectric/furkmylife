@@ -269,7 +269,10 @@ public class DownloadIcon extends JPanel implements
 						}
 					}
 				} catch (Exception ex) {
-					if (ex.getMessage().equals("No Downloads Found")) {
+					if(ex.getMessage()==null){
+						
+					}
+					else if (ex.getMessage().equals("No Downloads Found")) {
 						FurkManager.trayAlert(FurkManager.TRAY_INFO,
 								"Download Complete", "Finished Downloading '"
 										+ cDownload.getName() + "'",

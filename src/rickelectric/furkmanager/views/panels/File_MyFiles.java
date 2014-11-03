@@ -32,7 +32,7 @@ public class File_MyFiles extends JPanel implements Runnable{
 
 	public static final Mode MYFILES = Mode.MYFILES, RECYCLER = Mode.RECYCLER;
 
-	private JScrollPane resultScroller;
+	protected JScrollPane resultScroller;
 	private JPanel resultPanel;
 	private boolean hardReload;
 
@@ -44,6 +44,9 @@ public class File_MyFiles extends JPanel implements Runnable{
 
 	private int numResults=0;
 	
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public File_MyFiles(Mode mode,boolean hardReload){
 		this(mode);
 		
@@ -170,8 +173,10 @@ public class File_MyFiles extends JPanel implements Runnable{
 					.getResource("img/remove.png")));
 		}
 		try {
-			((AppFrameClass) getTopLevelAncestor()).addConsole();
-			((AppFrameClass) getTopLevelAncestor()).addImgCacheViewer();
+			if (getTopLevelAncestor() instanceof AppFrameClass) {
+				((AppFrameClass) getTopLevelAncestor()).addConsole();
+				((AppFrameClass) getTopLevelAncestor()).addImgCacheViewer();
+			}
 		} catch (Exception e) {
 		}
 		loading=false;

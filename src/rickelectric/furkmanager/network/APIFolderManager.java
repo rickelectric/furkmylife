@@ -12,7 +12,6 @@ import rickelectric.furkmanager.models.MoveableItem;
 import rickelectric.furkmanager.network.api.API_Label;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FolderTreeNode;
-import rickelectric.furkmanager.views.panels.File_FolderView;
 
 public class APIFolderManager {
 
@@ -164,22 +163,22 @@ public class APIFolderManager {
 	public static DefaultMutableTreeNode generateTree() {
 		if (root == null)
 			return null;
-		FolderTreeNode head = popTree(root);
+		FolderTreeNode head = populateTree(root);
 		return head;
 	}
 
-	public static FolderTreeNode popTree(APIFolder folder) {
+	public static FolderTreeNode populateTree(APIFolder folder) {
 		FolderTreeNode col = new FolderTreeNode(folder);
-		col.setParent(File_FolderView.currTree());
+		//col.setParent(File_FolderView.currTree());
 		
 		ArrayList<MoveableItem> list = folder.getFiles();
 		for (MoveableItem m : list) {
 			if (m instanceof APIFolder) {
-				FolderTreeNode ftr = popTree((APIFolder) m);
+				FolderTreeNode ftr = populateTree((APIFolder) m);
 				col.add(ftr);
 			} else if (m instanceof FurkFile) {
 				FileTreeNode ftr = new FileTreeNode((FurkFile) m);
-				ftr.setParent(File_FolderView.currTree());
+				//ftr.setParent(File_FolderView.currTree());
 				col.add(ftr);
 			}
 		}

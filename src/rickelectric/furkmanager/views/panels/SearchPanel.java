@@ -32,7 +32,7 @@ import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
-public class SearchPanel extends JPanel implements ActionListener,Runnable {
+public class SearchPanel extends JPanel implements ActionListener, Runnable {
 	private static final long serialVersionUID = 1L;
 
 	public static final int FILESEARCH = 100, FURKSEARCH = 101,
@@ -43,7 +43,7 @@ public class SearchPanel extends JPanel implements ActionListener,Runnable {
 	private JPanel resultPanel;
 	private JTextField input_searchtext;
 	private int searchMode;
-	
+
 	private boolean isSearching = false;
 	private JButton button_search;
 	private JRadioButton mod_full;
@@ -63,8 +63,10 @@ public class SearchPanel extends JPanel implements ActionListener,Runnable {
 			loading.setVisible(b);
 			input_searchtext.setBounds(9, 20, 511, 20);
 			button_search.setBounds(400, 54, 120, 23);
-			((AppFrameClass)getTopLevelAncestor()).addConsole();
-			((AppFrameClass)getTopLevelAncestor()).addImgCacheViewer();
+			if (getTopLevelAncestor() instanceof AppFrameClass) {
+				((AppFrameClass) getTopLevelAncestor()).addConsole();
+				((AppFrameClass) getTopLevelAncestor()).addImgCacheViewer();
+			}
 		}
 	}
 
@@ -107,21 +109,22 @@ public class SearchPanel extends JPanel implements ActionListener,Runnable {
 
 		loading = new JLabel();
 		loading.setBounds(470, 11, 50, 50);
-		loading.setIcon(new ImageIcon(FurkManager.class.getResource("img/ajax-loader-48.gif")));
+		loading.setIcon(new ImageIcon(FurkManager.class
+				.getResource("img/ajax-loader-48.gif")));
 		loading.setVisible(false);
 		searchPanel.add(loading);
 
 		panel = new JPanel();
 		panel.setOpaque(false);
-		panel.setBorder(new TitledBorder(new LineBorder(
-				new Color(0,0,0)), "Moderator (Safe Search)",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)),
+				"Moderator (Safe Search)", TitledBorder.LEADING,
+				TitledBorder.TOP, null, null));
 		panel.setBounds(9, 42, 305, 53);
-		
-		if (searchMode!=FILESEARCH&&FurkUserData.User.flags != null
-				&& FurkUserData.User.flags==URI_Enums.Prefs_Flags.NONE)
+
+		if (searchMode != FILESEARCH && FurkUserData.User.flags != null
+				&& FurkUserData.User.flags == URI_Enums.Prefs_Flags.NONE)
 			searchPanel.add(panel);
-		
+
 		panel.setLayout(null);
 
 		mod_full = new JRadioButton("Fully Moderated");
@@ -156,9 +159,9 @@ public class SearchPanel extends JPanel implements ActionListener,Runnable {
 		resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		resultPanel.setBackground(getBackground());
 		resultScroller.setViewportView(resultPanel);
-		
+
 	}
-	
+
 	public void run() {
 		try {
 			resultPanel.removeAll();
@@ -174,10 +177,8 @@ public class SearchPanel extends JPanel implements ActionListener,Runnable {
 			}
 			if (numResults > 0) {
 				setStatus("Displaying " + numResults + " Found Files");
-				resultScroller.getVerticalScrollBar()
-						.setBlockIncrement(200);
-				resultScroller.getVerticalScrollBar().setUnitIncrement(
-						50);
+				resultScroller.getVerticalScrollBar().setBlockIncrement(200);
+				resultScroller.getVerticalScrollBar().setUnitIncrement(50);
 			} else
 				setStatus("No Files Found.");
 			isSearching(false);
@@ -220,7 +221,7 @@ public class SearchPanel extends JPanel implements ActionListener,Runnable {
 
 	private void populateResultField(APIObject o, boolean wide) {
 		FileIcon pane = new FileIcon(o);
-		
+
 		resultPanel.add(pane);
 		resultPanel.add(Box.createVerticalStrut(5));
 	}

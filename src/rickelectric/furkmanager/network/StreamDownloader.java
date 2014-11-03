@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -28,20 +29,21 @@ import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpHost;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.xerces.impl.dv.util.Base64;
 
 import rickelectric.furkmanager.models.ImgRequest;
 import rickelectric.furkmanager.utils.SettingsManager;
 
 public class StreamDownloader {
-	
-	private static boolean interrupt=false;
+
+	private static boolean interrupt = false;
 
 	public static String fileToString(String filepath) throws IOException {
 		FileReader f = new FileReader(filepath);
@@ -54,44 +56,172 @@ public class StreamDownloader {
 		b.close();
 		return full;
 	}
-	
-	public static String postDataPartStream(String fileURL, Part[] parts){
 
-		HttpClient client = new HttpClient();
+	public static String postDataPartStream(String fileURL, Part[] parts)
+			throws IOException {
+		OutputStream out = new ByteArrayOutputStream();
+		URLConnection conn = null;
+		URL url = new URL(fileURL);
 
-		try {
-			
-			PostMethod filePost = new PostMethod(fileURL);
-			if (SettingsManager.proxyEnabled()){
-				client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
-				String encoded = new String(
-						Base64.encode(new String(
-								SettingsManager.getProxyUser() + ":"
-										+ SettingsManager.getProxyPassword())
-								.getBytes()));
+		int batchWriteSize = SettingsManager.downloadBuffer();
 
-				filePost.addRequestHeader("Proxy-Authorization", "Basic "
-						+ encoded);
-			}
-			
-			filePost.setRequestEntity(new MultipartRequestEntity(parts,
-					filePost.getParams()));
-			if(interrupt){
-				interrupt=false;
-				return null;
-			}
-			client.executeMethod(filePost);
-			if(interrupt){
-				filePost.abort();
-				interrupt=false;
-				return null;
-			}
-			return filePost.getResponseBodyAsString();
+		if (SettingsManager.proxyEnabled()) {
+			Proxy proxy = new Proxy(SettingsManager.getProxyType(),
+					new InetSocketAddress(SettingsManager.getProxyHost(),
+							Integer.parseInt(SettingsManager.getProxyPort())));
+
+			Authenticator authenticator = new Authenticator() {
+
+				public PasswordAuthentication getPasswordAuthentication() {
+					return (new PasswordAuthentication(
+							SettingsManager.getProxyUser(), SettingsManager
+									.getProxyPassword().toCharArray()));
+				}
+			};
+			Authenticator.setDefault(authenticator);
+
+			conn = url.openConnection(proxy);
+		} else {
+			conn = url.openConnection();
 		}
-		catch(HttpException e){e.printStackTrace();}
-		catch(IOException e){e.printStackTrace();}
+
+		HttpMethodParams params = new HttpMethodParams();
+		MultipartRequestEntity reqEntity = new MultipartRequestEntity(parts,
+				params);
+		conn.setUseCaches(false);
+		conn.setDoOutput(true);
+
+		if (conn instanceof HttpsURLConnection)
+			((HttpsURLConnection) conn).setRequestMethod("POST");
+		else
+			((HttpURLConnection) conn).setRequestMethod("POST");
+		conn.setRequestProperty("Connection", "Keep-Alive");
+		conn.addRequestProperty("Content-length", reqEntity.getContentLength()
+				+ "");
+		conn.addRequestProperty("Content-Type", reqEntity.getContentType());
+
+		OutputStream os = conn.getOutputStream();
+		reqEntity.writeRequest(conn.getOutputStream());
+		os.flush();
+		os.close();
+
+		int responseCode;
+		if (conn instanceof HttpsURLConnection) {
+			responseCode = ((HttpsURLConnection) conn).getResponseCode();
+			if (responseCode < 200 || responseCode > 299) {
+				((HttpsURLConnection) conn).disconnect();
+				throw new FileNotFoundException("Server returned "
+						+ responseCode);
+			}
+		} else {
+			responseCode = ((HttpURLConnection) conn).getResponseCode();
+			if (responseCode < 200 || responseCode > 299) {
+				((HttpURLConnection) conn).disconnect();
+				throw new FileNotFoundException("Server returned "
+						+ responseCode);
+			}
+		}
+
+		int contentLength = conn.getContentLength();
+		if (contentLength < 1) {
+			throw new IOException("Stream Empty");
+		}
+
+		BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
+		if (interrupt) {
+			interrupt = false;
+			return null;
+		}
+
+		byte[] b = new byte[batchWriteSize];
+		int bytesRead = bis.read(b, 0, batchWriteSize);
+		while (bytesRead != -1) {
+			if (interrupt) {
+				out.close();
+				interrupt = false;
+				return null;
+			}
+			out.write(b, 0, bytesRead);
+			bytesRead = bis.read(b, 0, batchWriteSize);
+		}
+		bis.close();
+		String s = out.toString();
+		out.flush();
+		out.close();
+		return s;
+	}
+
+	private static void proxySettings(HttpClient client, HttpMethod method) {
+		if (SettingsManager.proxyEnabled()) {
+			client.getParams().setParameter(
+					"Proxy",
+					new HttpHost(SettingsManager.getProxyHost(), Integer
+							.parseInt(SettingsManager.getProxyPort())));
+			String encoded = new String(Base64.encode(new String(
+					SettingsManager.getProxyUser() + ":"
+							+ SettingsManager.getProxyPassword()).getBytes()));
+
+			method.addRequestHeader("Proxy-Authorization", "Basic " + encoded);
+		}
+	}
+	
+	public static String getStringStream(String url) throws IOException{
+		URL obj = new URL(url);
+		HttpsURLConnection con = null;
+		if (SettingsManager.proxyEnabled()) {
+			Proxy proxy = new Proxy(SettingsManager.getProxyType(),
+					new InetSocketAddress(SettingsManager.getProxyHost(),
+							Integer.parseInt(SettingsManager.getProxyPort())));
+			System.out.println("Proxy Enabled.\nConnecting To: "
+					+ SettingsManager.getProxyHost() + ": "
+					+ Integer.parseInt(SettingsManager.getProxyPort()));
+			Authenticator authenticator = new Authenticator() {
+
+				public PasswordAuthentication getPasswordAuthentication() {
+					return (new PasswordAuthentication(
+							SettingsManager.getProxyUser(), SettingsManager
+									.getProxyPassword().toCharArray()));
+				}
+			};
+			Authenticator.setDefault(authenticator);
+			con = (HttpsURLConnection) obj.openConnection(proxy);
+		} else {
+			con = (HttpsURLConnection) obj.openConnection();
+		}
+		con.setRequestMethod("GET");
+		con.setRequestProperty("User-Agent", "Mozilla/5.0");
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		if (interrupt) {
+			interrupt = false;
+			return null;
+		}
 		
-		return null;
+		int responseCode = con.getResponseCode();
+		if (responseCode < 200 || responseCode > 299)
+			throw new IOException("Server Error: Code " + responseCode);
+
+		if (interrupt) {
+			interrupt = false;
+			return null;
+		}
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(
+				con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			if (interrupt) {
+				in.close();
+				interrupt = false;
+				return null;
+			}
+			response.append(inputLine);
+			response.append("\n");
+		}
+		in.close();
+
+		return response.toString();
 	}
 
 	public static String getStringStream(String fileURL, int batchWriteSize)
@@ -114,27 +244,15 @@ public class StreamDownloader {
 			get.addRequestHeader("Proxy-Authorization", "Basic "
 					+ encoded);
 		}
-		if(interrupt){
-			interrupt=false;
-			return null;
-		}
+
 		try {
 			client.executeMethod(get);
-			if(interrupt){
-				get.abort();
-				interrupt=false;
-				return null;
-			}
 		} catch (ConnectException e) {
 			out.close();
 			throw new IOException("ConnectionException trying to GET "
 					+ fileURL, e);
 		}
-		if(interrupt){
-			interrupt=false;
-			return null;
-		}
-		
+
 		if (get.getStatusCode() < 200||get.getStatusCode()>299) {
 			out.close();
 			throw new FileNotFoundException("Server returned "
@@ -142,19 +260,10 @@ public class StreamDownloader {
 		}
 		BufferedInputStream bis = new BufferedInputStream(
 				get.getResponseBodyAsStream());
-		if(interrupt){
-			interrupt=false;
-			return null;
-		}
-		
+
 		byte[] b = new byte[batchWriteSize];
 		int bytesRead = bis.read(b, 0, batchWriteSize);
 		while (bytesRead != -1) {
-			if(interrupt){
-				out.close();
-				interrupt=false;
-				return null;
-			}
 			out.write(b, 0, bytesRead);
 			bytesRead = bis.read(b, 0, batchWriteSize);
 		}
@@ -165,75 +274,69 @@ public class StreamDownloader {
 		return s;
 	}
 
+	
+	
 	public static String postStringStream(String urlx, int batchWriteSize)
 			throws Exception {
 		String[] urli = urlx.split("[?]");
 		URL obj = new URL(urli[0]);
-		HttpsURLConnection con=null;
-		if(SettingsManager.proxyEnabled()){
-			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort())));
-			System.out.println("Proxy Enabled.\nConnecting To: "+SettingsManager.getProxyHost()+": "+Integer.parseInt(SettingsManager.getProxyPort()));
+		HttpsURLConnection con = null;
+		if (SettingsManager.proxyEnabled()) {
+			Proxy proxy = new Proxy(SettingsManager.getProxyType(),
+					new InetSocketAddress(SettingsManager.getProxyHost(),
+							Integer.parseInt(SettingsManager.getProxyPort())));
+			System.out.println("Proxy Enabled.\nConnecting To: "
+					+ SettingsManager.getProxyHost() + ": "
+					+ Integer.parseInt(SettingsManager.getProxyPort()));
 			Authenticator authenticator = new Authenticator() {
 
-		        public PasswordAuthentication getPasswordAuthentication() {
-		            return (new PasswordAuthentication(SettingsManager.getProxyUser(),
-		                    SettingsManager.getProxyPassword().toCharArray()));
-		        }
-		    };
-		    Authenticator.setDefault(authenticator);
+				public PasswordAuthentication getPasswordAuthentication() {
+					return (new PasswordAuthentication(
+							SettingsManager.getProxyUser(), SettingsManager
+									.getProxyPassword().toCharArray()));
+				}
+			};
+			Authenticator.setDefault(authenticator);
 			con = (HttpsURLConnection) obj.openConnection(proxy);
-		}
-		else{
-			con=(HttpsURLConnection) obj.openConnection();
+		} else {
+			con = (HttpsURLConnection) obj.openConnection();
 		}
 		con.setRequestMethod("POST");
 		con.setRequestProperty("User-Agent", "Mozilla/5.0");
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		if(interrupt){
-			interrupt=false;
+		if (interrupt) {
+			interrupt = false;
 			return null;
 		}
-		/*
-		if (SettingsManager.proxyEnabled()) {
-			String encoded = new String(
-					new sun.misc.BASE64Encoder().encode(new String(
-							SettingsManager.getProxyUser() + ":"
-									+ SettingsManager.getProxyPassword())
-							.getBytes()));
 
-			con.setRequestProperty("Proxy-Authorization", "Basic "
-					+ encoded);
-		}
-		*/
-		
 		// Send post request
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		if(interrupt){
-			interrupt=false;
+		if (interrupt) {
+			interrupt = false;
 			return null;
 		}
 		wr.writeBytes(urli[1]);
 		wr.flush();
 		wr.close();
 		int responseCode = con.getResponseCode();
-		if (responseCode < 200||responseCode>299)
+		if (responseCode < 200 || responseCode > 299)
 			throw new Exception("Server Error: Code " + responseCode);
-		
-		if(interrupt){
-			interrupt=false;
+
+		if (interrupt) {
+			interrupt = false;
 			return null;
 		}
-		
+
 		BufferedReader in = new BufferedReader(new InputStreamReader(
 				con.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
 
 		while ((inputLine = in.readLine()) != null) {
-			if(interrupt){
+			if (interrupt) {
 				in.close();
-				interrupt=false;
+				interrupt = false;
 				return null;
 			}
 			response.append(inputLine);
@@ -253,20 +356,24 @@ public class StreamDownloader {
 		String nextCookie = null, titleRet = null;
 		obj = new URL(url);
 		do {
-			if(SettingsManager.proxyEnabled()){
-				Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort())));
+			if (SettingsManager.proxyEnabled()) {
+				Proxy proxy = new Proxy(
+						SettingsManager.getProxyType(),
+						new InetSocketAddress(
+								SettingsManager.getProxyHost(),
+								Integer.parseInt(SettingsManager.getProxyPort())));
 				Authenticator authenticator = new Authenticator() {
 
-			        public PasswordAuthentication getPasswordAuthentication() {
-			            return (new PasswordAuthentication(SettingsManager.getProxyUser(),
-			                    SettingsManager.getProxyPassword().toCharArray()));
-			        }
-			    };
-			    Authenticator.setDefault(authenticator);
+					public PasswordAuthentication getPasswordAuthentication() {
+						return (new PasswordAuthentication(
+								SettingsManager.getProxyUser(), SettingsManager
+										.getProxyPassword().toCharArray()));
+					}
+				};
+				Authenticator.setDefault(authenticator);
 				con = (HttpURLConnection) obj.openConnection(proxy);
-			}
-			else{
-				con=(HttpURLConnection) obj.openConnection();
+			} else {
+				con = (HttpURLConnection) obj.openConnection();
 			}
 			con.setRequestMethod("GET");
 			con.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -275,7 +382,7 @@ public class StreamDownloader {
 				con.setRequestProperty("Cookie",
 						"JSESSIONID=" + URLEncoder.encode(nextCookie, "UTF-8"));
 			con.setInstanceFollowRedirects(false);
-			
+
 			con.setConnectTimeout(8000);
 			con.connect();
 
@@ -306,7 +413,7 @@ public class StreamDownloader {
 
 		} while ((responseCode / 100) == 3);/* codes 3XX are redirections */
 
-		if (responseCode < 200||responseCode > 299)
+		if (responseCode < 200 || responseCode > 299)
 			throw new Exception("Server Error: Code " + responseCode);
 
 		InputStream in = con.getInputStream();
@@ -325,27 +432,18 @@ public class StreamDownloader {
 
 	public static BufferedImage getImageStream(String fileURL,
 			int batchWriteSize) throws IOException {
-		ImgRequest img=RequestCache.ImageR.get(fileURL);
-		if(img!=null) return img.getImage();
-		
+		ImgRequest img = RequestCache.ImageR.get(fileURL);
+		if (img != null)
+			return img.getImage();
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		GetMethod get = new GetMethod(fileURL);
 		HttpClient client = new HttpClient();
 		HttpClientParams params = client.getParams();
 		params.setSoTimeout((int) (8000));
 		client.setParams(params);
-		
-		if (SettingsManager.proxyEnabled()) {
-			client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
-			String encoded = new String(
-					Base64.encode(new String(
-							SettingsManager.getProxyUser() + ":"
-									+ SettingsManager.getProxyPassword())
-							.getBytes()));
 
-			get.addRequestHeader("Proxy-Authorization", "Basic "
-					+ encoded);
-		}
+		proxySettings(client, get);
 
 		try {
 			client.executeMethod(get);
@@ -355,7 +453,7 @@ public class StreamDownloader {
 					+ fileURL, e);
 		}
 
-		if (get.getStatusCode() < 200||get.getStatusCode()>299) {
+		if (get.getStatusCode() < 200 || get.getStatusCode() > 299) {
 			out.close();
 			throw new FileNotFoundException("Server returned "
 					+ get.getStatusCode());
@@ -376,8 +474,12 @@ public class StreamDownloader {
 
 		out.flush();
 		out.close();
-		
-		try{RequestCache.ImageR.add(fileURL, image);}catch(Exception e){e.printStackTrace();}
+
+		try {
+			RequestCache.ImageR.add(fileURL, image);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return image;
 	}
 
@@ -389,18 +491,8 @@ public class StreamDownloader {
 		HttpClientParams params = client.getParams();
 		params.setSoTimeout((int) (8000));
 		client.setParams(params);
-		
-		if (SettingsManager.proxyEnabled()) {
-			client.getHostConfiguration().setProxy(SettingsManager.getProxyHost(),Integer.parseInt(SettingsManager.getProxyPort()));
-			String encoded = new String(
-					Base64.encode(new String(
-							SettingsManager.getProxyUser() + ":"
-									+ SettingsManager.getProxyPassword())
-							.getBytes()));
 
-			get.addRequestHeader("Proxy-Authorization", "Basic "
-					+ encoded);
-		}
+		proxySettings(client, get);
 
 		try {
 			client.executeMethod(get);
@@ -410,7 +502,7 @@ public class StreamDownloader {
 					+ fileURL, e);
 		}
 
-		if (get.getStatusCode() < 200||get.getStatusCode()>299) {
+		if (get.getStatusCode() < 200 || get.getStatusCode() > 299) {
 			out.close();
 			throw new FileNotFoundException("Server returned "
 					+ get.getStatusCode());
@@ -431,6 +523,6 @@ public class StreamDownloader {
 	}
 
 	public static void interrupt() {
-		interrupt=true;
+		interrupt = true;
 	}
 }

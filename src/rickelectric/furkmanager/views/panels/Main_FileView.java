@@ -1,12 +1,15 @@
 package rickelectric.furkmanager.views.panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
 public class Main_FileView extends TranslucentPane {
@@ -23,26 +26,32 @@ public class Main_FileView extends TranslucentPane {
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
+		if (SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE) {
+			setBackground(Color.darkGray);
+			setPreferredSize(new Dimension(561,
+					GraphicsEnvironment.getLocalGraphicsEnvironment()
+							.getMaximumWindowBounds().height - 200));
+		}
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(4, 0, 554, 394);
+		tabbedPane.setBounds(4, 0, 554, getPreferredSize().height - 8);
 		add(tabbedPane);
 
-		pane_myfiles = new File_MyFiles(File_MyFiles.MYFILES,false);
+		pane_myfiles = new File_MyFiles(File_MyFiles.MYFILES, false);
 
 		tabbedPane.addTab(
 				"My Files",
 				new ImageIcon(FurkManager.class
-						.getResource("img/dash/Files-16.png")), pane_myfiles,
+						.getResource("img/dash/Files-16.png")), pane_myfiles.resultScroller,
 				"All My Files");
 		pane_myfiles.setLayout(null);
 
-		pane_folders = new File_FolderView();
+		pane_folders = File_FolderView.getInstance();
 		tabbedPane.addTab(
 				"Folders (Labels)",
 				new ImageIcon(FurkManager.class
 						.getResource("img/tree/folder-blue-16.png")),
-				pane_folders, "Organize Files In Folders");
+				pane_folders.scroller, "Organize Files In Folders");
 		pane_folders.setLayout(null);
 
 		JPanel pane_find = new SearchPanel(SearchPanel.FILESEARCH);
@@ -56,11 +65,11 @@ public class Main_FileView extends TranslucentPane {
 		tabbedPane.addTab("Search Furk", null, pane_search, null);
 		pane_search.setLayout(null);
 
-		pane_recycler = new File_MyFiles(File_MyFiles.RECYCLER,true);
+		pane_recycler = new File_MyFiles(File_MyFiles.RECYCLER, true);
 		tabbedPane.addTab(
 				"Recycle Bin",
 				new ImageIcon(FurkManager.class
-						.getResource("img/sm/recycler.png")), pane_recycler,
+						.getResource("img/sm/recycler.png")), pane_recycler.resultScroller,
 				null);
 
 	}

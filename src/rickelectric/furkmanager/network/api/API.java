@@ -42,21 +42,25 @@ public class API {
 			msgCache.add(API.jsonMessage(j.getJSONObject(i)));
 		}
 		msgPanel.update();
-		try{FurkManager.getMainWindow().loadMessages();}catch(Exception e){}
+		try {
+			FurkManager.getMainWindow().loadMessages();
+		} catch (Exception e) {
+		}
 	}
-	
+
 	private static APIMessage jsonMessage(JSONObject o) {
 		String type = o.getString("type");
 		String key = o.getString("key");
-		APIMessage msg = new APIMessage(type,key);
-		try{
+		APIMessage msg = new APIMessage(type, key);
+		try {
 			String txt = o.getString("txt");
 			msg.setText(txt);
-		}catch(Exception e){}
+		} catch (Exception e) {
+		}
 		return msg;
 	}
 
-	public static void flushAll(){
+	public static void flushAll() {
 		API_Download.flush();
 		API_File.flush();
 		API_Label.flush();

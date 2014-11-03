@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -25,7 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.idownloader.SDownload;
+import rickelectric.furkmanager.network.ProxDownload;
 import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
@@ -55,11 +56,13 @@ public class ImageViewer extends JDialog {
 
 	public static void main(String[] args) throws MalformedURLException {
 		SettingsManager.init();
+		SettingsManager.setProxy(Proxy.Type.SOCKS, "localhost", "9150", "", "");
+		SettingsManager.enableProxy(true);
 		// loadAll("Pictures", "C:\\Users\\Ionicle\\", true);
 		// viewAll(20);
-		SDownload d = new SDownload(
+		ProxDownload d = new ProxDownload(
 				new URL(
-						"http://33.media.tumblr.com/tumblr_m5cra4gyKr1rxmba4o1_400.gif"));
+						"https://j5h7rua7iqqvh35k5nmake7rio.gcdn.biz/ss/4764133/3"));
 		new ImageViewer(d).setVisible(true);
 	}
 
@@ -162,7 +165,7 @@ public class ImageViewer extends JDialog {
 	 * @param d
 	 *            A Download
 	 */
-	public ImageViewer(final SDownload d) {
+	public ImageViewer(final ProxDownload d) {
 		construct("Downloading...");
 		image_poster.setIcon(new ImageIcon(FurkManager.class
 				.getResource("img/ajax-loader.gif")));
@@ -171,7 +174,7 @@ public class ImageViewer extends JDialog {
 				d.run();
 				setTitle(d.getFileName());
 				title_text.setText(d.getFileName());
-				imageToDisplay(d.image());
+				imageToDisplay(d.toImage());
 			}
 		}).start();
 	}

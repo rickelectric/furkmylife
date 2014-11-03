@@ -20,7 +20,6 @@ public class FurkBridge {
 	}
 
 	private static boolean overrideCache = false;
-	public static boolean dummy = false;
 
 	public static boolean overrideCache() {
 		return overrideCache;

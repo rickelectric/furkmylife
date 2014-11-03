@@ -33,19 +33,20 @@ import rickelectric.furkmanager.views.windows.AppFrameClass;
 public class File_FolderView extends JLayeredPane implements MouseListener,
 		KeyListener {
 	private static final long serialVersionUID = 1L;
-	private static JTree folder_tree;
+	private JTree folder_tree;
+	private static File_FolderView thisInstance = null;
 	private Thread thisRun;
-	private JScrollPane scroller;
+	protected JScrollPane scroller;
 	private TransferHandler transferer;
 	private TreeCellRenderer renderer;
 	private JFadeLabel loading;
 	private JPopupMenu menu;
 
-	public static JTree currTree() {
+	public JTree currTree() {
 		return folder_tree;
 	}
 
-	public File_FolderView() {
+	private File_FolderView() {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(null);
 
@@ -66,6 +67,13 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		renderer = new FolderTreeRenderer();
 
 		refreshMyFolders(false);
+	}
+	
+	public static File_FolderView getInstance(){
+		if(thisInstance==null){
+			thisInstance = new File_FolderView();
+		}
+		return thisInstance;
 	}
 
 	@Override
@@ -88,13 +96,9 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 			public void run() {
 				loading.setVisible(true);
 				loading.setAlpha(1.0f);
-				if(folder_tree!=null) folder_tree.setEnabled(false);
-				try{
-					JTree folder_tree = new JTree();
-					folder_tree.setModel(getTreeModel(hardReload));
-					
-					File_FolderView.folder_tree=folder_tree;
-					
+				if(folder_tree==null){
+					folder_tree = new JTree();
+
 					folder_tree.addMouseListener(File_FolderView.this);
 					folder_tree.addKeyListener(File_FolderView.this);
 	
@@ -108,14 +112,19 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 					folder_tree.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 					folder_tree.getSelectionModel().setSelectionMode(
 							TreeSelectionModel.SINGLE_TREE_SELECTION);
-	
-					OpacEffects.fadeOut(loading, 20);
-					scroller.setViewportView(folder_tree);
 					
+					scroller.setViewportView(folder_tree);
+				}
+				folder_tree.setEnabled(false);
+				try{
+					folder_tree.setModel(getTreeModel(hardReload));
+	
+					OpacEffects.fadeOut(loading, 30);
+					folder_tree.setEnabled(true);
 					folder_tree.requestFocus();
 				}catch(Exception e){
 					folder_tree.setEnabled(true);
-					OpacEffects.fadeOut(loading, 40);
+					OpacEffects.fadeOut(loading, 30);
 				}
 				repaint();
 			}
@@ -218,7 +227,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 			statusPath(tp);
 		}
 		if (e.getKeyCode() == KeyEvent.VK_F5) {
-			refreshMyFolders(true);
+			refreshMyFolders(e.isShiftDown());
 		}
 	}
 
