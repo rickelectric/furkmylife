@@ -11,6 +11,7 @@ import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkLabel;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 
 /**
  * Access Furk Files
@@ -143,10 +144,10 @@ public class API_File extends API {
 		}
 		String json = null;
 		if (type == GET_FINISHED)
-			json = APIBridge.fileGet(APIBridge.GET_ALL, null, limoffs,
+			json = APIBridge.fileGet(FurkBridge.GET_ALL, null, limoffs,
 					null, true);
 		else if (type == GET_DELETED)
-			json = APIBridge.fileGet(APIBridge.GET_TRASH, null, limoffs,
+			json = APIBridge.fileGet(FurkBridge.GET_TRASH, null, limoffs,
 					null, true);
 		else
 			throw new IllegalArgumentException(
@@ -175,7 +176,7 @@ public class API_File extends API {
 	public static APIObject get(String fileID) {
 		if (fileID == null || fileID.equals(""))
 			return null;
-		String json = APIBridge.fileGet(APIBridge.GET_ID, fileID, null,
+		String json = APIBridge.fileGet(FurkBridge.GET_ID, fileID, null,
 				null, true);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
@@ -195,7 +196,7 @@ public class API_File extends API {
 	}
 
 	public static boolean link(String[] fileIDs) {
-		String json = APIBridge.fileLinkstate(APIBridge.LINK_LINK, fileIDs);
+		String json = APIBridge.fileLinkstate(FurkBridge.LINK_LINK, fileIDs);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return false;
@@ -205,7 +206,7 @@ public class API_File extends API {
 	}
 
 	public static boolean unlink(String[] fileIDs) {
-		String json = APIBridge.fileLinkstate(APIBridge.LINK_UNLINK,
+		String json = APIBridge.fileLinkstate(FurkBridge.LINK_UNLINK,
 				fileIDs);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
@@ -225,7 +226,7 @@ public class API_File extends API {
 
 	public static boolean clear(String[] fileIDs) {
 		String json = APIBridge
-				.fileLinkstate(APIBridge.LINK_CLEAR, fileIDs);
+				.fileLinkstate(FurkBridge.LINK_CLEAR, fileIDs);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return false;

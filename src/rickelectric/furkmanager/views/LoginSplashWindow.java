@@ -35,7 +35,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -49,6 +51,7 @@ import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Settings_ProxyPorts;
+import rickelectric.furkmanager.views.panels.Settings_UIPanel;
 import rickelectric.furkmanager.views.swingmods.JButtonLabel;
 
 public class LoginSplashWindow extends JFrame {
@@ -77,6 +80,7 @@ public class LoginSplashWindow extends JFrame {
 	private JPanel panel_login;
 	private Rectangle label_loading;
 	private ImageObserver loadingImageObserver = new ImageObserver() {
+		@Override
 		public boolean imageUpdate(Image img, int infoflags, int x, int y,
 				int width, int height) {
 			if (panel_login.isVisible())
@@ -86,6 +90,7 @@ public class LoginSplashWindow extends JFrame {
 		}
 	};
 	private ImageObserver frameImageObserver = new ImageObserver() {
+		@Override
 		public boolean imageUpdate(Image img, int infoflags, int x, int y,
 				int width, int height) {
 			repaint(x, y, width, height);
@@ -115,13 +120,15 @@ public class LoginSplashWindow extends JFrame {
 				startPoint = LoginSplashWindow.this.getMousePosition();
 		}
 
+		@Override
 		public void mouseReleased(MouseEvent e) {
 			startPoint = null;
 		}
 	};
 	private JCheckBox check_savecreds;
-	private JDialog sf = null;
+	private JDialog sf = null, uf = null;
 	private JButtonLabel btn_apihelp;
+	private JButtonLabel buttonLabel;
 
 	public void addListeners() {
 		UtilBox.addMouseListenerToAll(contentPane, pointInit);
@@ -133,7 +140,8 @@ public class LoginSplashWindow extends JFrame {
 	public LoginSplashWindow() {
 		setUndecorated(true);
 		setBackground(new Color(255, 255, 255, 0));
-		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png")).getImage());
+		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png"))
+				.getImage());
 
 		contentPane = new JPanel();
 		contentPane.setBackground(getBackground());
@@ -141,7 +149,8 @@ public class LoginSplashWindow extends JFrame {
 		contentPane.setIgnoreRepaint(true);
 		contentPane.setLayout(null);
 
-		btn_X = new JButtonLabel("",new Runnable() {
+		btn_X = new JButtonLabel("", new Runnable() {
+			@Override
 			public void run() {
 				setText("Exiting...");
 				FurkManager.exit();
@@ -153,7 +162,8 @@ public class LoginSplashWindow extends JFrame {
 		btn_X.setBounds(639, 11, 39, 23);
 		contentPane.add(btn_X);
 
-		btn_min = new JButtonLabel("",new Runnable() {
+		btn_min = new JButtonLabel("", new Runnable() {
+			@Override
 			public void run() {
 				setState(ICONIFIED);
 			}
@@ -220,6 +230,7 @@ public class LoginSplashWindow extends JFrame {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					ThreadPool.run(new Runnable() {
+						@Override
 						public void run() {
 							login();
 						}
@@ -228,9 +239,11 @@ public class LoginSplashWindow extends JFrame {
 			}
 		});
 
-		button_userlogin = new JButtonLabel("User Login",new Runnable() {
+		button_userlogin = new JButtonLabel("User Login", new Runnable() {
+			@Override
 			public void run() {
 				ThreadPool.run(new Runnable() {
+					@Override
 					public void run() {
 						login();
 					}
@@ -259,9 +272,11 @@ public class LoginSplashWindow extends JFrame {
 		input_apikey.setText((String) null);
 		input_apikey.setColumns(10);
 
-		button_apilogin = new JButtonLabel("API Login",new Runnable() {
+		button_apilogin = new JButtonLabel("API Login", new Runnable() {
+			@Override
 			public void run() {
 				ThreadPool.run(new Runnable() {
+					@Override
 					public void run() {
 						apiLogin();
 					}
@@ -277,7 +292,8 @@ public class LoginSplashWindow extends JFrame {
 		check_savecreds.setBounds(143, 100, 128, 23);
 		panel_login.add(check_savecreds);
 
-		btn_apihelp = new JButtonLabel("API Key Help", new Runnable() {
+		btn_apihelp = new JButtonLabel("  API Key Help", new Runnable() {
+			@Override
 			public void run() {
 				setText("Opening Help. Please Wait...");
 				JEditorPane editorPane = new JEditorPane();
@@ -285,6 +301,7 @@ public class LoginSplashWindow extends JFrame {
 				editorPane.setText(HelpData.apiKey(true, true));
 				editorPane.setEditable(false);
 				editorPane.addHyperlinkListener(new HyperlinkListener() {
+					@Override
 					public void hyperlinkUpdate(HyperlinkEvent e) {
 						if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 							UtilBox.openUrl(e.getURL().toExternalForm());
@@ -296,14 +313,16 @@ public class LoginSplashWindow extends JFrame {
 				clearText();
 			}
 		});
+		btn_apihelp.setHorizontalAlignment(SwingConstants.LEFT);
 		btn_apihelp.setIcon(new ImageIcon(getClass().getResource(
 				"/rickelectric/furkmanager/img/dash/User-16.png")));
 		btn_apihelp.setForeground(Color.BLUE);
 		btn_apihelp.setBounds(10, 140, 123, 25);
 		panel_login.add(btn_apihelp);
 
-		JButtonLabel btn_settings = new JButtonLabel("Proxy Settings",
+		JButtonLabel btn_settings = new JButtonLabel("  Proxy Settings",
 				new Runnable() {
+					@Override
 					public void run() {
 						if (sf != null) {
 							sf.setVisible(true);
@@ -314,7 +333,7 @@ public class LoginSplashWindow extends JFrame {
 								"Proxy Settings");
 						sf.setModal(true);
 						sf.setModalityType(ModalityType.APPLICATION_MODAL);
-						sf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+						sf.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 						Settings_ProxyPorts pp = new Settings_ProxyPorts();
 						pp.extDisable();
 						pp.closeOnSave(sf);
@@ -325,12 +344,41 @@ public class LoginSplashWindow extends JFrame {
 						sf.setVisible(true);
 					}
 				});
+		btn_settings.setHorizontalAlignment(SwingConstants.LEFT);
 		btn_settings.setIcon(new ImageIcon(getClass().getResource(
 				"/rickelectric/furkmanager/img/dash/Settings-16.png")));
 		btn_settings.setBounds(10, 99, 123, 25);
 		panel_login.add(btn_settings);
 
-		
+		buttonLabel = new JButtonLabel("  Environment", new Runnable() {
+			@Override
+			public void run() {
+				if (uf != null) {
+					uf.setVisible(true);
+					uf.toFront();
+					return;
+				}
+				uf = new JDialog(LoginSplashWindow.this, "Environment");
+				uf.setModal(true);
+				uf.setModalityType(ModalityType.APPLICATION_MODAL);
+				uf.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				Settings_UIPanel pp = new Settings_UIPanel();
+				pp.closeOnSave(uf);
+				uf.getContentPane().add(pp);
+				uf.setResizable(false);
+				uf.pack();
+				uf.setLocationRelativeTo(contentPane);
+				uf.setVisible(true);
+			}
+		});
+		buttonLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		btn_apihelp.setForeground(Color.RED);
+		buttonLabel
+				.setIcon(new ImageIcon(
+						LoginSplashWindow.class
+								.getResource("/rickelectric/furkmanager/img/sm/menu_expand.png")));
+		buttonLabel.setBounds(10, 58, 123, 25);
+		panel_login.add(buttonLabel);
 
 		splashImage = ImageManager
 				.classLoadImage("/rickelectric/furkmanager/img/Splash_Big.png");
@@ -363,6 +411,7 @@ public class LoginSplashWindow extends JFrame {
 		repaint();
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g.create();
@@ -429,7 +478,6 @@ public class LoginSplashWindow extends JFrame {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			furkAnimate(2);
 			FurkManager.trayAlert(FurkManager.TRAY_ERROR, "Login Failed",
 					e.getMessage(), null);
 			setText("Login Failed: " + e.getMessage());
@@ -441,9 +489,9 @@ public class LoginSplashWindow extends JFrame {
 	}
 
 	public void loadLoginData() {
-		input_username.setText(SettingsManager.getUsername());
-		input_password.setText(SettingsManager.getPassword());
-		input_apikey.setText(SettingsManager.getApiKey());
+		input_username.setText(SettingsManager.getInstance().getUsername());
+		input_password.setText(SettingsManager.getInstance().getPassword());
+		input_apikey.setText(SettingsManager.getInstance().getApiKey());
 		loggingIn = false;
 	}
 
@@ -459,6 +507,7 @@ public class LoginSplashWindow extends JFrame {
 		setOpacity(b ? 0 : 1);
 		super.setVisible(true);
 		fader = new Timer(50, new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				float newOpac = getOpacity() + (b ? 0.05f : -0.05f);
 				if (newOpac > 1) {

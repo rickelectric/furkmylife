@@ -69,6 +69,7 @@ public abstract class TrayWindow extends JDialog {
 				startPoint = TrayWindow.this.getMousePosition();
 		}
 
+		@Override
 		public void mouseReleased(MouseEvent e) {
 			startPoint = null;
 		}
@@ -152,6 +153,7 @@ public abstract class TrayWindow extends JDialog {
 	public void onMinimize(final Runnable onMinimizeAction) {
 		UtilBox.clearActionListeners(btn_minimize);
 		btn_minimize.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				onMinimizeAction.run();
 			}
@@ -161,6 +163,7 @@ public abstract class TrayWindow extends JDialog {
 	public void onClose(final Runnable onCloseAction) {
 		UtilBox.clearActionListeners(btn_close);
 		btn_close.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				onCloseAction.run();
 			}

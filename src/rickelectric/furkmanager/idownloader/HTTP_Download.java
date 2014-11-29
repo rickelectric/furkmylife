@@ -17,17 +17,20 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 
-public class HTTP_Download extends Download implements Serializable {
+public class HTTP_Download extends FileDownload implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public HTTP_Download(String name, URL url, String saveDir) {
 		super(name, url, saveDir);
 	}
-	
-	public void run(){
-		try{
+
+	@Override
+	public void run() {
+		try {
 			apacheDownload();
-		}catch(IOException e){}
+		} catch (IOException e) {
+		} catch (Exception e) {
+		}
 	}
 
 	// Download file.
@@ -45,6 +48,7 @@ public class HTTP_Download extends Download implements Serializable {
 						Integer.parseInt(SettingsManager.getProxyPort())));
 				Authenticator authenticator = new Authenticator() {
 
+					@Override
 					public PasswordAuthentication getPasswordAuthentication() {
 						return (new PasswordAuthentication(
 								SettingsManager.getProxyUser(), SettingsManager
@@ -145,6 +149,7 @@ public class HTTP_Download extends Download implements Serializable {
 						"Download Complete",
 						"Your download of file '" + dwFile.getName()
 								+ "' is complete", new Runnable() {
+							@Override
 							public void run() {
 								UtilBox.openFileLocation(dwFile);
 							}

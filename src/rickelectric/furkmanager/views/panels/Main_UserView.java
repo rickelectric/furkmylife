@@ -16,6 +16,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
@@ -70,10 +71,10 @@ public class Main_UserView extends TranslucentPane {
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
-		if(SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE)
+		if(SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE)
 			setBackground(Color.yellow);
 		
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.setBounds(4, 0, 554, 394);
 		add(tabbedPane);
 		
@@ -125,6 +126,7 @@ public class Main_UserView extends TranslucentPane {
 		final JCheckBox chckbxVerified = new JCheckBox("Verified");
 		chckbxVerified.setOpaque(false);
 		chckbxVerified.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e){
 				chckbxVerified.setSelected(FurkUserData.User.emailVerified==1);
 			}
@@ -135,6 +137,7 @@ public class Main_UserView extends TranslucentPane {
 		
 		button_ChangeEmail = new JButton("Change Email");
 		button_ChangeEmail.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				
 			}
@@ -173,6 +176,7 @@ public class Main_UserView extends TranslucentPane {
 		
 		button_save = new JButton("Save Settings");
 		button_save.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				saving_box_tab_3.setVisible(true);
 				label_saving_tab_3.setVisible(true);
@@ -189,9 +193,10 @@ public class Main_UserView extends TranslucentPane {
 				if(check_noadult.isSelected()) FurkUserData.User.flags=URI_Enums.Prefs_Flags.MODERATED_FULL;
 				else FurkUserData.User.flags=URI_Enums.Prefs_Flags.NONE;
 				
-				SettingsManager.searchResultsPerPage((Integer)spinner_ppresults.getValue());
+				SettingsManager.getInstance().searchResultsPerPage((Integer)spinner_ppresults.getValue());
 				
 				FurkUserData.User.save(new Runnable(){
+					@Override
 					public void run(){
 						saving_box_tab_3.setVisible(false);
 						label_saving_tab_3.setVisible(false);
@@ -276,6 +281,7 @@ public class Main_UserView extends TranslucentPane {
 		
 		button_Refresh = new JButton("Refresh");
 		button_Refresh.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent a){
 				loadAccountData(500);
 			}
@@ -305,6 +311,7 @@ public class Main_UserView extends TranslucentPane {
 		if(loading) return;
 		loading=true;
 		Thread t=new Thread(new Runnable(){
+			@Override
 			public void run(){
 				try{
 					loading_box_tab1.setVisible(true);

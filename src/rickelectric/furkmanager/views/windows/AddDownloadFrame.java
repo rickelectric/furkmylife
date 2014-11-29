@@ -28,13 +28,9 @@ import org.eclipse.ecf.protocol.bittorrent.TorrentFile;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIObject;
-import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.StreamDownloader;
-import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
-import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
 
 public class AddDownloadFrame extends JFrame implements ActionListener{
@@ -67,6 +63,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		
 		choice_type = new JComboBox<String>();
 		choice_type.addItemListener(new ItemListener() {
+			@Override
 			public void itemStateChanged(ItemEvent e){
 				if(choice_type.getSelectedIndex()==1){
 					btn_open.setVisible(true);
@@ -170,6 +167,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		setVisible(true);
 		getLinkType();
 		info(new Runnable(){
+			@Override
 			public void run(){
 				btn_add.setText("Add Download");
 				loading.setVisible(false);
@@ -177,11 +175,13 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		});
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src=e.getSource();
 		if(src.equals(btn_add)){
 			if(btn_add.getText().contains("Check")){
 				info(new Runnable(){
+					@Override
 					public void run(){
 						btn_add.setText("Add Download");
 						loading.setVisible(false);
@@ -212,6 +212,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 	
 	private void addLink(final String link) {
 		new Thread(new Runnable(){
+			@Override
 			public void run(){
 				loading.setVisible(true);
 				try{
@@ -219,6 +220,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 					if(type==1){
 						if(API_Download.addTorrentFile(link)){
 							FurkManager.trayAlert(FurkManager.TRAY_INFO, "Success", "Added "+link+" to my Furk account.", new Runnable(){
+								@Override
 								public void run(){
 									API_Download.getAll();
 								}
@@ -231,6 +233,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 					else{
 						if(API_Download.addHash(link)){
 							FurkManager.trayAlert(FurkManager.TRAY_INFO, "Success", "Added "+link+" to my Furk account.", new Runnable(){
+								@Override
 								public void run(){
 									API_Download.getAll();
 								}
@@ -248,6 +251,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 	
 	private void info(final Runnable r){
 		new Thread(new Runnable(){
+			@Override
 			public void run(){
 				info();
 				r.run();
@@ -341,18 +345,5 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 
 	private void close(){
 		dispose();
-	}
-	
-	public static void main(String[] args){
-		ThreadPool.init();
-		SettingsManager.init();
-		UtilBox.init();
-		RequestCache.init();
-		
-		API.init("5323228d687ed9f7f1bdf9ce87050a1fa672e485");
-		AddDownloadFrame f=new AddDownloadFrame("G:\\Users\\Ionicle\\Torrents\\Jake 2.0.torrent");
-		f.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		f.setVisible(true);
-		;
 	}
 }

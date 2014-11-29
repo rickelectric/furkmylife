@@ -20,6 +20,7 @@ public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 		setDoubleBuffered(true);
 	}
 
+	@Override
 	public void setAlpha(float value) {
 		if (value > 1 || value < 0)
 			return;
@@ -35,6 +36,7 @@ public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 		}
 	}
 
+	@Override
 	public float getAlpha() {
 		return alpha;
 	}
@@ -62,24 +64,29 @@ public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 	private boolean oscillation;
 	public int oscSpeed;
 
+	@Override
 	public boolean isOscillating() {
 		return oscillation;
 	}
 
+	@Override
 	public void setOscillating(boolean oscillation) {
 		this.oscillation = oscillation;
 	}
 
+	@Override
 	public int getOscSpeed() {
 		return oscSpeed;
 	}
 
+	@Override
 	public void setOscSpeed(int oscSpeed) {
 		this.oscSpeed = oscSpeed;
 	}
 
 	public void fadeIn(final int msec) {
 		ThreadPool.run(new Runnable() {
+			@Override
 			public void run() {
 				while (getAlpha() < 1f) {
 					setAlpha(alpha + 0.02f);
@@ -92,6 +99,7 @@ public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 
 	public void fadeOut(final int msec) {
 		ThreadPool.run(new Runnable() {
+			@Override
 			public void run() {
 				while (getAlpha() > 0f) {
 					setAlpha(alpha - 0.02f);

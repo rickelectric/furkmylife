@@ -19,12 +19,15 @@ public class JButtonLabel extends JLabel {
 		setHorizontalAlignment(CENTER);
 		setFont(defFont);
 		addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				onclick.run();
 			}
+			@Override
 			public void mousePressed(MouseEvent e){
 				setBorder(lowered);
 			}
+			@Override
 			public void mouseReleased(MouseEvent e){
 				setBorder(raised);
 			}

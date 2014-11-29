@@ -13,12 +13,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.models.FurkTFile;
-import rickelectric.furkmanager.network.ProxDownload;
-import rickelectric.furkmanager.player.MediaStreamer;
+import rickelectric.furkmanager.network.AsyncDownload;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.ImageViewer;
 import rickelectric.furkmanager.views.panels.ScreenshotViewPanel;
+import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
 public class TFileTreeNode extends DefaultMutableTreeNode implements
 		FurkTreeNode {
@@ -32,6 +32,7 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 		return isAction;
 	}
 
+	@Override
 	public FurkTFile getUserObject() {
 		return tfile;
 	}
@@ -42,8 +43,17 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 		this.tfile = tfile;
 	}
 
+	@Override
 	public String toString() {
 		return tfile.getName();
+	}
+	
+	private void videoMediaCall() {
+		FurkManager.getMainWindow().mediaCall(PrimaryEnv.VIDEO,tfile.getUrlDl());
+	}
+
+	private void audioMediaCall() {
+		FurkManager.getMainWindow().mediaCall(PrimaryEnv.AUDIO,tfile.getUrlDl());
 	}
 
 	private class ContextMenu extends JPopupMenu implements ActionListener {
@@ -87,7 +97,7 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 				idm.setIcon(new ImageIcon(FurkManager.class
 						.getResource("img/sm/idm.png")));
 				idm.addActionListener(this);
-				if (SettingsManager.idm()) {
+				if (SettingsManager.getInstance().idm()) {
 					download.add(idm);
 				}
 
@@ -129,39 +139,28 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 
 		}
 
+		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
 			Thread t = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					action = true;
 					isAction = true;
 					try {
 						Object src = e.getSource();
 						if (src.equals(play)) {
-							MediaStreamer.init();
-							MediaStreamer.playAudio(tfile.getUrlDl());
+							audioMediaCall();
 						}
 						if (src.equals(vplay)) {
-							MediaStreamer.init();
-							MediaStreamer.playVideo(tfile.getUrlDl());
+							videoMediaCall();
 						}
 						if (src.equals(view)) {
 
-							ProxDownload d = new ProxDownload(new URL(tfile.getUrlDl()));
+							AsyncDownload d = new AsyncDownload(new URL(tfile
+									.getUrlDl()));
 							new ImageViewer(d).setVisible(true);
-
-							/*
-							 * BufferedImage img = StreamDownloader
-							 * .getImageStream(tfile.getUrlDl(), 8); if (img !=
-							 * null) JOptionPane.showMessageDialog(null, new
-							 * JLabel( new ImageIcon(img)), tfile.getName(),
-							 * JOptionPane.PLAIN_MESSAGE); else FurkManager
-							 * .trayAlert( FurkManager.TRAY_ERROR,
-							 * "Cannot Access File",
-							 * "Server Error. Unable To Access Image File For Viewing."
-							 * , null);
-							 */
 						}
 						if (src.equals(screenshots)) {
 							new ScreenshotViewPanel(tfile);
@@ -171,11 +170,11 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 							UtilBox.openUrl(tfile.getUrlDl());
 						}
 						if (src.equals(idm)) {
-							String path = SettingsManager.idmPath();
+							String path = SettingsManager.getInstance().idmPath();
 							Runtime.getRuntime()
 									.exec(new String[] { path, "-d",
 											(tfile).getUrlDl(), "/p",
-											SettingsManager.getDownloadFolder() });
+											SettingsManager.getInstance().getDownloadFolder() });
 						}
 						if (src.equals(internal)) {
 							String savePath = DownloadManager
@@ -213,29 +212,31 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 		}
 	}
 
+	@Override
 	public JPopupMenu popupMenu() {
 		return new ContextMenu();
 	}
 
+	@Override
 	public void action() {
 		isAction = true;
 		action = true;
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					if (tfile.getContentType().toLowerCase().contains("image")) {
-						ProxDownload d = new ProxDownload(new URL(tfile.getUrlDl()));
+						AsyncDownload d = new AsyncDownload(new URL(tfile
+								.getUrlDl()));
 						new ImageViewer(d).setVisible(true);
 					}
 
 					if (tfile.getContentType().toLowerCase().contains("audio")) {
-						MediaStreamer.init();
-						MediaStreamer.playAudio(tfile.getUrlDl());
+						audioMediaCall();
 					}
 
 					if (tfile.getContentType().toLowerCase().contains("video")) {
-						MediaStreamer.init();
-						MediaStreamer.playVideo(tfile.getUrlDl());
+						videoMediaCall();
 					}
 				} catch (Exception e) {
 				}
@@ -245,10 +246,12 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 		}).start();
 	}
 
+	@Override
 	public boolean draggable() {
 		return false;
 	}
 
+	@Override
 	public boolean droppable() {
 		return false;
 	}

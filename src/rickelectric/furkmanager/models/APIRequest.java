@@ -31,6 +31,7 @@ public class APIRequest implements Comparable<Object>{
 		return url;
 	}
 	
+	@Override
 	public int compareTo(Object o) {
 		if(o==null) return -1;
 		if(o instanceof APIRequest){
@@ -50,7 +51,7 @@ public class APIRequest implements Comparable<Object>{
 			return url.equals(((APIRequest) o).getUrl());
 		}
 		else if(o instanceof String){
-			return url.equals((String)o);
+			return url.equals(o);
 		}
 		throw new IllegalArgumentException("Expected Either a String or an APIRequest object, not a "+o.getClass().getName());
 	}

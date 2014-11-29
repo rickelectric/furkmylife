@@ -76,6 +76,7 @@ public class ImgCacheViewer extends JFrame {
 		contentPane.setLayout(null);
 
 		addComponentListener(new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				Dimension size = getSize();
 				scrollPane.setSize(size.width - 36, size.height - 120);
@@ -93,6 +94,7 @@ public class ImgCacheViewer extends JFrame {
 		
 		button_clear = new JButton("Clear Cache");
 		button_clear.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				RequestCache.ImageR.flush();
 				modelTable();
@@ -112,8 +114,9 @@ public class ImgCacheViewer extends JFrame {
 		
 		button_SaveNewCapacity = new JButton("Save New Capacity");
 		button_SaveNewCapacity.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0){
-				SettingsManager.numCachedImages((Integer)spinner_capacity.getValue());
+				SettingsManager.getInstance().numCachedImages((Integer)spinner_capacity.getValue());
 				SettingsManager.save();
 			}
 		});
@@ -126,7 +129,7 @@ public class ImgCacheViewer extends JFrame {
 		if (table_imgs == null)
 			return;
 		table_imgs.setModel(getImgCacheModel());
-		spinner_capacity.setValue(SettingsManager.numCachedImages());
+		spinner_capacity.setValue(SettingsManager.getInstance().numCachedImages());
 		TableColumnModel l = table_imgs.getColumnModel();
 		table_imgs.addMouseListener(tableM);
 		l.getColumn(0).setPreferredWidth(table_imgs.getWidth() - 55);
@@ -160,9 +163,11 @@ public class ImgCacheViewer extends JFrame {
 		
 		Thread action;
 
+		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if(action==null)
 			action=new Thread(new Runnable(){
+				@Override
 				public void run(){
 					try{
 						Object src = e.getSource();

@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
@@ -38,7 +39,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 		super.setTitle("Furk My Life!");
 		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png")).getImage());
 
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		setBounds(100, 100, 450, 357);
 		afContentPane = new JPanel();
@@ -61,6 +62,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 	//private static ImgCacheViewer cache=null;
 	
 	public static final KeyListener consoleAdp=new KeyAdapter(){
+		@Override
 		public void keyReleased(KeyEvent e){
 			if(e.getKeyCode()==KeyEvent.VK_F12){
 				/*if(console==null){
@@ -79,6 +81,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 	}
 	
 	public static final KeyListener cacheAdp=new KeyAdapter(){
+		@Override
 		public void keyReleased(KeyEvent e){
 			if(e.getKeyCode()==KeyEvent.VK_F11){
 				/*if(cache==null){
@@ -97,6 +100,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 		UtilBox.addKeyListenerToAll(this, cacheAdp);
 	}
 
+	@Override
 	public final void setStatus(String s) {
 		status_bar.setText(s);
 	}
@@ -118,12 +122,13 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 
 	}
 	
+	@Override
 	public Container getContentPane(){
 		return panel_main;
 	}
 
 	public void windowClose() {
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		for(WindowListener w:getWindowListeners()){
 			removeWindowListener(w);
 		}
@@ -146,7 +151,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 	}
 	
 	public void exitOnClose(){
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		for(WindowListener w:getWindowListeners()){
 			removeWindowListener(w);
 		}

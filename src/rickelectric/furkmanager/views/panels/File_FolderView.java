@@ -21,6 +21,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
@@ -28,7 +29,6 @@ import rickelectric.furkmanager.views.iconutil.FolderTreeRenderer;
 import rickelectric.furkmanager.views.iconutil.FolderTreeTransferHandler;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.swingmods.OpacEffects;
-import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class File_FolderView extends JLayeredPane implements MouseListener,
 		KeyListener {
@@ -93,6 +93,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 
 	public void refreshMyFolders(final boolean hardReload) {
 		thisRun = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				loading.setVisible(true);
 				loading.setAlpha(1.0f);
@@ -132,6 +133,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		thisRun.start();
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent e) {
 		int row = folder_tree.getRowForLocation(e.getX(), e.getY());
 		if (row == -1) {
@@ -174,6 +176,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		if (action == 1) {
 			if (src instanceof FileTreeNode) {
 				((FileTreeNode) src).action(new Runnable() {
+					@Override
 					public void run() {
 						folder_tree.repaint();
 					}
@@ -203,9 +206,10 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		for (String s : sp) {
 			ps += "/" + s;
 		}
-		((AppFrameClass) getTopLevelAncestor()).setStatus(ps);
+		FurkManager.getMainWindow().setStatus(ps);
 	}
 
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_CONTEXT_MENU) {
 			TreePath tp = folder_tree.getSelectionPath();
@@ -221,6 +225,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		}
 	}
 
+	@Override
 	public void keyReleased(KeyEvent e) {
 		TreePath tp = folder_tree.getSelectionPath();
 		if (tp != null) {
@@ -231,18 +236,23 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		}
 	}
 
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
 
+	@Override
 	public void mousePressed(MouseEvent e) {
 	}
 
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 
+	@Override
 	public void mouseExited(MouseEvent e) {
 	}
 
+	@Override
 	public void keyTyped(KeyEvent e) {
 	}
 

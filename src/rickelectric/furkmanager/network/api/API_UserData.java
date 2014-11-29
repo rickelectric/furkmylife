@@ -8,6 +8,8 @@ import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
+import rickelectric.furkmanager.network.TunneledAPIBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 
@@ -65,16 +67,23 @@ public class API_UserData extends API {
 				+ URI_Enums.URI_Port.getValue(FurkUserData.User.dlPort);
 		String dl_uri_key = "dl_uri_key=" + FurkUserData.User.uriKey;
 
-		String saveString = APIBridge.API_BASE + "/account/save_prefs?"
-				+ APIBridge.key() + "&pretty=1";
+		String saveString = "";
 		saveString += "&" + prefs_flags;
 		saveString += "&" + prefs_json;
 		saveString += "&" + dl_uri_scheme;
 		saveString += "&" + dl_uri_host;
 		saveString += "&" + dl_uri_port;
 		saveString += "&" + dl_uri_key;
+		if (SettingsManager.getInstance().useTunnel()) {
+			saveString = TunneledAPIBridge.API_BASE
+					+ "?object=account&function=save_prefs&api_key="
+					+ TunneledAPIBridge.key() + "&pretty=1" + saveString;
+		} else {
+			saveString = APIBridge.API_BASE + "/account/save_prefs?"
+					+ APIBridge.key() + "&pretty=1" + saveString;
+		}
 
-		APIBridge.jsonPost(saveString, false, false);
+		FurkBridge.jsonPost(saveString, false, false);
 	}
 
 	public static boolean isLoaded() {
@@ -82,19 +91,20 @@ public class API_UserData extends API {
 	}
 
 	public static boolean login(LoginModel login) {
-		boolean isValid=false;
-		switch(login.mode()){
+		boolean isValid = false;
+		switch (login.mode()) {
 		case LoginModel.APIKEY:
-			isValid=APIBridge.ping(login.apiKey());
-			if(isValid){
+			isValid = FurkBridge.ping(login.apiKey());
+			if (isValid) {
 				API.init(login.apiKey());
 			}
-			
+
 			break;
 		case LoginModel.CREDENTIALS:
-			String key=APIBridge.userLogin(login.username(), UtilBox.charToString(login.password()));
-			isValid = key!=null;
-			if(isValid){
+			String key = FurkBridge.userLogin(login.username(),
+					UtilBox.charToString(login.password()));
+			isValid = key != null;
+			if (isValid) {
 				API.init(key);
 				login.setApiKey(key);
 			}
@@ -102,10 +112,10 @@ public class API_UserData extends API {
 		default:
 			return false;
 		}
-		if(isValid){
-			if(login.save()){
-				SettingsManager.loginModel(login);
-				currentLogin=login;
+		if (isValid) {
+			if (login.save()) {
+				SettingsManager.getInstance().loginModel(login);
+				currentLogin = login;
 				SettingsManager.save();
 			}
 			return true;
@@ -118,8 +128,8 @@ public class API_UserData extends API {
 	}
 
 	public static void flush() {
-		currentLogin=null;
-		isLoaded=false;
+		currentLogin = null;
+		isLoaded = false;
 	}
 
 }

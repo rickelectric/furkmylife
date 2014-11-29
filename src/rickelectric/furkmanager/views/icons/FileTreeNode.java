@@ -34,6 +34,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 
 	public boolean expanded = false;
 
+	@Override
 	public FurkFile getUserObject() {
 		return file;
 	}
@@ -48,10 +49,12 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		return file.getName();
 	}
 
+	@Override
 	public JPopupMenu popupMenu() {
 		return new ContextMenu(file);
 	}
 
+	@Override
 	public void action() {
 
 	}
@@ -60,6 +63,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		if (action)
 			return;
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				isAction = true;
 				action = true;
@@ -130,7 +134,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 				idm.setIcon(new ImageIcon(FurkManager.class
 						.getResource("img/sm/idm.png")));
 				idm.addActionListener(this);
-				if (SettingsManager.idm()) {
+				if (SettingsManager.getInstance().idm()) {
 					download.add(idm);
 				}
 
@@ -169,10 +173,12 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 			add(recycle);
 		}
 
+		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
 			Thread t = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					action = true;
 					try {
@@ -196,14 +202,15 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(idm)) {
 							try {
-								String path = SettingsManager.idmPath();
+								String path = SettingsManager.getInstance()
+										.idmPath();
 								Runtime.getRuntime().exec(
 										new String[] {
 												path,
 												"-d",
 												cFile.getUrlDl(),
 												"/p",
-												SettingsManager
+												SettingsManager.getInstance()
 														.getDownloadFolder() });
 							} catch (Exception e) {
 								FurkManager
@@ -212,7 +219,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 												"IDM Error",
 												"Could Not Find IDM Download Manager.\nIDM Will Be Disabled.",
 												null);
-								SettingsManager.idmPath(null);
+								SettingsManager.getInstance().idmPath(null);
 							}
 						}
 						if (src.equals(internal)) {
@@ -230,8 +237,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(link)) {
 							// Show Link
-							UtilBox.sendToClipboard(((FurkFile) cFile)
-									.getUrlDl());
+							UtilBox.sendToClipboard(cFile.getUrlDl());
 							FurkManager.trayAlert(FurkManager.TRAY_INFO,
 									"Link Copied",
 									"Download link to '" + cFile.getName()
@@ -256,10 +262,12 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		File_FolderView.getInstance().refreshMyFolders(hard);
 	}
 
+	@Override
 	public boolean draggable() {
 		return true;
 	}
 
+	@Override
 	public boolean droppable() {
 		return false;
 	}

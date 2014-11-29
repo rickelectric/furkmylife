@@ -3,7 +3,6 @@ package rickelectric.furkmanager.views.windows;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
@@ -19,13 +18,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API;
-import rickelectric.furkmanager.utils.SettingsManager;
 
 public class APIConsole extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -40,28 +39,11 @@ public class APIConsole extends JFrame {
 	private JPanel panel_top;
 	private JComboBox<String> method;
 
-	// private JPanel centerPane;
-
-	public static void main(String[] args) {
-		SettingsManager.init();
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					APIConsole frame = new APIConsole();
-					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	public APIConsole() {
 		setMinimumSize(new Dimension(450, 400));
 		setTitle("API Console");
 		setBounds(100, 100, 450, 400);
-		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout());
@@ -107,6 +89,7 @@ public class APIConsole extends JFrame {
 			public void keyReleased(KeyEvent arg0) {
 				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 					new Thread(new Runnable() {
+						@Override
 						public void run() {
 							request();
 						}

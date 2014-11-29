@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONObject;
 
 public class APIBridge extends FurkBridge {
@@ -46,9 +47,13 @@ public class APIBridge extends FurkBridge {
 			dest += "&info_hash=";
 		else if (type == DL_ADD_TORRENT) {
 			try {
-				Part[] parts = new Part[] { new StringPart("api_key", api_key),
-						new FilePart("file", new File(link)) };
-				String stream = StreamDownloader.postDataPartStream(API_BASE
+				MultipartEntity parts = new MultipartEntity();
+
+				parts.addPart("api_key", new StringBody(api_key));
+
+				FileBody bin = new FileBody(new File(link));
+				parts.addPart("file", bin);
+				String stream = StreamDownloader.postMultipartStream(API_BASE
 						+ "/dl/add", parts);
 				return stream;
 			} catch (Exception e) {
@@ -125,6 +130,15 @@ public class APIBridge extends FurkBridge {
 	public static String TFileInfo(String fileID) {
 		if (api_key == null)
 			return null;
+		if (dummy) {
+			try {
+				return StreamDownloader
+						.fileToString("./JSON_Samples_And_Docs/JSON-FurkTFilesVideo.txt");
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e.getMessage());
+			}
+		}
 		String dest = API_BASE + "/file/get?" + key() + "&id=" + fileID
 				+ "&t_files=1";
 		return jsonPost(dest, true, true);
@@ -304,13 +318,17 @@ public class APIBridge extends FurkBridge {
 			password = URLEncoder.encode(password, "utf-8");
 		} catch (Exception e) {
 		}
-		Part[] params = new Part[] { new StringPart("login", username),
-				new StringPart("pwd", password) };
 
 		String url = API_BASE + "/login/login";// ?login="+username+"&pwd="+password;
 		String json = null;
 		try {
-			json = StreamDownloader.postDataPartStream(url, params);
+			MultipartEntity parts = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
+
+			parts.addPart("login", new StringBody(username));
+			parts.addPart("pwd", new StringBody(password));
+
+			json = StreamDownloader.postMultipartStream(url, parts);
 		} catch (Exception e) {
 			throw new RuntimeException("Connection Error");
 		}
@@ -337,8 +355,8 @@ public class APIBridge extends FurkBridge {
 		String dest = API_BASE + "/account/info?" + key();
 		return jsonPost(dest, false, false);
 	}
-	
-	public static void logout(){
+
+	public static void logout() {
 		api_key = null;
 	}
 
@@ -394,7 +412,8 @@ public class APIBridge extends FurkBridge {
 	}
 
 	public static boolean ping(String apiKey) {
-		if(dummy) return true;
+		if (dummy)
+			return true;
 		if (apiKey == null)
 			return false;
 		String url = API_BASE + "/ping?api_key=" + apiKey;
@@ -452,11 +471,11 @@ public class APIBridge extends FurkBridge {
 		}
 	}
 
-	public static String jsonPost(String url, Part[] parts) {
+	public static String jsonPost(String url, MultipartEntity parts) {
 		if (api_key == null)
 			return null;
 		try {
-			String s = StreamDownloader.postDataPartStream(url, parts);
+			String s = StreamDownloader.postMultipartStream(url, parts);
 			return s;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -2,7 +2,7 @@ package rickelectric.furkmanager.network;
 
 import java.net.URLEncoder;
 
-import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.json.JSONObject;
 
 public class TunneledAPIBridge extends FurkBridge {
@@ -329,6 +329,7 @@ public class TunneledAPIBridge extends FurkBridge {
 			else
 				return false;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException("Connection Error");
 		}
 	}
@@ -371,11 +372,11 @@ public class TunneledAPIBridge extends FurkBridge {
 		}
 	}
 
-	public static String jsonPost(String url, Part[] parts) {
+	public static String jsonPost(String url, MultipartEntity parts) {
 		if (api_key == null)
 			return null;
 		try {
-			String s = StreamDownloader.postDataPartStream(url, parts);
+			String s = StreamDownloader.postMultipartStream(url, parts);
 			return s;
 		} catch (Exception e) {
 			e.printStackTrace();

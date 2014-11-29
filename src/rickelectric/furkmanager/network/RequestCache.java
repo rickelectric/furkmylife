@@ -107,7 +107,7 @@ public class RequestCache {
 			if(APIBridge.key()==null) return false;
 			if (images == null)
 				images = new ArrayList<ImgRequest>();
-			if(images.size()>SettingsManager.numCachedImages()){
+			if(images.size()>SettingsManager.getInstance().numCachedImages()){
 				ImgRequest.compareCriterion(ImgRequest.SIZE);
 				Collections.sort(images);
 				int n=images.size()-5;

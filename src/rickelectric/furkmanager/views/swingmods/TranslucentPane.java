@@ -21,6 +21,7 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 		setDoubleBuffered(true);
 	}
 	
+	@Override
 	public void setAlpha(float value) {
 		if (value > 1 || value < 0)
 			return;
@@ -36,6 +37,7 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 		}
 	}
 
+	@Override
 	public float getAlpha() {
 		return alpha;
 	}
@@ -63,24 +65,29 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 	private boolean oscillation;
 	public int oscSpeed;
 
+	@Override
 	public boolean isOscillating() {
 		return oscillation;
 	}
 
+	@Override
 	public void setOscillating(boolean oscillation) {
 		this.oscillation = oscillation;
 	}
 
+	@Override
 	public int getOscSpeed() {
 		return oscSpeed;
 	}
 
+	@Override
 	public void setOscSpeed(int oscSpeed) {
 		this.oscSpeed = oscSpeed;
 	}
 
 	public void fadeIn(final int msec) {
 		ThreadPool.run(new Runnable() {
+			@Override
 			public void run() {
 				while (getAlpha() < 1f) {
 					setAlpha(alpha + 0.02f);
@@ -93,6 +100,7 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 
 	public void fadeOut(final int msec) {
 		ThreadPool.run(new Runnable() {
+			@Override
 			public void run() {
 				while (getAlpha() > 0f) {
 					setAlpha(alpha - 0.02f);
@@ -105,16 +113,19 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 
 	public boolean isSliding = false;
 
+	@Override
 	public boolean isSliding() {
 		return t==null?false:t.isRunning();//isSliding;
 	}
 
+	@Override
 	public void setSliding(boolean b) {
 		isSliding = b;
 	}
 
 	private Thread slidingThread = null;
 
+	@Override
 	public void setSlidingThread(Thread t) {
 		while (t.isAlive())
 			;
@@ -122,12 +133,14 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 		slidingThread = t;
 	}
 
+	@Override
 	public Thread getSlidingThread() {
 		return slidingThread;
 	}
 
 	Timer t;
 
+	@Override
 	public void setSlidingTimer(Timer t) {
 		this.t = t;
 

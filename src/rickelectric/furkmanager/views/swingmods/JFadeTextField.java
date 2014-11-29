@@ -52,18 +52,22 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 	private boolean oscillation;
 	private int oscSpeed;
 
+	@Override
 	public boolean isOscillating() {
 		return oscillation;
 	}
 
+	@Override
 	public void setOscillating(boolean oscillation) {
 		this.oscillation = oscillation;
 	}
 
+	@Override
 	public int getOscSpeed() {
 		return oscSpeed;
 	}
 
+	@Override
 	public void setOscSpeed(int oscSpeed) {
 		this.oscSpeed = oscSpeed;
 	}
@@ -77,11 +81,13 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 
 	private boolean isSliding;
 
+	@Override
 	public boolean isSliding() {
 		return t.isRunning();
 		//return isSliding;
 	}
 
+	@Override
 	public void setSliding(boolean b) {
 		isSliding = true;
 	}
@@ -128,13 +134,14 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 		final float alphaInc = (float) aResolve / distance;
 
 		ThreadPool.run(new Runnable() {
+			@Override
 			public void run() {
 				isSliding = true;
 				for (int i = 0; i < distance; i++) {
 					if (direction == UP || direction == DOWN) {
-						setLocation(getX(), getY() + (int) (direction / 10));
+						setLocation(getX(), getY() + direction / 10);
 					} else {
-						setLocation(getX() + (int) (direction / 20), getY());
+						setLocation(getX() + direction / 20, getY());
 					}
 					if (fadeMode == IN || fadeMode == OUT) {
 						setAlpha(getAlpha() + alphaInc);
@@ -147,6 +154,7 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 		});
 	}
 
+	@Override
 	public void setAlpha(float value) {
 		if (value > 1 || value < 0)
 			return;
@@ -164,6 +172,7 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 		}
 	}
 
+	@Override
 	public float getAlpha() {
 		return alpha;
 	}
@@ -187,16 +196,19 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 
 	private Thread slidingThread = null;
 
+	@Override
 	public void setSlidingThread(Thread t) {
 		slidingThread = t;
 	}
 
+	@Override
 	public Thread getSlidingThread() {
 		return slidingThread;
 	}
 
 	Timer t;
 
+	@Override
 	public void setSlidingTimer(Timer t) {
 		// TODO Auto-generated method stub
 		this.t = t;

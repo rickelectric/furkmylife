@@ -37,13 +37,14 @@ public class ServerLink {
 
 	public void run() {
 		localThread = new Thread(new Runnable() {
+			@Override
 			public void run() {
 				localServerProcess();
 			}
 		});
 		try {
-			webSockThread = new Thread(new CrxSocketLink(
-					SettingsManager.getWebSockPort()));
+			webSockThread = new Thread(new ChromeWebSocketLink(
+					SettingsManager.getInstance().getWebSockPort()));
 			webSockThread.start();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -55,7 +56,7 @@ public class ServerLink {
 	private void localServerProcess() {
 		ServerSocket serverSocket = null;
 		try {
-			serverSocket = new ServerSocket(SettingsManager.getLocalPort());
+			serverSocket = new ServerSocket(SettingsManager.getInstance().getLocalPort());
 		} catch (Exception e) {
 			error = "Port Error";
 			return;
@@ -71,6 +72,7 @@ public class ServerLink {
 			}
 			final Socket clientSocket = cliSocket;
 			new Thread(new Runnable() {
+				@Override
 				public void run() {
 					try {
 						PrintWriter out = new PrintWriter(clientSocket
@@ -142,6 +144,7 @@ public class ServerLink {
 
 	private boolean passTorrent(final String link) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				while (APIBridge.key() == null)
 					;
@@ -153,6 +156,7 @@ public class ServerLink {
 
 	private boolean passHash(final String link) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				while (APIBridge.key() == null)
 					;
@@ -164,6 +168,7 @@ public class ServerLink {
 
 	private boolean passURL(final String link) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				while (APIBridge.key() == null)
 					;

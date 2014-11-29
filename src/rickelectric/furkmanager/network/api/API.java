@@ -13,6 +13,8 @@ import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.views.panels.APIMessagePanel;
 
+import com.tecnick.htmlutils.htmlentities.HTMLEntities;
+
 public class API {
 
 	private static ArrayList<APIMessage> msgCache;
@@ -54,6 +56,7 @@ public class API {
 		APIMessage msg = new APIMessage(type, key);
 		try {
 			String txt = o.getString("txt");
+			txt = HTMLEntities.unhtmlentities(txt);
 			msg.setText(txt);
 		} catch (Exception e) {
 		}

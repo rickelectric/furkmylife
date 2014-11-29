@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.Proxy;
-import java.net.Proxy.Type;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -20,8 +18,11 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import rickelectric.furkmanager.utils.ProxySettings;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class Settings_ProxyPorts extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -31,7 +32,6 @@ public class Settings_ProxyPorts extends JPanel {
 	private JTextField input_prox_port;
 	private JTextField input_prox_username;
 	private JPasswordField input_prox_password;
-	private JCheckBox check_proxy;
 	private JButton button_prox_save;
 	private JButton button_prox_revert;
 	private JTextField input_loopback;
@@ -41,7 +41,9 @@ public class Settings_ProxyPorts extends JPanel {
 	private JPanel panel_socks;
 	private JCheckBox check_tunnel;
 	private JLabel lblProxyType;
-	private JComboBox<Type> choice_proxyType;
+	private JComboBox<ProxySettings.Type> choice_proxyType;
+	private JLabel lblDomain;
+	private JTextField input_prox_domain;
 
 	public Settings_ProxyPorts() {
 		setPreferredSize(new Dimension(336, 314));
@@ -57,18 +59,6 @@ public class Settings_ProxyPorts extends JPanel {
 		panel_proxy.setBounds(12, 12, 312, 282);
 		add(panel_proxy);
 		panel_proxy.setLayout(null);
-
-		check_proxy = new JCheckBox("Proxy Required");
-		check_proxy.setFont(new Font("Dialog", Font.BOLD, 12));
-		check_proxy.setOpaque(false);
-		check_proxy.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				boolean sel = check_proxy.isSelected();
-				proxyEnabled(sel);
-			}
-		});
-		check_proxy.setBounds(10, 23, 128, 20);
-		panel_proxy.add(check_proxy);
 
 		JLabel lblHostIp = new JLabel("Host IP: ");
 		lblHostIp.setBounds(14, 55, 82, 20);
@@ -88,64 +78,86 @@ public class Settings_ProxyPorts extends JPanel {
 		JLabel lblPort = new JLabel("Port:");
 		lblPort.setBounds(14, 80, 82, 20);
 		panel_proxy.add(lblPort);
+		
+		lblDomain = new JLabel("Domain: ");
+		lblDomain.setToolTipText("Windows Domain Name (For ISA or NTLM Proxy Servers): ");
+		lblDomain.setBounds(14, 132, 82, 20);
+		panel_proxy.add(lblDomain);
+		
+		input_prox_domain = new JTextField();
+		input_prox_domain.setToolTipText("Windows Domain Name (For ISA or NTLM Proxy Servers): ");
+		input_prox_domain.setEnabled(false);
+		input_prox_domain.setColumns(10);
+		input_prox_domain.setBounds(114, 132, 186, 20);
+		panel_proxy.add(input_prox_domain);
 
 		JLabel lblUsername = new JLabel("Username: ");
-		lblUsername.setBounds(14, 152, 82, 20);
+		lblUsername.setBounds(14, 163, 82, 20);
 		panel_proxy.add(lblUsername);
 
 		input_prox_username = new JTextField();
-		input_prox_username.setBounds(114, 152, 186, 20);
+		input_prox_username.setBounds(114, 163, 186, 20);
 		panel_proxy.add(input_prox_username);
 		input_prox_username.setColumns(10);
 
 		JLabel lblPassword = new JLabel("Password: ");
-		lblPassword.setBounds(14, 177, 82, 20);
+		lblPassword.setBounds(14, 194, 82, 20);
 		panel_proxy.add(lblPassword);
 
 		input_prox_password = new JPasswordField();
-		input_prox_password.setBounds(114, 177, 186, 20);
+		input_prox_password.setBounds(114, 194, 186, 20);
 		panel_proxy.add(input_prox_password);
 
 		button_prox_save = new JButton("Save");
 		button_prox_save.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				SettingsManager.enableProxy(check_proxy.isSelected());
-				SettingsManager.setProxy(
-						Proxy.Type.values()[choice_proxyType.getSelectedIndex()],
-						input_prox_ip.getText(), input_prox_port.getText(),
-						input_prox_username.getText(),
-						UtilBox.charToString(input_prox_password.getPassword()));
-				SettingsManager.useTunnel(check_tunnel.isSelected());
+				ProxySettings ps = SettingsManager.getInstance().getProxySettings();
+				
+				ps.proxyType = ProxySettings.Type.values()[choice_proxyType.getSelectedIndex()];
+				ps.HOST = input_prox_ip.getText();
+				ps.PORT = Integer.parseInt(input_prox_port.getText());
+				
+				ps.DOMAIN = input_prox_domain.getText();
+				ps.USER = input_prox_username.getText();
+				ps.PASS = UtilBox.charToString(input_prox_password.getPassword());
+				SettingsManager.getInstance().useTunnel(check_tunnel.isSelected());
 				SettingsManager.save();
 			}
 		});
-		button_prox_save.setBounds(212, 209, 88, 20);
+		button_prox_save.setBounds(212, 225, 88, 20);
 		panel_proxy.add(button_prox_save);
 
 		button_prox_revert = new JButton("Revert");
 		button_prox_revert.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				proxLoad();
 			}
 		});
-		button_prox_revert.setBounds(114, 209, 88, 20);
+		button_prox_revert.setBounds(114, 225, 88, 20);
 		panel_proxy.add(button_prox_revert);
 
 		check_tunnel = new JCheckBox("Enable Tunneled API");
 		check_tunnel.setFont(new Font("Dialog", Font.BOLD, 12));
 		check_tunnel.setOpaque(false);
-		check_tunnel.setBounds(140, 22, 160, 23);
-		check_tunnel.setSelected(SettingsManager.useTunnel());
+		check_tunnel.setBounds(14, 252, 160, 23);
+		check_tunnel.setSelected(SettingsManager.getInstance().useTunnel());
 		panel_proxy.add(check_tunnel);
 
 		lblProxyType = new JLabel("Proxy Type: ");
-		lblProxyType.setBounds(14, 114, 72, 14);
+		lblProxyType.setBounds(10, 22, 72, 14);
 		panel_proxy.add(lblProxyType);
 
-		choice_proxyType = new JComboBox<Proxy.Type>();
-		choice_proxyType.setModel(new DefaultComboBoxModel<Proxy.Type>(Type
+		choice_proxyType = new JComboBox<ProxySettings.Type>();
+		choice_proxyType.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				proxyEnabled(choice_proxyType.getSelectedItem()!=ProxySettings.Type.NONE);
+			}
+		});
+		choice_proxyType.setModel(new DefaultComboBoxModel<ProxySettings.Type>(ProxySettings.Type
 				.values()));
-		choice_proxyType.setBounds(114, 111, 188, 20);
+		choice_proxyType.setBounds(114, 19, 186, 20);
 		panel_proxy.add(choice_proxyType);
 
 		panel_socks = new JPanel();
@@ -178,18 +190,19 @@ public class Settings_ProxyPorts extends JPanel {
 
 		button_ext_save = new JButton("Save");
 		button_ext_save.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				int local = SettingsManager.getLocalPort();
+				int local = SettingsManager.getInstance().getLocalPort();
 				try {
 					local = Integer.parseInt(input_loopback.getText());
 				} catch (Exception ex) {
 				}
-				int websock = SettingsManager.getWebSockPort();
+				int websock = SettingsManager.getInstance().getWebSockPort();
 				try {
 					websock = Integer.parseInt(input_chrome.getText());
 				} catch (Exception ex) {
 				}
-				SettingsManager.setPorts(local, websock);
+				SettingsManager.getInstance().setPorts(local, websock);
 				SettingsManager.save();
 			}
 		});
@@ -198,6 +211,7 @@ public class Settings_ProxyPorts extends JPanel {
 
 		button_ext_revert = new JButton("Revert");
 		button_ext_revert.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				extportLoad();
 			}
@@ -211,34 +225,36 @@ public class Settings_ProxyPorts extends JPanel {
 	}
 
 	protected void proxyEnabled(boolean sel) {
-		check_proxy.setSelected(sel);
 		input_prox_ip.setEnabled(sel);
 		input_prox_port.setEnabled(sel);
-		choice_proxyType.setEnabled(sel);
+		
+		input_prox_domain.setEnabled(sel && choice_proxyType.getSelectedItem()==ProxySettings.Type.NTLM);
 		input_prox_username.setEnabled(sel);
 		input_prox_password.setEnabled(sel);
 
 	}
 
 	private void proxLoad(){
-		input_prox_ip.setText(SettingsManager.getProxyHost());
-		input_prox_port.setText(SettingsManager.getProxyPort());
-		
-		for(int i=0;i<Type.values().length;i++){
-			if(Type.values()[i].equals(SettingsManager.getProxyType())){
+		ProxySettings ps = SettingsManager.getInstance().getProxySettings();
+		for(int i=0;i<ProxySettings.Type.values().length;i++){
+			if(ProxySettings.Type.values()[i].equals(ps.proxyType)){
 				choice_proxyType.setSelectedIndex(i);
 				break;
 			}
 		}
 		
-		input_prox_username.setText(SettingsManager.getProxyUser());
-		input_prox_password.setText(SettingsManager.getProxyPassword());
-		proxyEnabled(SettingsManager.proxyEnabled());
+		input_prox_ip.setText(ps.HOST);
+		input_prox_port.setText(ps.PORT+"");
+		
+		input_prox_domain.setText(ps.DOMAIN);
+		input_prox_username.setText(ps.USER);
+		input_prox_password.setText(ps.PASS);
+		proxyEnabled(ps.proxyType!=ProxySettings.Type.NONE);
 	}
 
 	private void extportLoad() {
-		input_chrome.setText("" + SettingsManager.getWebSockPort());
-		input_loopback.setText("" + SettingsManager.getLocalPort());
+		input_chrome.setText("" + SettingsManager.getInstance().getWebSockPort());
+		input_loopback.setText("" + SettingsManager.getInstance().getLocalPort());
 	}
 
 	public void extDisable() {
@@ -250,6 +266,7 @@ public class Settings_ProxyPorts extends JPanel {
 
 	public void closeOnSave(final JDialog sf) {
 		button_prox_save.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				sf.dispose();
 			}

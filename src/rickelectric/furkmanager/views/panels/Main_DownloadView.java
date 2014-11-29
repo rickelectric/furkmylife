@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
@@ -22,14 +23,14 @@ public class Main_DownloadView extends TranslucentPane {
 		setDoubleBuffered(true);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
-		if (SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE) {
+		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE) {
 			setBackground(Color.cyan);
 			setPreferredSize(new Dimension(561,
 					GraphicsEnvironment.getLocalGraphicsEnvironment()
 							.getMaximumWindowBounds().height - 200));
 		}
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.setBounds(4, 0, 554, getPreferredSize().height - 8);
 		add(tabbedPane);
 

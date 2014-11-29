@@ -15,7 +15,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIFolder;
 import rickelectric.furkmanager.network.APIFolderManager;
+import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.panels.File_FolderView;
+import rickelectric.furkmanager.views.windows.MainEnvironment;
+import rickelectric.furkmanager.views.windows.MainWindow;
 
 public class FolderTreeNode extends DefaultMutableTreeNode implements
 		FurkTreeNode {
@@ -23,16 +26,17 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 
 	private APIFolder folder;
 	private JTree parentTree;
-	
+
+	@Override
 	public APIFolder getUserObject() {
 		return folder;
 	}
-	
-	public void setParent(JTree parent){
-		this.parentTree=parent;
+
+	public void setParent(JTree parent) {
+		this.parentTree = parent;
 	}
 
-	public FolderTreeNode(APIFolder folder){
+	public FolderTreeNode(APIFolder folder) {
 		super(folder.getName());
 		this.folder = folder;
 	}
@@ -42,20 +46,22 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 		return folder.getName();
 	}
 
+	@Override
 	public JPopupMenu popupMenu() {
 		return new ContextMenu(folder);
 	}
-	
-	public void action(){
-		
+
+	@Override
+	public void action() {
+
 	}
 
 	public class ContextMenu extends JPopupMenu implements ActionListener {
 		private static final long serialVersionUID = 1L;
-		
+
 		private APIFolder folder = null;
-		
-		private JMenuItem folder_delete,folder_new;
+
+		private JMenuItem folder_delete, folder_new;
 		private JMenuItem folder_rename;
 		private JMenuItem folder_colorchange;
 
@@ -64,94 +70,117 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 		public ContextMenu(APIFolder folder) {
 			super();
 			this.folder = folder;
-			
-			folder_new=new JMenuItem("New Folder");
+
+			folder_new = new JMenuItem("New Folder");
 			folder_new.addActionListener(this);
-			folder_new.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/new_black.png")));
+			folder_new.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/new_black.png")));
 			add(folder_new);
 
 			folder_colorchange = new JMenuItem("Change Color");
 			folder_colorchange.addActionListener(this);
-			folder_colorchange.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/web_view.png")));
+			folder_colorchange.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/web_view.png")));
 			add(folder_colorchange);
 
 			folder_rename = new JMenuItem("Rename Folder");
 			folder_rename.addActionListener(this);
-			folder_rename.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_icon.png")));
+			folder_rename.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/edit_icon.png")));
 			add(folder_rename);
-			
+
 			folder_delete = new JMenuItem("Delete Folder");
 			folder_delete.addActionListener(this);
-			folder_delete.setIcon(new ImageIcon(FurkManager.class.getResource("img/sm/edit_delete.png")));
+			folder_delete.setIcon(new ImageIcon(FurkManager.class
+					.getResource("img/sm/edit_delete.png")));
 			add(folder_delete);
-			
+
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
-			Object src=e.getSource();
-			if(src.equals(folder_new)){
-				JTextField f=new JTextField();
+			Object src = e.getSource();
+			if (src.equals(folder_new)) {
+				JTextField f = new JTextField();
 				f.setColumns(40);
-				int resp=JOptionPane.showConfirmDialog(null, f, "Folder Name", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-				if(resp==JOptionPane.OK_OPTION){
-					String name=f.getText();
-					if(name!=null&&name.length()>=0){
-						if(APIFolderManager.newFolder(folder, name))
+				int resp = JOptionPane
+						.showConfirmDialog(
+								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
+										.getMainWindow()
+										: (MainWindow) FurkManager
+												.getMainWindow())), f,
+								"Folder Name", JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+				if (resp == JOptionPane.OK_OPTION) {
+					String name = f.getText();
+					if (name != null && name.length() >= 0) {
+						if (APIFolderManager.newFolder(folder, name))
 							parentRef(false);
 					}
-					
+
 				}
-			}
-			else if(src==folder_colorchange){
-				//TODO Change Color, Update The Label
-			}
-			else if(src==folder_rename){
-				JTextField f=new JTextField();
+			} else if (src == folder_colorchange) {
+				// TODO Change Color, Update The Label
+			} else if (src == folder_rename) {
+				JTextField f = new JTextField();
 				f.setColumns(40);
 				f.setText(folder.getName());
 				f.setSelectionStart(0);
 				f.setSelectionEnd(folder.getName().length());
-				int resp=JOptionPane.showConfirmDialog(null, f, "Rename", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-				if(resp==JOptionPane.OK_OPTION){
-					String name=f.getText();
-					if(name!=null&&name.length()>=0)
-						if(APIFolderManager.rename(folder,name)){
+				int resp = JOptionPane
+						.showConfirmDialog(
+								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
+										.getMainWindow()
+										: (MainWindow) FurkManager
+												.getMainWindow())), f,
+								"Rename", JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+				if (resp == JOptionPane.OK_OPTION) {
+					String name = f.getText();
+					if (name != null && name.length() >= 0)
+						if (APIFolderManager.rename(folder, name)) {
 							parentRef(false);
 						}
 				}
-			}
-			else if(src==folder_delete){
-				int resp=JOptionPane.showConfirmDialog(null,
-					"Are You Sure You Want To Delete This Folder?\n"
-					+ "(This Operation Is Permanent)", 
-					"Delete", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-				if(resp==JOptionPane.YES_OPTION){
-					if(APIFolderManager.delete(folder)){
+			} else if (src == folder_delete) {
+				int resp = JOptionPane
+						.showConfirmDialog(
+								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
+										.getMainWindow()
+										: (MainWindow) FurkManager
+												.getMainWindow())),
+								"Are You Sure You Want To Delete This Folder?\n"
+										+ "(This Operation Is Permanent)",
+								"Delete", JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+				if (resp == JOptionPane.YES_OPTION) {
+					if (APIFolderManager.delete(folder)) {
 						parentRef(true);
 					}
 				}
 			}
 		}
 	}
-	
-	private void parentRef(boolean hard){
+
+	private void parentRef(boolean hard) {
 		try {
-			Container parent=parentTree.getParent();
+			Container parent = parentTree.getParent();
 			do {
 				parent = parent.getParent();
 			} while (!(parent instanceof File_FolderView));
 			((File_FolderView) parent).refreshMyFolders(hard);
-		} catch (Exception ex){
-			System.err
-					.println("Could Not Find Proper Parent");
+		} catch (Exception ex) {
+			System.err.println("Could Not Find Proper Parent");
 			ex.printStackTrace();
 		}
 	}
 
+	@Override
 	public boolean draggable() {
 		return true;
 	}
 
+	@Override
 	public boolean droppable() {
 		return true;
 	}

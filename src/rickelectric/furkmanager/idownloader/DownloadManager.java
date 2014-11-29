@@ -54,7 +54,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 	private static JButton cancelButton, clearButton;
 	private static JLabel saveFileLabel = new JLabel();
 
-	private static Download selectedDownload;
+	private static FileDownload selectedDownload;
 	private boolean clearing;
 
 	public DownloadManager() {
@@ -74,6 +74,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 		JButton addButton = new JButton("Add Download");
 		addButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionAdd();
 			}
@@ -85,6 +86,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 		JButton saveFileButton = new JButton("Download To");
 		saveFileButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionSaveTo(false);
 			}
@@ -113,6 +115,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		}
 		table.getSelectionModel().addListSelectionListener(
 				new ListSelectionListener() {
+					@Override
 					public void valueChanged(ListSelectionEvent e) {
 						tableSelectionChanged();
 					}
@@ -122,6 +125,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		setDropTarget(new DropTarget() {
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public synchronized void drop(DropTargetDropEvent evt) {
 				try {
 					evt.acceptDrop(DnDConstants.ACTION_COPY);
@@ -142,6 +146,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		table.setRowHeight((int) renderer.getPreferredSize().getHeight());
 
 		table.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e){
 				if (e.getClickCount() == 1) {
 					int r = table.rowAtPoint(e.getPoint());
@@ -154,7 +159,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 					if (rowindex < 0)
 						return;
 					if (e.getButton()==MouseEvent.BUTTON3&&e.getClickCount()==1) {
-						Download d=tableModel.getDownload(r);
+						FileDownload d=tableModel.getDownload(r);
 						JPopupMenu popup=d.popup();
 						popup.show(e.getComponent(), e.getX(), e.getY());
 					}
@@ -169,6 +174,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 		JPanel buttonsPanel = new JPanel();
 		pauseButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionPause();
 			}
@@ -177,6 +183,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		buttonsPanel.add(pauseButton);
 
 		resumeButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionResume();
 			}
@@ -186,6 +193,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 		cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionCancel();
 			}
@@ -195,6 +203,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 		clearButton = new JButton("Clear");
 		clearButton.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				actionClear();
 			}
@@ -219,7 +228,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 	public static boolean addDownload(String name, String url, String folder,
 			boolean autostart) {
-		Download d = thisObj.actionAdd(name, url, folder);
+		FileDownload d = thisObj.actionAdd(name, url, folder);
 		if (d == null)
 			return false;
 		if (autostart)
@@ -230,8 +239,8 @@ public class DownloadManager extends AppFrameClass implements Observer {
 	}
 
 	public static String actionSaveTo(boolean ext) {
-		String sm=SettingsManager.getDownloadFolder();
-		if(!SettingsManager.askFolderOnDownload()) return sm;
+		String sm=SettingsManager.getInstance().getDownloadFolder();
+		if(!SettingsManager.getInstance().askFolderOnDownload()) return sm;
 		JFileChooser jfchooser = new JFileChooser(sm);
 		jfchooser.setApproveButtonText("OK");
 		jfchooser.setDialogTitle("Select Folder...");
@@ -254,10 +263,10 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		addTextField.setText("");
 	}
 
-	private Download actionAdd(String name, String url, String dest) {
+	private FileDownload actionAdd(String name, String url, String dest) {
 		URL verifiedUrl = verifyUrl(url);
 		if (verifiedUrl != null) {
-			Download d = new Download(name, verifiedUrl, dest);
+			FileDownload d = new FileDownload(name, verifiedUrl, dest);
 			
 			tableModel.addDownload(d);
 
@@ -334,7 +343,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		updateButtons();
 	}
 	
-	public static void actionClear(Download d){
+	public static void actionClear(FileDownload d){
 		tableModel.clearDownload(d);
 		selectedDownload=null;
 		updateButtons();
@@ -344,26 +353,26 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		if (selectedDownload != null) {
 			int status = selectedDownload.getStatus();
 			switch (status) {
-			case Download.DOWNLOADING:
+			case FileDownload.DOWNLOADING:
 				pauseButton.setEnabled(true);
 				resumeButton.setEnabled(false);
 				cancelButton.setEnabled(true);
 				clearButton.setEnabled(false);
 				break;
-			case Download.PAUSED:
+			case FileDownload.PAUSED:
 				pauseButton.setEnabled(false);
 				resumeButton.setEnabled(true);
 				resumeButton.setText("Resume");
 				cancelButton.setEnabled(true);
 				clearButton.setEnabled(false);
 				break;
-			case Download.ERROR:
+			case FileDownload.ERROR:
 				pauseButton.setEnabled(false);
 				resumeButton.setEnabled(true);
 				cancelButton.setEnabled(false);
 				clearButton.setEnabled(true);
 				break;
-			case Download.IDLE:
+			case FileDownload.IDLE:
 				pauseButton.setEnabled(false);
 				resumeButton.setEnabled(true);
 				resumeButton.setText("Start");
@@ -384,6 +393,7 @@ public class DownloadManager extends AppFrameClass implements Observer {
 		}
 	}
 
+	@Override
 	public void update(Observable o, Object arg) {
 		// Update buttons if the selected download has changed.
 		if (selectedDownload != null && selectedDownload.equals(o))
@@ -392,9 +402,10 @@ public class DownloadManager extends AppFrameClass implements Observer {
 
 	// Run the Download Manager.
 	public static void main(String[] args) {
-		SettingsManager.init();
+		SettingsManager.getInstance();
 		DownloadManager manager = new DownloadManager();
 		manager.addWindowListener(new WindowAdapter(){
+			@Override
 			public void windowClosing(WindowEvent e){
 				tableModel.persist();
 				((JFrame)e.getSource()).dispose();

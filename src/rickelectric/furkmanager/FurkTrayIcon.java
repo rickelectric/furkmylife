@@ -28,8 +28,10 @@ public class FurkTrayIcon {
 	private static TrayIcon trayIcon = null;
 
 	private ActionListener defAction = new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			ThreadPool.run(new Runnable() {
+				@Override
 				public void run() {
 					FurkManager.appRun();
 				}
@@ -53,6 +55,7 @@ public class FurkTrayIcon {
 			add(showApp);
 			
 			trayIcon.addMouseListener(new MouseAdapter(){
+				@Override
 				public void mouseClicked(MouseEvent e){
 					if(e.getButton()==MouseEvent.BUTTON1){
 						if(e.getClickCount()==1 && API.key()!=null){
@@ -73,6 +76,7 @@ public class FurkTrayIcon {
 			}
 			anim = new MenuItem("Test Loading Animation");
 			anim.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					loading();
 					UtilBox.pause(2000);
@@ -86,8 +90,10 @@ public class FurkTrayIcon {
 			add(hardExitApp);
 		}
 
+		@Override
 		public void actionPerformed(final ActionEvent e) {
 			ThreadPool.run(new Runnable() {
+				@Override
 				public void run() {
 					if (e.getSource().equals(addDl))
 						new AddDownloadFrame().setVisible(true);
@@ -121,6 +127,7 @@ public class FurkTrayIcon {
 					FurkManager.class.getResource("img/fr.png"));
 
 			ActionListener exitAction = new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (APIBridge.key() != null)
 						popupMessage("Exiting", "Logging out. Please wait.",
@@ -138,6 +145,7 @@ public class FurkTrayIcon {
 			MenuItem addDl = new MenuItem("Add Furk Download");
 			addDl.addActionListener(new ActionListener() {
 
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					new AddDownloadFrame().setVisible(true);
 				}
@@ -147,6 +155,7 @@ public class FurkTrayIcon {
 
 			MenuItem dlsView = new MenuItem("Show File Download Manager");
 			dlsView.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					FurkManager.downloader(true);
 				}
@@ -157,6 +166,7 @@ public class FurkTrayIcon {
 
 			MenuItem anim = new MenuItem("Test Loading Animation");
 			anim.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					loading();
 					UtilBox.pause(2000);
@@ -172,6 +182,7 @@ public class FurkTrayIcon {
 			// construct a TrayIcon
 			trayIcon = new TrayIcon(image, "FurkManager", popup);
 			trayIcon.addMouseListener(new MouseAdapter(){
+				@Override
 				public void mouseClicked(MouseEvent e){
 					if(e.getButton()==MouseEvent.BUTTON1){
 						if(e.getClickCount()==1){
@@ -217,11 +228,13 @@ public class FurkTrayIcon {
 	public void popupMessage(final String title, final String text,
 			final Runnable clickAction) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				actionRemove();
 				trayIcon.displayMessage(title, text, TrayIcon.MessageType.NONE);
 				if (clickAction != null)
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							clickAction.run();
 							actionRemove();
@@ -230,6 +243,7 @@ public class FurkTrayIcon {
 					});
 				else
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							trayIcon.addActionListener(defAction);
 						}
@@ -247,11 +261,13 @@ public class FurkTrayIcon {
 	public void popupInfo(final String title, final String text,
 			final Runnable clickAction) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				actionRemove();
 				trayIcon.displayMessage(title, text, TrayIcon.MessageType.INFO);
 				if (clickAction != null) {
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							clickAction.run();
 							actionRemove();
@@ -260,6 +276,7 @@ public class FurkTrayIcon {
 					});
 				} else
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							trayIcon.addActionListener(defAction);
 						}
@@ -277,12 +294,14 @@ public class FurkTrayIcon {
 	public void popupWarning(final String title, final String text,
 			final Runnable clickAction) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				actionRemove();
 				trayIcon.displayMessage(title, text,
 						TrayIcon.MessageType.WARNING);
 				if (clickAction != null) {
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							clickAction.run();
 							actionRemove();
@@ -291,6 +310,7 @@ public class FurkTrayIcon {
 					});
 				} else
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							trayIcon.addActionListener(defAction);
 						}
@@ -308,11 +328,13 @@ public class FurkTrayIcon {
 	public void popupError(final String title, final String text,
 			final Runnable clickAction) {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				actionRemove();
 				trayIcon.displayMessage(title, text, TrayIcon.MessageType.ERROR);
 				if (clickAction != null) {
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							clickAction.run();
 							actionRemove();
@@ -321,6 +343,7 @@ public class FurkTrayIcon {
 					});
 				} else
 					trayIcon.addActionListener(new ActionListener() {
+						@Override
 						public void actionPerformed(ActionEvent e) {
 							trayIcon.addActionListener(defAction);
 						}

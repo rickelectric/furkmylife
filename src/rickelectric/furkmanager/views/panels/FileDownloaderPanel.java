@@ -10,7 +10,7 @@ public class FileDownloaderPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
 	private JTable table_downloads;
 	private DownloadTable tmodel;
-
+	
 	public FileDownloaderPanel() {
 		setLayout(null);
 		setBackground(UtilBox.getRandomColor());

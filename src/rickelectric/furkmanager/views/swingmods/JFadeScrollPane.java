@@ -26,18 +26,22 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 	private boolean oscillation;
 	private int oscSpeed;
 
+	@Override
 	public boolean isOscillating() {
 		return oscillation;
 	}
 
+	@Override
 	public void setOscillating(boolean oscillation) {
 		this.oscillation = oscillation;
 	}
 
+	@Override
 	public int getOscSpeed() {
 		return oscSpeed;
 	}
 
+	@Override
 	public void setOscSpeed(int oscSpeed) {
 		this.oscSpeed = oscSpeed;
 	}
@@ -46,6 +50,7 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 		oscillation = false;
 	}
 
+	@Override
 	public void setAlpha(float value) {
 		if (value > 1 || value < 0)
 			return;
@@ -61,6 +66,7 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 		}
 	}
 
+	@Override
 	public float getAlpha() {
 		return alpha;
 	}
@@ -84,16 +90,19 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 
 	public boolean isSliding = false;
 
+	@Override
 	public boolean isSliding() {
 		return t.isRunning();//isSliding;
 	}
 
+	@Override
 	public void setSliding(boolean b) {
 		isSliding = b;
 	}
 
 	private Thread slidingThread = null;
 
+	@Override
 	public void setSlidingThread(Thread t) {
 		while (t.isAlive())
 			;
@@ -101,12 +110,14 @@ public class JFadeScrollPane extends JScrollPane implements Opacible, Slideable 
 		slidingThread = t;
 	}
 
+	@Override
 	public Thread getSlidingThread() {
 		return slidingThread;
 	}
 
 	private Timer t;
 
+	@Override
 	public void setSlidingTimer(Timer t) {
 		this.t = t;
 	}

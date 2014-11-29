@@ -22,6 +22,7 @@ public class NodeImageObserver implements ImageObserver {
 		this.node = node;
 	}
 
+	@Override
 	public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
 		if ((flags & (FRAMEBITS | ALLBITS)) != 0) {
 			TreePath path = new TreePath(model.getPathToRoot(node));

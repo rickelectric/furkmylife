@@ -76,6 +76,7 @@ public class FurkLabel implements Comparable<FurkLabel>{
 		return true;
 	}
 
+	@Override
 	public int compareTo(FurkLabel o) {
 		String left="",right="";
 		if(this.name!=null && o.name!=null){

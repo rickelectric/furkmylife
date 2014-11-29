@@ -7,28 +7,10 @@ import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
-import rickelectric.furkmanager.network.InstanceConn;
-import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_File;
-import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class DataToJSON {
-	
-	public static void main(String[] args) throws Exception{
-		ThreadPool.init();
-		SettingsManager.init();
-		UtilBox.init();
-		RequestCache.init();
-		
-		API.init("5323228d687ed9f7f1bdf9ce87050a1fa672e485");
-		
-		InstanceConn.main(args);
-		System.out.println("Started");
-		
-	}
 	
 	public static String getFiles(int limit, int offset){
 		JSONObject root=new JSONObject();
@@ -51,7 +33,7 @@ public class DataToJSON {
 		JSONArray file=new JSONArray();
 		for(int i=offset;i<offset+limit;i++){
 			if(i>=files.size()) break;
-			FurkFile ffile=(FurkFile)files.get(i);
+			FurkFile ffile=files.get(i);
 			JSONObject o=new JSONObject();
 			String urlPage=ffile.getUrlPage();
 			if(!urlPage.contains("furk.net")) urlPage="https://www.furk.net"+urlPage;

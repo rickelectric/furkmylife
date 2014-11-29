@@ -12,7 +12,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -26,9 +25,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.network.ProxDownload;
+import rickelectric.furkmanager.network.AsyncDownload;
 import rickelectric.furkmanager.utils.ImageManager;
-import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.swingmods.OpacEffects;
 
@@ -55,12 +53,9 @@ public class ImageViewer extends JDialog {
 	private static ImageViewer openDialog;
 
 	public static void main(String[] args) throws MalformedURLException {
-		SettingsManager.init();
-		SettingsManager.setProxy(Proxy.Type.SOCKS, "localhost", "9150", "", "");
-		SettingsManager.enableProxy(true);
 		// loadAll("Pictures", "C:\\Users\\Ionicle\\", true);
 		// viewAll(20);
-		ProxDownload d = new ProxDownload(
+		AsyncDownload d = new AsyncDownload(
 				new URL(
 						"https://j5h7rua7iqqvh35k5nmake7rio.gcdn.biz/ss/4764133/3"));
 		new ImageViewer(d).setVisible(true);
@@ -80,6 +75,7 @@ public class ImageViewer extends JDialog {
 			openDialog = new ImageViewer(name, allImages);
 			if (exitOnClose)
 				openDialog.addWindowListener(new WindowAdapter() {
+					@Override
 					public void windowClosing(WindowEvent e) {
 						System.exit(0);
 					}
@@ -122,6 +118,7 @@ public class ImageViewer extends JDialog {
 
 		next = new JButton();
 		next.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (position + 1 >= imagePaths.size())
 					position = -1;
@@ -142,6 +139,7 @@ public class ImageViewer extends JDialog {
 
 		prev = new JButton();
 		prev.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (position - 1 < 0)
 					position = imagePaths.size();
@@ -165,11 +163,12 @@ public class ImageViewer extends JDialog {
 	 * @param d
 	 *            A Download
 	 */
-	public ImageViewer(final ProxDownload d) {
+	public ImageViewer(final AsyncDownload d) {
 		construct("Downloading...");
 		image_poster.setIcon(new ImageIcon(FurkManager.class
 				.getResource("img/ajax-loader.gif")));
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				d.run();
 				setTitle(d.getFileName());
@@ -243,6 +242,7 @@ public class ImageViewer extends JDialog {
 				ImageViewer.class
 						.getResource("/rickelectric/furkmanager/img/sm/edit_delete.png")));
 		btn_X.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				close();
 			}
@@ -293,6 +293,7 @@ public class ImageViewer extends JDialog {
 		if (imageLoading)
 			return;
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				imageLoading = true;
 				image_poster.setIcon(new ImageIcon(FurkManager.class

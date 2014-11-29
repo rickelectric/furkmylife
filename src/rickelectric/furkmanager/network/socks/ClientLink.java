@@ -29,12 +29,13 @@ public class ClientLink implements Runnable{
 		else if(type==ADD_TORRENT) text="torrent\r\n"+t;
 	}
 	
+	@Override
 	public void run(){
 		Socket socket = null;
 		PrintWriter out = null;
 		BufferedReader in = null;
 		try{
-			socket = new Socket("localhost", SettingsManager.getLocalPort());
+			socket = new Socket("localhost", SettingsManager.getInstance().getLocalPort());
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			

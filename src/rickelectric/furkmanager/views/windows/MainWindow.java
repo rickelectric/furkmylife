@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.SystemColor;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.player.AudioPlayerPanel;
+import rickelectric.furkmanager.player.VideoPlayerPanel;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.menus.Main_TopMenuBar;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
@@ -29,10 +32,11 @@ import rickelectric.furkmanager.views.panels.Main_FileView;
 import rickelectric.furkmanager.views.panels.Main_SettingsView;
 import rickelectric.furkmanager.views.panels.Main_UserView;
 import rickelectric.furkmanager.views.swingmods.OpacEffects;
+import rickelectric.furkmanager.views.swingmods.Opacible;
 import rickelectric.furkmanager.views.swingmods.Slideable;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 
-public class MainWindow extends AppFrameClass implements PrimaryEnv{
+public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPane;
@@ -112,22 +116,25 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 
 			int borderState = OUT;
 
+			@Override
 			public void mouseEntered(MouseEvent e) {
 				borderState = IN;
 				JLabel src = (JLabel) e.getSource();
 				src.setBorder(new BevelBorder(BevelBorder.RAISED, null, null,
 						null, null));
-				src.setHorizontalAlignment(JLabel.LEADING);
+				src.setHorizontalAlignment(SwingConstants.LEADING);
 
 			}
 
+			@Override
 			public void mouseExited(MouseEvent e) {
 				borderState = OUT;
 				JLabel src = (JLabel) e.getSource();
 				src.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-				src.setHorizontalAlignment(JLabel.CENTER);
+				src.setHorizontalAlignment(SwingConstants.CENTER);
 			}
 
+			@Override
 			public void mousePressed(MouseEvent e) {
 				borderState = CLICKED;
 				JLabel src = (JLabel) e.getSource();
@@ -142,6 +149,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 				}
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (borderState != CLICKED)
 					return;
@@ -150,6 +158,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 						null, null));
 			}
 
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (paneChanging)
 					return;
@@ -160,6 +169,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 							if (e.getClickCount() > 1 && cpNum == i) {
 								if (e.getClickCount() == 3) {
 									new Thread(new Runnable() {
+										@Override
 										public void run() {
 											APIBridge.overrideCache(true);
 											UtilBox.pause(500);
@@ -294,12 +304,42 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 		message.setBounds(10, 530, 563, 32);
 		contentPane.add(message);
 
+		mediaCheck();
+
 		addConsole();
 		addImgCacheViewer();
 		setResizable(false);
 		setVisible(true);
 	}
 
+	@Override
+	public void dispose() {
+		super.dispose();
+		if (FurkManager.mediaEnabled()) {
+			if (AudioPlayerPanel.getInstance().getAudioWin().isVisible()) {
+				AudioPlayerPanel.getInstance().getAudioWin().dispose();
+			}
+			if (VideoPlayerPanel.getInstance().getVideoWin().isVisible()) {
+				VideoPlayerPanel.getInstance().getVideoWin().dispose();
+			}
+		}
+
+	}
+
+	private void mediaCheck() {
+		if (!FurkManager.mediaEnabled())
+			return;
+		try {
+			if (AudioPlayerPanel.getInstance().isActive())
+				AudioPlayerPanel.getInstance().getAudioWin().setVisible(true);
+			if (VideoPlayerPanel.getInstance().isActive())
+				VideoPlayerPanel.getInstance().getVideoWin().setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public void loadMessages() {
 		try {
 			ArrayList<APIMessage> messages = API.getMessages();
@@ -328,6 +368,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 		paneChanging = true;
 
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				Point loc = currPanel[cpNum].getLocation();
 				if (!currPanel[cpNum].isVisible())
@@ -340,14 +381,14 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 						locIn = -5;
 					}
 					OpacEffects.slide(currPanel[cpNum], 15, direction, 50,
-							Slideable.OUT);
+							Opacible.OUT);
 					UtilBox.pause(100);
 					while (currPanel[cpNum].isSliding())
 						;
 
 					currPanel[sec].setLocation(locIn, 124);
 					OpacEffects.slide(currPanel[sec], 15, direction, 18,
-							Slideable.IN);
+							Opacible.IN);
 					cpNum = sec;
 					paneChanging = false;
 					dashUpdate();
@@ -378,11 +419,41 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv{
 				null, null, null));
 	}
 
+	@Override
+	public void main() {
+		changeViewSection(0);
+	}
+
+	@Override
 	public void settings() {
 		changeViewSection(3);
 	}
 
+	@Override
 	public void userSettings() {
 		changeViewSection(4);
+	}
+
+	@Override
+	public void mediaCall(int mediaType, String mrl) {
+		if (!FurkManager.mediaEnabled())
+			return;
+		if (mediaType == AUDIO) {
+			AudioPlayerPanel.getInstance().play(mrl);
+			AudioPlayerPanel.getInstance().getAudioWin().setVisible(true);
+		} else if (mediaType == VIDEO) {
+			VideoPlayerPanel.getInstance().getVideoWin().setVisible(true);
+			VideoPlayerPanel.getInstance().play(mrl);
+		}
+	}
+
+	@Override
+	public Window getWindow() {
+		return MainWindow.this;
+	}
+
+	@Override
+	public void mediaNotify() {
+
 	}
 }

@@ -38,12 +38,14 @@ public class FMTrayBox extends TrayWindow {
 		setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE);
 
 		super.onClose(new Runnable() {
+			@Override
 			public void run() {
 				FurkManager.logout();
 				setVisible(false);
 			}
 		});
 		super.onMinimize(new Runnable() {
+			@Override
 			public void run() {
 				FMTrayBox.this.setVisible(false);
 			}
@@ -52,7 +54,7 @@ public class FMTrayBox extends TrayWindow {
 		setMoveable(true);
 		setContentPane(contentPane);
 
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 
 		panel_functions = new JPanel();
@@ -155,6 +157,7 @@ public class FMTrayBox extends TrayWindow {
 
 		JButtonLabel btn_showmm = new JButtonLabel("  Downloader",
 				new Runnable() {
+					@Override
 					public void run() {
 						FurkManager.downloader(true);
 						FMTrayBox.this.setVisible(false);
@@ -175,6 +178,7 @@ public class FMTrayBox extends TrayWindow {
 
 			JButtonLabel btn_settings = new JButtonLabel("  API Console",
 					new Runnable() {
+						@Override
 						public void run() {
 							FMTrayBox.this.setVisible(false);
 							FurkManager.showConsole(true);
@@ -194,6 +198,7 @@ public class FMTrayBox extends TrayWindow {
 
 			JButtonLabel btn_userSettings = new JButtonLabel("  Image Cache Viewer",
 					new Runnable() {
+						@Override
 						public void run() {
 							FMTrayBox.this.setVisible(false);
 							FurkManager.showImgCache(true);

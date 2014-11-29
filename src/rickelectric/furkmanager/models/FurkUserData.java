@@ -57,6 +57,7 @@ public class FurkUserData {
 
 		public static void save(final Runnable after) {
 			new Thread(new Runnable(){
+				@Override
 				public void run(){
 					save();
 					after.run();

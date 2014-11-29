@@ -77,15 +77,16 @@ public class OpacEffects {
 
 			int i = 0;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (i >=distance){
 					((Timer)e.getSource()).stop();
 					return;
 				}
 				if (direction == Slideable.UP || direction == Slideable.DOWN) {
-					o.setLocation(o.getX(), o.getY() + (int) (direction / 10));
+					o.setLocation(o.getX(), o.getY() + direction / 10);
 				} else {
-					o.setLocation(o.getX() + (int) (direction / 20), o.getY());
+					o.setLocation(o.getX() + direction / 20, o.getY());
 				}
 				if (fadeMode == Opacible.IN || fadeMode == Opacible.OUT) {
 					o.setAlpha(o.getAlpha() + alphaInc);
@@ -144,6 +145,7 @@ public class OpacEffects {
 		final float alphaInc = (float) aResolve / distance;
 
 		Thread t = getThread(new Runnable() {
+			@Override
 			public void run() {
 				for (int i = 0; i < distance; i++) {
 					if (Thread.interrupted()) {
@@ -153,9 +155,9 @@ public class OpacEffects {
 					if (direction == Slideable.UP
 							|| direction == Slideable.DOWN) {
 						o.setLocation(o.getX(), o.getY()
-								+ (int) (direction / 10));
+								+ direction / 10);
 					} else {
-						o.setLocation(o.getX() + (int) (direction / 20),
+						o.setLocation(o.getX() + direction / 20,
 								o.getY());
 					}
 					if (fadeMode == Opacible.IN || fadeMode == Opacible.OUT) {
@@ -195,6 +197,7 @@ public class OpacEffects {
 		int delay=100/speed;
 		
 		new Timer(delay,new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e){
 				if(o.getAlpha()>=1){
 					((Timer)e.getSource()).stop();
@@ -210,6 +213,7 @@ public class OpacEffects {
 		int delay=100/speed;
 		
 		new Timer(delay,new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e){
 				if(!o.isVisible()||o.getAlpha()==0){
 					((Timer)e.getSource()).stop();
@@ -235,6 +239,7 @@ public class OpacEffects {
 			return;
 		}
 		pool.execute(new Runnable() {
+			@Override
 			public void run() {
 				o.setOscillating(true);
 				float direction = -0.05f;

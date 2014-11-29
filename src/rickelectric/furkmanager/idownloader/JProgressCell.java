@@ -13,6 +13,7 @@ public class JProgressCell extends JProgressBar implements TableCellRenderer {
 		super(min, max);
 	}
 
+	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value,
 					boolean isSelected,
 					boolean hasFocus, int row, int column) {

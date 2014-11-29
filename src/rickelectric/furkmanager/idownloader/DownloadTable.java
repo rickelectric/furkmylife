@@ -32,8 +32,8 @@ public class DownloadTable extends AbstractTableModel implements Observer {
 			FileOutputStream o = new FileOutputStream(persistFile);
 			ObjectOutputStream oos=new ObjectOutputStream(o);
 			oos.writeInt(downloadList.size());//Number of Downloads
-			for(Download d:downloadList){
-				if(Download.DOWNLOADING==d.getStatus())
+			for(FileDownload d:downloadList){
+				if(FileDownload.DOWNLOADING==d.getStatus())
 				d.suspend();
 				oos.writeObject(d);
 			}
@@ -49,9 +49,9 @@ public class DownloadTable extends AbstractTableModel implements Observer {
 			ObjectInputStream ois=new ObjectInputStream(i);
 			int len=ois.readInt();
 			for(int x=0;x<len;x++){
-				Download d=(Download)ois.readObject();
+				FileDownload d=(FileDownload)ois.readObject();
 				addDownload(d);
-				if(d.getStatus()==Download.SUSPENDED)
+				if(d.getStatus()==FileDownload.SUSPENDED)
 					d.resume();
 			}
 			ois.close();
@@ -64,24 +64,24 @@ public class DownloadTable extends AbstractTableModel implements Observer {
 		reload();
 	}
 		
-	private static ArrayList<Download> downloadList = new ArrayList<Download>();
+	private static ArrayList<FileDownload> downloadList = new ArrayList<FileDownload>();
 
 	private static final File persistFile = new File("downloads.dat");
 	
-	public void addDownload(Download download){
-		if(downloadList.contains(download)) return;
-		download.addObserver(this);
-		downloadList.add(download);
+	public void addDownload(FileDownload fileDownload){
+		if(downloadList.contains(fileDownload)) return;
+		fileDownload.addObserver(this);
+		downloadList.add(fileDownload);
 		fireTableRowsInserted(getRowCount() - 1, getRowCount() - 1);
 	}
 
-	public Download getDownload(int row) {
-		return (Download) downloadList.get(row);
+	public FileDownload getDownload(int row) {
+		return downloadList.get(row);
 	}
 	
-	public void clearDownload(Download r){
+	public void clearDownload(FileDownload r){
 		if(r.getFile()!=null&&r.getFile().exists()){
-			if(r.getStatus()==Download.COMPLETE){
+			if(r.getStatus()==FileDownload.COMPLETE){
 				int alert=JOptionPane.showConfirmDialog(null,
 					"This download is complete.\nDelete completely downloaded file from disk?",
 					"Confirm Delete", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE
@@ -101,9 +101,9 @@ public class DownloadTable extends AbstractTableModel implements Observer {
 	}
 	
 	public void clearDownload(int row) {
-		Download r=getDownload(row);
+		FileDownload r=getDownload(row);
 		if(r.getFile()!=null&&r.getFile().exists()){
-			if(r.getStatus()==Download.COMPLETE){
+			if(r.getStatus()==FileDownload.COMPLETE){
 				int alert=JOptionPane.showConfirmDialog(null,
 					"This download is complete.\nDelete completely downloaded file from disk?",
 					"Confirm Delete", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE
@@ -122,35 +122,40 @@ public class DownloadTable extends AbstractTableModel implements Observer {
 		System.gc();
 	}
 
+	@Override
 	public int getColumnCount() {
 		return columnNames.length;
 	}
 
+	@Override
 	public String getColumnName(int col) {
 		return columnNames[col];
 	}
 	
+	@Override
 	public Class<?> getColumnClass(int col) {
 		return columnClasses[col];
 	}
 	
+	@Override
 	public int getRowCount() {
 		return downloadList.size();
 	}
 
+	@Override
 	public Object getValueAt(int row, int col) {
-		Download download = downloadList.get(row);
+		FileDownload fileDownload = downloadList.get(row);
 		
 		switch (col) {
 			case 0: // URL
-				return download.getName();
+				return fileDownload.getName();
 			case 1: // Size
-				int size = download.getSize();
-				return (size == -1) ? "N/A" : (getSizeString(download.downloaded)+"/"+download.getSizeString());
+				int size = fileDownload.getSize();
+				return (size == -1) ? "N/A" : (getSizeString(fileDownload.downloaded)+"/"+fileDownload.getSizeString());
 			case 2: // Progress
-				return new Float(download.getProgress());
+				return new Float(fileDownload.getProgress());
 			case 3: // Status
-				return Download.STATUSES[download.getStatus()];
+				return FileDownload.STATUSES[fileDownload.getStatus()];
 		}
 		return "";
 	}
@@ -168,6 +173,7 @@ public class DownloadTable extends AbstractTableModel implements Observer {
 		return szs[0]+"."+szs[1]+" "+reps[i];
 	}
 
+	@Override
 	public void update(Observable o, Object arg) {
 		int index = downloadList.indexOf(o);
 		fireTableRowsUpdated(index, index);

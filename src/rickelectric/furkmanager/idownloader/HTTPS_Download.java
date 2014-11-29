@@ -18,17 +18,20 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 
-public class HTTPS_Download extends Download implements Serializable {
+public class HTTPS_Download extends FileDownload implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public HTTPS_Download(String name, URL url, String saveDir) {
 		super(name, url, saveDir);
 	}
-	
-	public void run(){
-		try {apacheDownload();}
-		catch (IOException e) {
+
+	@Override
+	public void run() {
+		try {
+			apacheDownload();
+		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
 		}
 	}
 
@@ -45,6 +48,7 @@ public class HTTPS_Download extends Download implements Serializable {
 						Integer.parseInt(SettingsManager.getProxyPort())));
 				Authenticator authenticator = new Authenticator() {
 
+					@Override
 					public PasswordAuthentication getPasswordAuthentication() {
 						return (new PasswordAuthentication(
 								SettingsManager.getProxyUser(), SettingsManager
@@ -62,18 +66,15 @@ public class HTTPS_Download extends Download implements Serializable {
 				connection.setRequestProperty("If-Range", lastModified);
 
 			/*
-			if (SettingsManager.proxyEnabled()) {
-				String encoded = new String(
-						new sun.misc.BASE64Encoder().encode(new String(
-								SettingsManager.getProxyUser() + ":"
-										+ SettingsManager.getProxyPassword())
-								.getBytes()));
+			 * if (SettingsManager.proxyEnabled()) { String encoded = new
+			 * String( new sun.misc.BASE64Encoder().encode(new String(
+			 * SettingsManager.getProxyUser() + ":" +
+			 * SettingsManager.getProxyPassword()) .getBytes()));
+			 * 
+			 * connection.setRequestProperty("Proxy-Authorization", "Basic " +
+			 * encoded); }
+			 */
 
-				connection.setRequestProperty("Proxy-Authorization", "Basic "
-						+ encoded);
-			}
-			*/
-			
 			System.out.println("Going to make connection");
 
 			// Connect to server.
@@ -108,7 +109,7 @@ public class HTTPS_Download extends Download implements Serializable {
 						titleRet = s.split("=\"")[1].split("\"")[0];
 				}
 			}
-			
+
 			int contentLength = connection.getContentLength();
 			if (contentLength < 1) {
 				error();
@@ -124,7 +125,8 @@ public class HTTPS_Download extends Download implements Serializable {
 			if (dwFile == null)
 				dwFile = new File(saveDir, titleRet == null ? getFileName(url)
 						: titleRet);
-			if(this.name==null) this.name=titleRet;
+			if (this.name == null)
+				this.name = titleRet;
 			stateChanged();
 			file = new RandomAccessFile(dwFile, "rw");
 			file.seek(downloaded);
@@ -160,6 +162,7 @@ public class HTTPS_Download extends Download implements Serializable {
 						"Download Complete",
 						"Your download of file '" + dwFile.getName()
 								+ "' is complete", new Runnable() {
+							@Override
 							public void run() {
 								UtilBox.openFileLocation(dwFile);
 							}

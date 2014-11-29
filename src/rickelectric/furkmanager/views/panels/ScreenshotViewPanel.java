@@ -15,13 +15,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
-import rickelectric.furkmanager.network.ProxDownload;
+import rickelectric.furkmanager.network.AsyncDownload;
 import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.StreamDownloader;
 import rickelectric.furkmanager.utils.ImageManager;
@@ -60,7 +61,7 @@ public class ScreenshotViewPanel extends JPanel{
 			init(imgloc,imgloc);
 			
 			JFrame frame=new JFrame();
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			frame.setLocationRelativeTo(null);
 			
 			frame.setContentPane(this);
@@ -86,6 +87,7 @@ public class ScreenshotViewPanel extends JPanel{
 		setLayout(null);
 
 		ActionListener backnext = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				Object src = e.getSource();
 				if (src.equals(button_prev)) {
@@ -128,6 +130,7 @@ public class ScreenshotViewPanel extends JPanel{
 			}
 		}
 		new Thread(new Runnable() {
+			@Override
 			public void run(){
 				for (int z = offset; z < offset + 3; z++) {
 					if (ssf[z] == null) {
@@ -152,16 +155,18 @@ class ScreenshotIcon extends JLabel {
 	int ssNum = 0;
 
 	MouseAdapter doubleClick = new MouseAdapter() {
+		@Override
 		public void mouseClicked(final MouseEvent e) {
 			if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 				setIcon(ajax);
 				repaint();
 				ThreadPool.run(new Runnable() {
+					@Override
 					public void run() {
 						try {
 							if (currIcon == null)
 								loadImg();
-							ProxDownload d = new ProxDownload(new URL(ssFullUrl));
+							AsyncDownload d = new AsyncDownload(new URL(ssFullUrl));
 							new ImageViewer(d).setVisible(true);
 						} catch (Exception ex) {
 						}
@@ -187,6 +192,7 @@ class ScreenshotIcon extends JLabel {
 		this.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null,
 				null));
 		ThreadPool.run(new Runnable() {
+			@Override
 			public void run() {
 				loadImg();
 			}
@@ -194,6 +200,7 @@ class ScreenshotIcon extends JLabel {
 		if(diffSizes) this.addMouseListener(doubleClick);
 	}
 
+	@Override
 	public void repaint() {
 		super.repaint();
 	}

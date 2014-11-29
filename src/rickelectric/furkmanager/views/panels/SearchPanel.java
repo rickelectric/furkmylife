@@ -162,6 +162,7 @@ public class SearchPanel extends JPanel implements ActionListener, Runnable {
 
 	}
 
+	@Override
 	public void run() {
 		try {
 			resultPanel.removeAll();
@@ -226,6 +227,7 @@ public class SearchPanel extends JPanel implements ActionListener, Runnable {
 		resultPanel.add(Box.createVerticalStrut(5));
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		String command = event.getActionCommand();
 		if (command.equals("Search")) {

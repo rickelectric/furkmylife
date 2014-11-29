@@ -1,12 +1,11 @@
 package rickelectric.furkmanager.player;
 
 import rickelectric.furkmanager.data.DefaultParams;
-
-import com.sun.jna.NativeLibrary;
-
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
+
+import com.sun.jna.NativeLibrary;
 
 public class GUIStreamer {
 	
@@ -21,7 +20,7 @@ public class GUIStreamer {
 	}
 	
 	public static VideoPlayerWin playMedia(String mrl){
-		VideoPlayerWin win=new VideoPlayerWin(mrl, player,factory);
+		VideoPlayerWin win=new VideoPlayerWin();
 		return win;
 	}
 

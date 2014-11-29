@@ -45,6 +45,7 @@ public class FurkFile extends APIObject implements MoveableItem{
 		this.isReady = isReady;
 	}
 
+	@Override
 	public String getID() {return id;}
 
 	public String getType(){return type;}
@@ -175,6 +176,7 @@ public class FurkFile extends APIObject implements MoveableItem{
 	
 	public boolean serverRefresh(){
 		exec.execute(new Runnable(){
+			@Override
 			public void run(){
 				APIObject f=API_File.get(getID());
 				if(f!=null&&f instanceof FurkFile)
@@ -245,6 +247,7 @@ public class FurkFile extends APIObject implements MoveableItem{
 				+ isProtected + "]";
 	}
 
+	@Override
 	public int compareTo(Object o) {
 		if(o instanceof MoveableItem){
 			return getName().compareTo(((MoveableItem) o).getName());

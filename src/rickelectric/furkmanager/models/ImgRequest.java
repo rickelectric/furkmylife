@@ -54,6 +54,7 @@ public class ImgRequest implements Comparable<Object>{
 		cVal=by;
 	}
 
+	@Override
 	public int compareTo(Object o) {
 		if(cVal==TIME){
 			if(o instanceof ImgRequest){
@@ -88,7 +89,7 @@ public class ImgRequest implements Comparable<Object>{
 			return url.equals(((ImgRequest) o).getUrl());
 		}
 		else if(o instanceof String){
-			return url.equals((String)o);
+			return url.equals(o);
 		}
 		throw new IllegalArgumentException("Expected Either a String or an ImgRequest object, not a "+o.getClass().getName());
 	}

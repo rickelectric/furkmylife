@@ -18,7 +18,6 @@ import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.DownloadIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
-import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
 public class Download_MyDownloads extends JPanel implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -86,6 +85,7 @@ public class Download_MyDownloads extends JPanel implements Runnable {
 		resultPanel.add(Box.createVerticalStrut(3));
 	}
 
+	@Override
 	public void run() {
 		try {
 			API_Download.GET_STATUS stat = API_Download.STATUS_ACTIVE;
@@ -114,12 +114,12 @@ public class Download_MyDownloads extends JPanel implements Runnable {
 				resultScroller.repaint();
 			}
 			repaint();
-			((PrimaryEnv) getTopLevelAncestor()).setStatus("Loaded: "
+			FurkManager.getMainWindow().setStatus("Loaded: "
 					+ numResults + " " + (mode == FAILED ? "Failed" : "Active")
 					+ " Downloads");
 		} catch (Exception e) {
 			label_loading.setIcon(new ImageIcon("img/remove.png"));
-			((PrimaryEnv) getTopLevelAncestor()).setStatus("Could Not Load "
+			FurkManager.getMainWindow().setStatus("Could Not Load "
 					+ " " + (mode == FAILED ? "Failed" : "Active")
 					+ " Downloads");
 		}

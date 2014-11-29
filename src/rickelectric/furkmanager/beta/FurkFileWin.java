@@ -99,6 +99,7 @@ public class FurkFileWin extends JDialog {
 		FurkFileWin win = new FurkFileWin();
 		win.setLocationRelativeTo(null);
 		win.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
@@ -138,6 +139,7 @@ class Ellipse extends JComponent {
 		setForeground(Color.blue);
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		g.setColor(getForeground());
@@ -171,6 +173,7 @@ class Rect extends JComponent {
 		setForeground(Color.red);
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		g.setColor(getForeground());

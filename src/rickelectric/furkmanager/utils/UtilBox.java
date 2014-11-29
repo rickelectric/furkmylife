@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -19,7 +23,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Properties;
 import java.util.Random;
 
 import javax.swing.AbstractButton;
@@ -38,7 +41,7 @@ import org.apache.commons.io.FileUtils;
 
 public class UtilBox {
 
-	public static final int MAX_COLOR_INDEX=11;
+	public static final int MAX_COLOR_INDEX = 11;
 
 	private static boolean initd = false;
 
@@ -56,15 +59,15 @@ public class UtilBox {
 			j.setVisible(true);
 		}
 	}
-	
-	public static void init(){
+
+	public static void init() {
 		new UtilBox();
 	}
 
 	public UtilBox() {
 		if (initd)
 			return;
-		
+
 		File tc = new File("dwtemp");
 		if (!tc.exists() || !tc.isDirectory())
 			try {
@@ -72,8 +75,8 @@ public class UtilBox {
 						"dwtemp"), true);
 				FileUtils.deleteQuietly(new File("dwtemp/fr.ico"));
 			} catch (IOException e) {
-		}
-		
+			}
+
 		createColours();
 		initd = true;
 	}
@@ -148,11 +151,12 @@ public class UtilBox {
 			createColours();
 		return cols[cIndex];
 	}
-	
-	public static Color getColor(int cid){
+
+	public static Color getColor(int cid) {
 		if (r == null)
 			new UtilBox();
-		if(cid>MAX_COLOR_INDEX) cid=cid%MAX_COLOR_INDEX;
+		if (cid > MAX_COLOR_INDEX)
+			cid = cid % MAX_COLOR_INDEX;
 		if (cols == null)
 			createColours();
 		return cols[cid];
@@ -168,10 +172,11 @@ public class UtilBox {
 	 *            Internet Address To Open.
 	 */
 	public static void openUrl(String url) {
-		if (divertUrlOpen || url==null) return;
-		try{
+		if (divertUrlOpen || url == null)
+			return;
+		try {
 			Desktop.getDesktop().browse(URI.create(url));
-		}catch (IOException e){
+		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
 	}
@@ -206,24 +211,28 @@ public class UtilBox {
 
 	/**
 	 * 
-	 * @param millis Number Of Milliseconds To Pause For.
+	 * @param millis
+	 *            Number Of Milliseconds To Pause For.
 	 */
 	public static void pause(int millis) {
 		long base = System.currentTimeMillis();
 		while (System.currentTimeMillis() - base < millis)
 			;
 	}
-	
-	public static void wait(int millis){
-		try{Thread.sleep(millis);}
-		catch(InterruptedException e){}
+
+	public static void wait(int millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	public static String alphanum(String s) {
-		if(s==null) return "";
+		if (s == null)
+			return "";
 		char[] str = s.toCharArray();
 		s = "";
-		for (char p:str) {
+		for (char p : str) {
 			if (Character.isAlphabetic(p) || Character.isDigit(p))
 				s += p;
 		}
@@ -358,7 +367,7 @@ public class UtilBox {
 			}
 		}
 	}
-	
+
 	public static void addMouseMotionListenerToAll(Component parent,
 			MouseMotionListener listener) {
 		if (parent instanceof AbstractButton) {
@@ -392,16 +401,17 @@ public class UtilBox {
 		if (parent instanceof Container) {
 			Component[] comps = ((Container) parent).getComponents();
 			for (Component c : comps) {
-				if(!(c instanceof JScrollPane))
-				addMouseMotionListenerToAll(c, listener);
+				if (!(c instanceof JScrollPane))
+					addMouseMotionListenerToAll(c, listener);
 			}
 		}
 	}
-	
+
 	public static void addMouseMotionListenerToAll(Component parent,
-			MouseMotionListener listener,Class<?>[] exclude) {
-		for(Class<?> c:exclude){
-			if(parent.getClass() == c) return;
+			MouseMotionListener listener, Class<?>[] exclude) {
+		for (Class<?> c : exclude) {
+			if (parent.getClass() == c)
+				return;
 		}
 		if (parent instanceof AbstractButton) {
 			AbstractButton a = (AbstractButton) parent;
@@ -434,29 +444,35 @@ public class UtilBox {
 		if (parent instanceof Container) {
 			Component[] comps = ((Container) parent).getComponents();
 			for (Component c : comps) {
-				if(!(c instanceof JScrollPane))
-				addMouseMotionListenerToAll(c, listener,exclude);
+				if (!(c instanceof JScrollPane))
+					addMouseMotionListenerToAll(c, listener, exclude);
 			}
 		}
 	}
 
 	public static String openFile(String type) {
+		return openFile(type, null);
+	}
+
+	public static String openFile(String type, Window owner) {
 		JFileChooser fc = null;
 
 		if (type.equals("Torrent")) {
 			fc = new JFileChooser(System.getProperty("user.home"));
 			fc.setFileFilter(new FileNameExtensionFilter(
 					"BitTorrent File (.torrent)", "torrent"));
-		} else if(type.equals("IDMExecutable")){
+		} else if (type.equals("IDMExecutable")) {
 			fc = new JFileChooser("C:\\");
 			fc.setFileFilter(new FileNameExtensionFilter(
 					"IDM Executable (IDMan.exe)", "exe"));
-		}else{
+		} else {
 			fc = new JFileChooser(System.getProperty("user.home"));
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		}
-		
-		int returnVal = fc.showOpenDialog(null);
+
+		// TODO Alter Dialog To Get Modal For MainEnvironment
+		// fc.dialog.setModal(true);
+		int returnVal = fc.showOpenDialog(owner);
 
 		File file = null;
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -468,91 +484,99 @@ public class UtilBox {
 		return null;
 	}
 
-	public static void applyProxySettings(){
-		Properties systemSettings = System.getProperties();
-		if (SettingsManager.proxyEnabled()) {
-			// This can be put in a menu, updated via interface
-			System.out.println("Setting proxy");
-			
-			systemSettings.put("http.proxySet", "true");
-			systemSettings.put("http.proxyHost", SettingsManager.getProxyHost());
-			systemSettings.put("http.proxyPort", SettingsManager.getProxyPort());
-			
-			systemSettings.put("http.proxyUser", SettingsManager.getProxyUser());
-			systemSettings.put("http.proxyPassword", SettingsManager.getProxyPassword());
-			systemSettings.put("http.nonProxyHosts", "localhost|127.0.0.1");
-			System.setProperties(systemSettings);
-		}
-		else{
-			systemSettings.put("http.proxySet", "false");
-			System.setProperties(systemSettings);
-		}
-		
-	}
-	
-	public static void openFileLocation(File location){
+	public static void openFileLocation(File location) {
 		try {
-			if(location.exists()){
-				String sPath="\""+location.getAbsolutePath()+"\"";
-				Runtime.getRuntime().exec("explorer.exe /select,"+sPath);
-			}
-			else{
-				String[] arg=location.getAbsolutePath().split("\\\\");
-				String[] cmdArray=new String[2];
-				cmdArray[0]="explorer.exe";
-				int delim=arg.length;
-				if(location.getAbsolutePath().contains(" ")){
-					cmdArray[1]=arg[0];
+			if (location.exists()) {
+				String sPath = "\"" + location.getAbsolutePath() + "\"";
+				Runtime.getRuntime().exec("explorer.exe /select," + sPath);
+			} else {
+				String[] arg = location.getAbsolutePath().split("\\\\");
+				String[] cmdArray = new String[2];
+				cmdArray[0] = "explorer.exe";
+				int delim = arg.length;
+				if (location.getAbsolutePath().contains(" ")) {
+					cmdArray[1] = arg[0];
 					delim--;
-				}
-				else cmdArray[1]="/select,"+arg[0];
-				
-				if(arg.length>1)
-					for(int i=1;i<delim;i++)
-						cmdArray[1]+="\\"+arg[i];
+				} else
+					cmdArray[1] = "/select," + arg[0];
+
+				if (arg.length > 1)
+					for (int i = 1; i < delim; i++)
+						cmdArray[1] += "\\" + arg[i];
 				Runtime.getRuntime().exec(cmdArray);
 			}
-		}catch(IOException ioe){}
+		} catch (IOException ioe) {
+		}
 	}
 
-	public static String regex(String b4){
-		if(b4.contains("\\\\")) return b4;
+	public static String regex(String b4) {
+		if (b4.contains("\\\\"))
+			return b4;
 		String after;
-		String[] split=b4.split("\\\\");
-		after=split[0];
-		for(int i=1;i<split.length;i++)
-			after+="\\\\"+split[i];
+		String[] split = b4.split("\\\\");
+		after = split[0];
+		for (int i = 1; i < split.length; i++)
+			after += "\\\\" + split[i];
 		return after;
 	}
 
 	public static void schedule(final int i, final Runnable runnable) {
-		new Thread(new Runnable(){
-			public void run(){
-				try{Thread.sleep(i);}
-				catch(InterruptedException e){}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(i);
+				} catch (InterruptedException e) {
+				}
 				runnable.run();
 			}
 		}).start();
 	}
 
 	public static int numberParse(String str, int i) {
-		char[] chars=str.toCharArray();
-		str="";
-		for(char c:chars){
-			if(Character.isDigit(c)){
-				str+=c;
-			}
-			else str="";
-			if(str.length()==4) break;
+		char[] chars = str.toCharArray();
+		str = "";
+		for (char c : chars) {
+			if (Character.isDigit(c)) {
+				str += c;
+			} else
+				str = "";
+			if (str.length() == 4)
+				break;
 		}
-		if(str.length()<4) return -1;
+		if (str.length() < 4)
+			return -1;
 		return Integer.parseInt(str);
 	}
 
-	public static void clearActionListeners(AbstractButton cmpt){
+	public static void clearActionListeners(AbstractButton cmpt) {
 		for (ActionListener a : cmpt.getActionListeners()) {
 			cmpt.removeActionListener(a);
 		}
+	}
+	
+	public static final int LEFT=0,TOP=1,RIGHT=2,BOTTOM=3,NONEXISTANT=4;
+
+	public static int getTaskbarOrientation() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Rectangle windowBounds = GraphicsEnvironment
+				.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		
+		if(windowBounds.x>0) return LEFT;
+		if(windowBounds.y>0) return TOP;
+		if(windowBounds.width<screenSize.width) return RIGHT;
+		if(windowBounds.height<screenSize.height) return BOTTOM;
+		return NONEXISTANT;
+	}
+
+	public static int getTaskbarHeight() {
+		int yDev = Toolkit.getDefaultToolkit().getScreenSize().height
+				- GraphicsEnvironment.getLocalGraphicsEnvironment()
+						.getMaximumWindowBounds().height;
+		int xDev = Toolkit.getDefaultToolkit().getScreenSize().width
+				- GraphicsEnvironment.getLocalGraphicsEnvironment()
+						.getMaximumWindowBounds().width;
+		return Math.max(xDev, yDev);
 	}
 
 }

@@ -43,9 +43,13 @@ public class JFadeLabel extends JLabel implements Opacible{
 		
 		private boolean oscillation;
 		private int oscSpeed=20;
+		@Override
 		public boolean isOscillating(){return oscillation;}
+		@Override
 		public void setOscillating(boolean oscillation){this.oscillation=oscillation;}
+		@Override
 		public int getOscSpeed(){return oscSpeed;}
+		@Override
 		public void setOscSpeed(int oscSpeed){this.oscSpeed=oscSpeed;}
 		
 		public void stopOscillation(){oscillation=false;}
@@ -56,6 +60,7 @@ public class JFadeLabel extends JLabel implements Opacible{
 		 * </p>
 		 * @param value Alpha Value between 0 and 1 (decimal). 
 		 */
+		@Override
 		public void setAlpha(float value){
 			if(value>1||value<0) return;
 			if(value<0.02) setVisible(false);
@@ -68,6 +73,7 @@ public class JFadeLabel extends JLabel implements Opacible{
 			}
 		}
 		
+		@Override
 		public float getAlpha(){return alpha;}
 		
 		@Override
@@ -108,6 +114,7 @@ public class JFadeLabel extends JLabel implements Opacible{
 		public void fadeIn(final int msec){
 			fading=true;
 			ThreadPool.run(new Runnable(){
+				@Override
 				public void run(){
 					while(getAlpha()<0.9f){
 						setAlpha(alpha+0.02f);

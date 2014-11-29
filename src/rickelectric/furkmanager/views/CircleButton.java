@@ -2,6 +2,7 @@ package rickelectric.furkmanager.views;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -12,6 +13,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+
+import net.java.balloontip.BalloonTip;
 
 public class CircleButton extends JComponent {
 	private static final long serialVersionUID = 1L;
@@ -31,6 +34,15 @@ public class CircleButton extends JComponent {
 		} catch (IOException e) {
 		}
 	}
+	
+	public BalloonTip getAttachedBalloon(){
+		for(Component c:getComponents()){
+			if(c instanceof BalloonTip){
+				return (BalloonTip)c;
+			}
+		}
+		return null;
+	}
 
 	public String getPopup() {
 		return popup;
@@ -40,6 +52,7 @@ public class CircleButton extends JComponent {
 		this.popup = popup;
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D)g;
@@ -53,8 +66,8 @@ public class CircleButton extends JComponent {
 		g2d.setStroke(new BasicStroke(8));
 		g2d.draw(new Ellipse2D.Double(getX()+1, getY()+1, getWidth()-2, getHeight()-2));
 		
-		g2d.drawImage(icon, (int) (getX() + (getWidth() / 2 - icon.getWidth() / 2)),
-				(int) (getY() + (getHeight() / 2 - icon.getHeight() / 2)), null);
+		g2d.drawImage(icon, getX() + (getWidth() / 2 - icon.getWidth() / 2),
+				getY() + (getHeight() / 2 - icon.getHeight() / 2), null);
 		g2d.setColor(old);
 		g2d.setStroke(s);
 	}

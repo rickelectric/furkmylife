@@ -25,6 +25,7 @@ public class LoadingCircle extends JLabel {
 		repaint();
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		int w = g.getFontMetrics().stringWidth(str);

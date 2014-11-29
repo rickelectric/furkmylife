@@ -9,17 +9,23 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
+import rickelectric.furkmanager.views.windows.MainEnvironment;
+import rickelectric.furkmanager.views.windows.MainWindow;
 
 public class Main_SettingsView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;
@@ -44,10 +50,10 @@ public class Main_SettingsView extends TranslucentPane {
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
-		if(SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE)
+		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE)
 			setBackground(Color.lightGray);
 
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.setBounds(4, 0, 554, 394);
 		add(tabbedPane);
 
@@ -61,8 +67,7 @@ public class Main_SettingsView extends TranslucentPane {
 
 		JPanel panel_dwfolder = new JPanel();
 		panel_dwfolder.setOpaque(false);
-		panel_dwfolder.setBorder(new TitledBorder(null, "Default Folder",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_dwfolder.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Default Folder", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_dwfolder.setBounds(12, 12, 525, 105);
 		panel_downloader.add(panel_dwfolder);
 		panel_dwfolder.setLayout(null);
@@ -77,7 +82,7 @@ public class Main_SettingsView extends TranslucentPane {
 		input_dwFolder.setEditable(false);
 		input_dwFolder.setBounds(11, 35, 392, 20);
 		panel_dwfolder.add(input_dwFolder);
-		input_dwFolder.setText(SettingsManager.getDownloadFolder());
+		input_dwFolder.setText(SettingsManager.getInstance().getDownloadFolder());
 		input_dwFolder.setColumns(10);
 
 		check_dwAsk = new JCheckBox("Ask Before Every Download");
@@ -88,8 +93,9 @@ public class Main_SettingsView extends TranslucentPane {
 
 		button_browse = new JButton("Browse...");
 		button_browse.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				String f = UtilBox.openFile(SettingsManager.getDownloadFolder());
+				String f = UtilBox.openFile(SettingsManager.getInstance().getDownloadFolder());
 				if (f != null && !f.equals(""))
 					input_dwFolder.setText(f);
 			}
@@ -101,15 +107,17 @@ public class Main_SettingsView extends TranslucentPane {
 		button_dfsave.addActionListener(new ActionListener() {
 			boolean action = false;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (action)
 					return;
 				action = true;
 				button_dfsave.setText("Saving");
-				SettingsManager.setDownloadFolder(input_dwFolder.getText());
-				SettingsManager.askFolderOnDownload(check_dwAsk.isSelected());
+				SettingsManager.getInstance().setDownloadFolder(input_dwFolder.getText());
+				SettingsManager.getInstance().askFolderOnDownload(check_dwAsk.isSelected());
 				SettingsManager.save();
 				new Thread(new Runnable() {
+					@Override
 					public void run() {
 						Color c = button_dfsave.getForeground();
 						Color b = button_dfsave.getBackground();
@@ -136,9 +144,7 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_dwfolder.add(button_dfsave);
 
 		JPanel panel_dwopt = new JPanel();
-		panel_dwopt.setBorder(new TitledBorder(new LineBorder(new Color(184,
-				207, 229)), "Optimization (Internal Downloader)",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_dwopt.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Optimization (Internal Downloader)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_dwopt.setOpaque(false);
 		panel_dwopt.setBounds(12, 129, 204, 128);
 		panel_downloader.add(panel_dwopt);
@@ -150,7 +156,7 @@ public class Main_SettingsView extends TranslucentPane {
 
 		spinner_buffsize = new JSpinner();
 		spinner_buffsize.setModel(new SpinnerNumberModel(SettingsManager
-				.downloadBuffer(), 8, 524288, 8));
+				.getInstance().downloadBuffer(), 8, 524288, 8));
 		spinner_buffsize.setBounds(12, 29, 68, 20);
 		panel_dwopt.add(spinner_buffsize);
 
@@ -162,9 +168,10 @@ public class Main_SettingsView extends TranslucentPane {
 
 		btn_optsave = new JButton("Save");
 		btn_optsave.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int val = (Integer) spinner_buffsize.getValue();
-				SettingsManager.downloadBuffer(val);
+				SettingsManager.getInstance().downloadBuffer(val);
 				SettingsManager.save();
 			}
 		});
@@ -174,14 +181,13 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_idm = new JPanel();
 		panel_idm.setLayout(null);
 		panel_idm.setOpaque(false);
-		panel_idm.setBorder(new TitledBorder(new LineBorder(new Color(184, 207,
-				229)), "External Downloader (IDM)", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		panel_idm.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "External Downloader (IDM)", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_idm.setBounds(226, 129, 311, 128);
 		panel_downloader.add(panel_idm);
 
 		check_idm = new JCheckBox("Enable IDM");
 		check_idm.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean b = check_idm.isSelected();
 				if (!b)
@@ -197,6 +203,7 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_idm.add(check_idm);
 
 		input_idmexe = new JTextField();
+		input_idmexe.setEditable(false);
 		input_idmexe.setBounds(6, 60, 282, 20);
 		panel_idm.add(input_idmexe);
 		input_idmexe.setColumns(10);
@@ -207,8 +214,13 @@ public class Main_SettingsView extends TranslucentPane {
 
 		btn_idmbrowse = new JButton("Browse...");
 		btn_idmbrowse.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				String f = UtilBox.openFile("IDMExecutable");
+				String f = UtilBox.openFile(
+						"IDMExecutable",
+						((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
+								.getMainWindow() : (MainWindow) FurkManager
+								.getMainWindow())));
 				if (f != null && !f.equals(""))
 					input_idmexe.setText(f);
 			}
@@ -218,11 +230,13 @@ public class Main_SettingsView extends TranslucentPane {
 
 		btn_idmdetect = new JButton("Detect");
 		btn_idmdetect.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				String idmPath = SettingsManager.checkPaths();
+				String idmPath = SettingsManager.getInstance().checkPaths();
 				if (idmPath != null) {
 					input_idmexe.setText(idmPath);
 				} else {
+					JOptionPane.showMessageDialog(null, "IDM Not Detected");
 					btn_idmdetect.setEnabled(false);
 				}
 			}
@@ -232,8 +246,9 @@ public class Main_SettingsView extends TranslucentPane {
 
 		btn_idmSave = new JButton("Save");
 		btn_idmSave.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				SettingsManager.idmPath(input_idmexe.getText());
+				SettingsManager.getInstance().idmPath(input_idmexe.getText());
 				SettingsManager.save();
 			}
 		});
@@ -250,20 +265,23 @@ public class Main_SettingsView extends TranslucentPane {
 		panel.add(label);
 
 		input_api_base = new JTextField();
+		input_api_base.setBackground(Color.WHITE);
+		input_api_base.setEditable(false);
 		input_api_base.setFont(new Font("Dialog", Font.BOLD, 12));
-		input_api_base.setText("https://www.furk.net/api");
+		input_api_base.setText(FurkBridge.API_BASE());
 		input_api_base.setColumns(10);
 		input_api_base.setBounds(169, 12, 285, 20);
 		panel.add(input_api_base);
 
-		JLabel label_1 = new JLabel("ms");
-		label_1.setBounds(248, 44, 55, 16);
-		panel.add(label_1);
+		JLabel lblMilliseconds = new JLabel("milliseconds");
+		lblMilliseconds.setBounds(248, 44, 92, 16);
+		panel.add(lblMilliseconds);
 
-		JSpinner spinner = new JSpinner();
-		spinner.setFont(new Font("Dialog", Font.BOLD, 12));
-		spinner.setBounds(169, 42, 61, 20);
-		panel.add(spinner);
+		JSpinner spinner_timeout = new JSpinner();
+		spinner_timeout.setModel(new SpinnerNumberModel(10000, 3000, 30000, 100));
+		spinner_timeout.setFont(new Font("Dialog", Font.BOLD, 12));
+		spinner_timeout.setBounds(169, 42, 69, 20);
+		panel.add(spinner_timeout);
 
 		JLabel label_2 = new JLabel("Connection Timeout: ");
 		label_2.setBounds(12, 44, 139, 16);
@@ -277,10 +295,13 @@ public class Main_SettingsView extends TranslucentPane {
 	}
 
 	private void load() {
-		input_dwFolder.setText(SettingsManager.getDownloadFolder());
-		check_dwAsk.setSelected(SettingsManager.askFolderOnDownload());
+		input_dwFolder.setText(SettingsManager.getInstance().getDownloadFolder());
+		check_dwAsk.setSelected(SettingsManager.getInstance().askFolderOnDownload());
 
-		spinner_buffsize.setValue(SettingsManager.downloadBuffer());
+		check_idm.setSelected(SettingsManager.getInstance().idm());
+		input_idmexe.setText(SettingsManager.getInstance().idmPath());
+
+		spinner_buffsize.setValue(SettingsManager.getInstance().downloadBuffer());
 
 	}
 }

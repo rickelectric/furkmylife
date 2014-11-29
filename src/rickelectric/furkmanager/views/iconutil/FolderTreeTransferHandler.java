@@ -13,12 +13,12 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIFolder;
 import rickelectric.furkmanager.models.MoveableItem;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FolderTreeNode;
-import rickelectric.furkmanager.views.windows.AppFrameClass;
 
 public class FolderTreeTransferHandler extends TransferHandler {
 	private static final long serialVersionUID = 1L;
@@ -44,19 +44,19 @@ public class FolderTreeTransferHandler extends TransferHandler {
 	public boolean canImport(TransferSupport support) {
 		JTree tree = (JTree) support.getComponent();
 		if (!support.isDrop()) {
-			((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Forbidden - Not A Drop Location");
+			FurkManager.getMainWindow().setStatus("Drop Forbidden - Not A Drop Location");
 			return false;
 		}
 		support.setShowDropLocation(true);
 		if (!support.isDataFlavorSupported(nodesFlavor)) {
-			((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Forbidden - Flavour Not Spprtd");
+			FurkManager.getMainWindow().setStatus("Drop Forbidden - Flavour Not Spprtd");
 			return false;
 		}
 
 		// Do Not Allow Any Action Other Than A MOVE
 		int action = support.getDropAction();
 		if (action != MOVE){
-			((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Forbidden - Not A MOVE");
+			FurkManager.getMainWindow().setStatus("Drop Forbidden - Not A MOVE");
 			return false;
 		}
 
@@ -66,7 +66,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 		int[] selRows = tree.getSelectionRows();
 		for (int i = 0; i < selRows.length; i++) {
 			if (selRows[i] == dropRow) {
-				((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Forbidden - Destination is Source");
+				FurkManager.getMainWindow().setStatus("Drop Forbidden - Destination is Source");
 				return false;
 			}
 		}
@@ -76,7 +76,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 
 		// Do not allow MOVE-action unless the destination is a FolderTreeNode
 		if (!(target instanceof FolderTreeNode)) {
-			((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Forbidden - Not a FolderTreeNode");
+			FurkManager.getMainWindow().setStatus("Drop Forbidden - Not a FolderTreeNode");
 			return false;
 		}
 
@@ -87,13 +87,14 @@ public class FolderTreeTransferHandler extends TransferHandler {
 				.getLastPathComponent();
 		if (firstNode.getChildCount() > 0
 				&& target.getLevel() > firstNode.getLevel()) {
-			((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Forbidden - Parent to Child Transfer");
+			FurkManager.getMainWindow().setStatus("Drop Forbidden - Parent to Child Transfer");
 			return false;
 		}
-		((AppFrameClass)tree.getTopLevelAncestor()).setStatus("Drop Allowed");
+		FurkManager.getMainWindow().setStatus("Drop Allowed");
 		return true;
 	}
 
+	@Override
 	protected Transferable createTransferable(JComponent c) {
 		JTree tree = (JTree) c;
 		TreePath path = tree.getSelectionPath();
@@ -124,6 +125,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 		return null;
 	}
 
+	@Override
 	protected void exportDone(JComponent source, Transferable data, int action) {
 		if ((action & MOVE) == MOVE) {
 			JTree tree = (JTree) source;
@@ -135,10 +137,12 @@ public class FolderTreeTransferHandler extends TransferHandler {
 		}
 	}
 
+	@Override
 	public int getSourceActions(JComponent c) {
 		return MOVE;
 	}
 
+	@Override
 	public boolean importData(TransferSupport support) {
 		if (!canImport(support)) {
 			return false;
@@ -189,6 +193,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 			this.nodes = nodes;
 		}
 
+		@Override
 		public Object getTransferData(DataFlavor flavor)
 				throws UnsupportedFlavorException {
 			if (!isDataFlavorSupported(flavor))
@@ -196,10 +201,12 @@ public class FolderTreeTransferHandler extends TransferHandler {
 			return nodes;
 		}
 
+		@Override
 		public DataFlavor[] getTransferDataFlavors() {
 			return flavors;
 		}
 
+		@Override
 		public boolean isDataFlavorSupported(DataFlavor flavor) {
 			return nodesFlavor.equals(flavor);
 		}

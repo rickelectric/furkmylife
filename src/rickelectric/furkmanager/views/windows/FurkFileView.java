@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -62,14 +61,14 @@ public class FurkFileView extends JDialog implements Statable {
 	private JLabel statusBar;
 
 	public FurkFileView(final FurkFile ff) {
-		super((Window)FurkManager.getMainWindow());
+		super(FurkManager.getMainWindow().getWindow());
 		setIconImage(Toolkit
 				.getDefaultToolkit()
 				.getImage(
 						FurkFileView.class
 								.getResource("/rickelectric/furkmanager/img/dash/Files-16.png")));
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		setModal(true);
+		setModalityType(ModalityType.DOCUMENT_MODAL);
+		//setModal(true);
 		this.ff = ff;
 		// if(windowlist==null) windowlist=new ArrayList<FurkFileView>();
 		// int i=windowlist.indexOf(this);
@@ -173,6 +172,7 @@ public class FurkFileView extends JDialog implements Statable {
 
 		btn_linkfile = new JButton("Add To My Files");
 		btn_linkfile.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				String cmd = e.getActionCommand();
 				if (cmd.equals("Add To My Files")) {
@@ -243,6 +243,7 @@ public class FurkFileView extends JDialog implements Statable {
 		JButton btn_copyLink = new JButton("Copy URL");
 		btn_copyLink.setBounds(334, 159, 98, 20);
 		btn_copyLink.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				UtilBox.sendToClipboard(ff.getUrlDl());
 				FurkManager.trayAlert(FurkManager.TRAY_INFO, "Copied",
@@ -253,6 +254,7 @@ public class FurkFileView extends JDialog implements Statable {
 
 		btn_viewfurk = new JButton("View on Furk");
 		btn_viewfurk.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String url = ff.getUrlPage();
 				UtilBox.openUrl("https://www.furk.net" + url);
@@ -264,6 +266,7 @@ public class FurkFileView extends JDialog implements Statable {
 
 		btn_close = new JButton("Close");
 		btn_close.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
@@ -297,6 +300,7 @@ public class FurkFileView extends JDialog implements Statable {
 			tmp.setVisible(false);
 
 		btn_changeview.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (tfile_scroll == null) {
 					if (tmp.isVisible()) {
@@ -335,6 +339,7 @@ public class FurkFileView extends JDialog implements Statable {
 		if (showScreenshots)
 			centerPane.add(btn_changeview);
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				tfile_scroll = new TFileTreePanel(ff);
 				tfile_scroll.setBounds(10, 192, 418, 201);
@@ -371,6 +376,7 @@ public class FurkFileView extends JDialog implements Statable {
 	// windowlist.get(0).dispose();
 	// }
 
+	@Override
 	public void setStatus(String status) {
 		statusBar.setText(status);
 	}

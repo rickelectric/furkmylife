@@ -1,7 +1,5 @@
 package rickelectric.furkmanager.player;
 
-import javax.swing.JFrame;
-
 import rickelectric.furkmanager.data.DefaultParams;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -9,9 +7,7 @@ import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 import com.sun.jna.NativeLibrary;
 
-public class MediaStreamer extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+public class MediaStreamer {
 
 	//private static AudioMediaPlayerComponent audioPlayer = null;
 	private static EmbeddedMediaPlayer player = null;
@@ -28,7 +24,6 @@ public class MediaStreamer extends JFrame {
 	}
 	
 	public static void init() {
-
 		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(),
 				DefaultParams.VLC_PATH);
 		
@@ -36,6 +31,8 @@ public class MediaStreamer extends JFrame {
 			factory = new MediaPlayerFactory();
 		
 		player = factory.newEmbeddedMediaPlayer();
+		audioWin = new AudioPlayerWin(player);
+		audioWin.setVisible(false);
 
 	}
 
@@ -69,7 +66,16 @@ public class MediaStreamer extends JFrame {
 		} catch (Exception e) {}
 
 		audioWin = new AudioPlayerWin(player);
+		//audioWin.setVisible(true);
 		
+	}
+
+	public static AudioPlayerWin getAudioWin() {
+		return audioWin;
+	}
+	
+	public static VideoPlayerWin getVideoWin() {
+		return videoWin;
 	}
 
 }

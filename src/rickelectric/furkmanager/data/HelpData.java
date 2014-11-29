@@ -16,6 +16,7 @@ public class HelpData {
 		editorPane.setText(data);
 		editorPane.setEditable(false);
 		editorPane.addHyperlinkListener(new HyperlinkListener(){
+			@Override
 			public void hyperlinkUpdate(HyperlinkEvent e) {
 				if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 					UtilBox.openUrl(e.getURL().toExternalForm());

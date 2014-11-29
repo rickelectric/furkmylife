@@ -143,6 +143,7 @@ public class TimeInterface{
 		month.add("September");month.add("October");
 		month.add("November");month.add("December");
 		month.addItemListener(new ItemListener(){
+			@Override
 			public void itemStateChanged(ItemEvent event){
 				int sItem=day.getSelectedIndex();
 				day.removeAll();
@@ -172,6 +173,7 @@ public class TimeInterface{
 		});
 		
 		year.addKeyListener(new KeyAdapter(){
+				@Override
 				public void keyReleased(KeyEvent event){
 					day.removeAll();
 					String selMonth=month.getSelectedItem();
@@ -197,7 +199,7 @@ public class TimeInterface{
 					}
 				}
 		});
-		month.select((int)(Integer.parseInt(currDate[1])-1));
+		month.select(Integer.parseInt(currDate[1])-1);
 		year.setText(currDate[0]);
 		month.getItemListeners()[0].itemStateChanged(null);
 		day.select(currDate[2]);

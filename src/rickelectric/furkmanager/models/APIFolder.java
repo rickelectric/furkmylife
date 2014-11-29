@@ -44,6 +44,7 @@ public class APIFolder implements MoveableItem{
 		}
 	}
 	
+	@Override
 	public String getID(){
 		return fsync.getID();
 	}
@@ -60,6 +61,7 @@ public class APIFolder implements MoveableItem{
 		files.remove(f);
 	}
 
+	@Override
 	public String getName(){
 		return fsync.getName();
 	}
@@ -68,6 +70,7 @@ public class APIFolder implements MoveableItem{
 		fsync.setName(name);
 	}
 	
+	@Override
 	public int compareTo(Object o) {
 		if (this.equals(o)) return 0;
 		if(o instanceof APIFolder){
@@ -82,6 +85,7 @@ public class APIFolder implements MoveableItem{
 		throw new IllegalArgumentException();
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		if (this==o) return true;
 		if (o==null) return false;
@@ -94,6 +98,7 @@ public class APIFolder implements MoveableItem{
 		return false;
 	}
 	
+	@Override
 	public String toString(){
 		return toString(0);
 	}

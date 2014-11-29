@@ -7,6 +7,7 @@ import java.awt.GraphicsEnvironment;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
@@ -26,14 +27,14 @@ public class Main_FileView extends TranslucentPane {
 		setAlpha(1);
 		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
-		if (SettingsManager.getMainWinMode() == SettingsManager.ENV_MODE) {
+		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE) {
 			setBackground(Color.darkGray);
 			setPreferredSize(new Dimension(561,
 					GraphicsEnvironment.getLocalGraphicsEnvironment()
 							.getMaximumWindowBounds().height - 200));
 		}
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.setBounds(4, 0, 554, getPreferredSize().height - 8);
 		add(tabbedPane);
 

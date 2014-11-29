@@ -148,7 +148,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 				idm.setIcon(new ImageIcon(FurkManager.class
 						.getResource("img/sm/idm.png")));
 				idm.addActionListener(this);
-				if (SettingsManager.idm()) {
+				if (SettingsManager.getInstance().idm()) {
 					download.add(idm);
 				}
 
@@ -225,12 +225,14 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 
 		}
 
+		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
 			Thread t = new Thread(new Runnable() {
 				private Icon curr;
 
+				@Override
 				public void run() {
 					action = true;
 					if (mode == SMALL_MODE) {
@@ -282,14 +284,15 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 						}
 						if (src.equals(idm)) {
 							try {
-								String path = SettingsManager.idmPath();
+								String path = SettingsManager.getInstance()
+										.idmPath();
 								Runtime.getRuntime().exec(
 										new String[] {
 												path,
 												"-d",
 												((FurkFile) cFile).getUrlDl(),
 												"/p",
-												SettingsManager
+												SettingsManager.getInstance()
 														.getDownloadFolder() });
 							} catch (Exception e) {
 								FurkManager
@@ -298,7 +301,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 												"IDM Error",
 												"Could Not Find IDM Download Manager.\nIDM Will Be Disabled.",
 												null);
-								SettingsManager.idmPath(null);
+								SettingsManager.getInstance().idmPath(null);
 							}
 						}
 						if (src.equals(internal)) {
@@ -476,6 +479,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		check_ready.setOpaque(false);
 		check_ready.setBounds(63, 41, 80, 21);
 		check_ready.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				check_ready.setSelected(f.isReady());
 			}
@@ -606,6 +610,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 			check_linked.setBounds(208, 56, 83, 20);
 			check_linked.setSelected(((FurkFile) o).isLinked());
 			check_linked.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					check_linked.setSelected(((FurkFile) o).isLinked());
 				}
@@ -617,6 +622,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 			check_ready.setBounds(306, 56, 83, 20);
 			check_ready.setSelected(((FurkFile) o).isReady());
 			check_ready.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					check_ready.setSelected(((FurkFile) o).isReady());
 				}
@@ -625,6 +631,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		}
 	}
 
+	@Override
 	public int compareTo(FileIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
 	}

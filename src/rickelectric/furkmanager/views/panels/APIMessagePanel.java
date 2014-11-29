@@ -23,6 +23,7 @@ public class APIMessagePanel extends JPanel {
 		setBackground(new Color(241,241,241));
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		if (messages == null)

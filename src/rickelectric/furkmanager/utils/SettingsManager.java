@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.Proxy;
 
 import org.apache.xerces.impl.dv.util.Base64;
 
@@ -15,11 +14,19 @@ import rickelectric.furkmanager.models.LoginModel;
 
 public class SettingsManager implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-	private static float version = 1.3f;
-
-	private static File sFile = null;
+	
+	private static float version = 1.4f;
 	private static SettingsManager sMan = null;
+	
+	private static File sFile = null;
+	
+	public static synchronized SettingsManager getInstance(){
+		if(sMan==null){
+			init();
+		}
+		return sMan;
+	}
+	
 	public static final int ENV_MODE = 0, WIN_MODE = 1;
 	
 	private int mainWinMode = 0;
@@ -27,10 +34,7 @@ public class SettingsManager implements Serializable {
 	private int localPort = 33250, webSockPort = 33251, timeout = 20000;
 	private String apiKey = "", username = "", password = "";
 
-	private String proxyHost = "", proxyPort = "", proxyUser = "",
-			proxyPassword = "";
-	private Proxy.Type proxyType;
-	private boolean proxyRequired = false;
+	private ProxySettings proxySettings;
 
 	private boolean useTunnel = false;
 
@@ -68,12 +72,7 @@ public class SettingsManager implements Serializable {
 		if (idmPath == null)
 			idm = false;
 
-		proxyRequired = false;
-		proxyType = Proxy.Type.DIRECT;
-		proxyHost = "";
-		proxyPort = "";
-		proxyUser = "";
-		proxyPassword = "";
+		proxySettings = new ProxySettings();
 
 		askFolderOnDownload = true;
 		downloadFolder = System.getProperty("user.home") + "/FurkDownloads";
@@ -92,12 +91,11 @@ public class SettingsManager implements Serializable {
 		useTunnel = false;
 	}
 
-	public static synchronized void init() {
+	private static void init() {
 		sFile = new File("settings.db");
 		if (!sFile.exists()) {
 			try {
 				sFile.createNewFile();
-				sMan = new SettingsManager();
 				save();
 			} catch (IOException e) {
 			}
@@ -123,6 +121,7 @@ public class SettingsManager implements Serializable {
 			}
 		} catch (Exception e) {
 			SettingsManager s = new SettingsManager();
+			save();
 			return s;
 		}
 	}
@@ -136,11 +135,12 @@ public class SettingsManager implements Serializable {
 			oos.close();
 			return true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
 
-	public static String checkPaths() {
+	public String checkPaths() {
 		String[] paths = {
 				"C:\\Program Files\\Internet Download Manager\\IDMan.exe",
 				"C:\\Program Files (x86)\\Internet Download Manager\\IDMan.exe", };
@@ -152,196 +152,164 @@ public class SettingsManager implements Serializable {
 		return null;
 	}
 
-	public static int timeout() {
-		return sMan.timeout;
+	public int timeout() {
+		return this.timeout;
 	}
 
-	public static void timeout(int t) {
-		sMan.timeout = t;
+	public void timeout(int t) {
+		this.timeout = t;
 	}
 
-	public static int numCachedImages() {
-		return sMan.numCachedImages;
+	public int numCachedImages() {
+		return this.numCachedImages;
 	}
 
-	public static void numCachedImages(int num) {
-		sMan.numCachedImages = num;
+	public void numCachedImages(int num) {
+		this.numCachedImages = num;
 	}
 
-	public static int getLocalPort() {
-		return sMan.localPort;
+	public int getLocalPort() {
+		return this.localPort;
 	}
 
-	public static int getWebSockPort() {
-		return sMan.webSockPort;
+	public int getWebSockPort() {
+		return this.webSockPort;
 	}
 
-	public static void setPorts(int local, int webSock) {
-		sMan.localPort = local;
-		sMan.webSockPort = webSock;
+	public void setPorts(int local, int webSock) {
+		this.localPort = local;
+		this.webSockPort = webSock;
 	}
 
-	public static String getApiKey() {
-		return sMan.apiKey;
+	public String getApiKey() {
+		return this.apiKey;
 	}
 
-	public static void setApiKey(String apiKey) {
-		sMan.apiKey = apiKey;
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
-	public static String getUsername() {
-		return sMan.username;
+	public String getUsername() {
+		return this.username;
 	}
 
-	public static String getPassword() {
-		byte[] pass = Base64.decode(sMan.password);
+	public String getPassword() {
+		byte[] pass = Base64.decode(this.password);
 		String s = new String(pass);
 		return s;
 	}
 
-	public static void setLogin(String username, String password) {
-		sMan.username = username;
-		sMan.password = Base64.encode(password.getBytes());
+	public void setLogin(String username, String password) {
+		this.username = username;
+		this.password = Base64.encode(password.getBytes());
 	}
 
-	public static boolean autoLogin() {
-		return sMan.autoLogin;
+	public boolean autoLogin() {
+		return this.autoLogin;
 	}
 
-	public static void autoLogin(boolean al) {
-		sMan.autoLogin = al;
+	public void autoLogin(boolean al) {
+		this.autoLogin = al;
 	}
 
-	public static void searchResultsPerPage(int val) {
-		sMan.searchResultsPerPage = val;
+	public void searchResultsPerPage(int val) {
+		this.searchResultsPerPage = val;
 	}
 
-	public static int searchResultsPerPage() {
-		return sMan.searchResultsPerPage;
+	public int searchResultsPerPage() {
+		return this.searchResultsPerPage;
 	}
 
-	public static void enableProxy(boolean on) {
-		sMan.proxyRequired = on;
+	public String getDownloadFolder() {
+		return this.downloadFolder;
 	}
 
-	public static boolean proxyEnabled() {
-		return sMan.proxyRequired;
+	public void setDownloadFolder(String downloadFolder) {
+		this.downloadFolder = downloadFolder;
 	}
 
-	public static void setProxy(Proxy.Type type, String host, String port,
-			String user, String pass) {
-		sMan.proxyHost = host;
-		sMan.proxyPort = port;
-		sMan.proxyUser = user;
-		sMan.proxyPassword = pass;
+	public boolean askFolderOnDownload() {
+		return this.askFolderOnDownload;
 	}
 
-	public static Proxy.Type getProxyType() {
-		return sMan.proxyType;
+	public void askFolderOnDownload(boolean askOnDownload) {
+		this.askFolderOnDownload = askOnDownload;
 	}
 
-	public static String getProxyHost() {
-		return sMan.proxyHost;
+	public int downloadBuffer() {
+		return this.downloadBuffer;
 	}
 
-	public static String getProxyPort() {
-		return sMan.proxyPort;
+	public void downloadBuffer(int downloadBuffer) {
+		this.downloadBuffer = downloadBuffer;
 	}
 
-	public static String getProxyUser() {
-		return sMan.proxyUser;
+	public boolean idm() {
+		return this.idm;
 	}
 
-	public static String getProxyPassword() {
-		return sMan.proxyPassword;
+	public String idmPath() {
+		return this.idmPath;
 	}
 
-	public static String getDownloadFolder() {
-		return sMan.downloadFolder;
-	}
-
-	public static void setDownloadFolder(String downloadFolder) {
-		sMan.downloadFolder = downloadFolder;
-	}
-
-	public static boolean askFolderOnDownload() {
-		return sMan.askFolderOnDownload;
-	}
-
-	public static void askFolderOnDownload(boolean askOnDownload) {
-		sMan.askFolderOnDownload = askOnDownload;
-	}
-
-	public static int downloadBuffer() {
-		return sMan.downloadBuffer;
-	}
-
-	public static void downloadBuffer(int downloadBuffer) {
-		sMan.downloadBuffer = downloadBuffer;
-	}
-
-	public static boolean idm() {
-		return sMan.idm;
-	}
-
-	public static String idmPath() {
-		return sMan.idmPath;
-	}
-
-	public static void idmPath(String s) {
+	public void idmPath(String s) {
 		if (s == null || s.equals(""))
-			sMan.idm = false;
+			this.idm = false;
 		else
-			sMan.idm = true;
-		sMan.idmPath = s;
+			this.idm = true;
+		this.idmPath = s;
 	}
 
-	public static boolean isUserRemember() {
-		return sMan.userRemember;
+	public boolean isUserRemember() {
+		return this.userRemember;
 	}
 
-	public static void setUserRemember(boolean userRemember) {
-		sMan.userRemember = userRemember;
+	public void setUserRemember(boolean userRemember) {
+		this.userRemember = userRemember;
 	}
 
-	public static boolean isApiRemember() {
-		return sMan.apiRemember;
+	public boolean isApiRemember() {
+		return this.apiRemember;
 	}
 
-	public static void setApiRemember(boolean apiRemember) {
-		sMan.apiRemember = apiRemember;
+	public void setApiRemember(boolean apiRemember) {
+		this.apiRemember = apiRemember;
 	}
 
-	public static void loginModel(LoginModel loginModel) {
-		sMan.loginModel = loginModel;
+	public void loginModel(LoginModel loginModel) {
+		this.loginModel = loginModel;
 	}
 
-	public static LoginModel loginModel() {
-		return sMan.loginModel;
+	public LoginModel loginModel() {
+		return this.loginModel;
 	}
 
-	public static boolean useTunnel() {
-		return sMan.useTunnel;
+	public boolean useTunnel() {
+		return this.useTunnel;
 	}
 
-	public static void useTunnel(boolean useTunnel) {
-		sMan.useTunnel = useTunnel;
+	public void useTunnel(boolean useTunnel) {
+		this.useTunnel = useTunnel;
 	}
 
-	public static int getMainWinMode() {
-		return sMan.mainWinMode;
+	public int getMainWinMode() {
+		return this.mainWinMode;
 	}
 
-	public static void setMainWinMode(int mainWinMode) {
-		sMan.mainWinMode = mainWinMode;
+	public void setMainWinMode(int mainWinMode) {
+		this.mainWinMode = mainWinMode;
 	}
 
-	public static boolean dimEnvironment() {
-		return sMan.dimEnvironment;
+	public boolean dimEnvironment() {
+		return this.dimEnvironment;
 	}
 	
-	public static void dimEnvironment(boolean dimEnvironment) {
-		sMan.dimEnvironment = dimEnvironment;
+	public void dimEnvironment(boolean dimEnvironment) {
+		this.dimEnvironment = dimEnvironment;
+	}
+
+	public ProxySettings getProxySettings() {
+		return this.proxySettings;
 	}
 
 }

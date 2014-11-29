@@ -22,9 +22,10 @@ import javax.swing.border.EtchedBorder;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkDownload;
 import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.panels.Main_DownloadView;
+import rickelectric.furkmanager.views.panels.Download_MyDownloads;
 import rickelectric.furkmanager.views.windows.FurkDownloadView;
 
 public class DownloadIcon extends JPanel implements
@@ -55,6 +56,7 @@ public class DownloadIcon extends JPanel implements
 	private FurkDownload cDownload;
 	private static boolean action = false;
 
+	@Override
 	protected void finalize() {
 		if (refTimer != null) {
 			refTimer.cancel();
@@ -73,8 +75,8 @@ public class DownloadIcon extends JPanel implements
 		try {
 			do {
 				parent = parent.getParent();
-			} while (!(parent instanceof Main_DownloadView));
-			((Main_DownloadView) parent)
+			} while (!(parent instanceof Download_MyDownloads));
+			((Download_MyDownloads) parent)
 					.refreshMyDownloads(false);
 		} catch (Exception e) {
 			System.err
@@ -104,10 +106,12 @@ public class DownloadIcon extends JPanel implements
 
 		}
 
+		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (action)
 				return;
 			Thread t = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					try {
 						action = true;
@@ -157,6 +161,7 @@ public class DownloadIcon extends JPanel implements
 		setBackground(bgc);
 
 		UtilBox.addMouseListenerToAll(this, new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1
 						&& e.getClickCount() == 2) {
@@ -234,6 +239,7 @@ public class DownloadIcon extends JPanel implements
 	public void refreshTimerExec() {
 		refTimer = new Timer();
 		runTask = new TimerTask() {
+			@Override
 			public void run() {
 				if (!thisPanel.isVisible()) {
 					thisPanel.setVisible(false);
@@ -277,7 +283,7 @@ public class DownloadIcon extends JPanel implements
 								"Download Complete", "Finished Downloading '"
 										+ cDownload.getName() + "'",
 								null);
-						APIBridge.fileGet(APIBridge.GET_ALL, null, null, null,
+						APIBridge.fileGet(FurkBridge.GET_ALL, null, null, null,
 								false);
 						this.cancel();
 					} else if (ex.getMessage().equals("Connection Error")) {
@@ -323,6 +329,7 @@ public class DownloadIcon extends JPanel implements
 
 	}
 
+	@Override
 	public int compareTo(DownloadIcon o) {
 		return o.input_name.getText().compareTo(this.input_name.getText());
 	}
