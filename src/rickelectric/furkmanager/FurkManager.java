@@ -221,7 +221,7 @@ public class FurkManager {
 		 * Remove
 		 */
 		// APIBridge.dummy = true;
-		VideoPlayerPanel.dummy = true;
+		//VideoPlayerPanel.dummy = true;
 		// AudioPlayerPanel.dummy = true;
 
 		loadingSplash(true);

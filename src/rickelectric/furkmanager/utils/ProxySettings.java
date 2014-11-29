@@ -14,17 +14,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import net.maxters.android.ntlm.NTLM;
-
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.params.AuthPNames;
+import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.Scheme;
@@ -60,13 +61,17 @@ public class ProxySettings implements Serializable {
 		if (proxyType != Type.NONE) {
 			switch (proxyType) {
 			case NTLM:
-				System.out.println("NTLM Proxy Applied");
-				NTLM.setNTLM(client, USER, PASS, "SASTUDENTS", HOST, PORT);
-				NTCredentials creds = new NTCredentials(USER, PASS, "SASTUDENTS",DOMAIN);
+				HttpHost proxy = new HttpHost(HOST,PORT);
+				client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+
+				List<String> authpref = new ArrayList<String>();
+				authpref.add(AuthPolicy.NTLM);
+				client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, authpref);
+				NTCredentials creds = new NTCredentials(USER,PASS,
+						"localhost", DOMAIN);
 				client.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
 				break;
 			case HTTP:
-				System.out.println("HTTP Proxy Applied");
 				HttpHost host = new HttpHost(HOST, PORT);
 				if (USER != null) {
 					client.getCredentialsProvider().setCredentials(
@@ -77,7 +82,6 @@ public class ProxySettings implements Serializable {
 						host);
 				break;
 			case SOCKS:
-				System.out.println("SOCKS Proxy Applied");
 				client.getParams().setParameter("socks.host", HOST);
 				client.getParams().setParameter("socks.port", PORT);
 				client.getConnectionManager()
