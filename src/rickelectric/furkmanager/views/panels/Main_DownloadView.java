@@ -17,6 +17,8 @@ public class Main_DownloadView extends TranslucentPane {
 
 	private SearchPanel pane_metasearch;
 
+	private JTabbedPane tabbedPane;
+
 	public Main_DownloadView() {
 		super();
 		setAlpha(1);
@@ -30,7 +32,7 @@ public class Main_DownloadView extends TranslucentPane {
 							.getMaximumWindowBounds().height - 200));
 		}
 
-		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
+		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.setBounds(4, 0, 554, getPreferredSize().height - 8);
 		add(tabbedPane);
 
@@ -50,5 +52,14 @@ public class Main_DownloadView extends TranslucentPane {
 	public void refreshMyDownloads(final boolean hardReload) {
 		pane_active.refreshMyDownloads(hardReload);
 		pane_failed.refreshMyDownloads(hardReload);
+	}
+
+	public void refreshActive(boolean hardReload) {
+		int selectedTab = tabbedPane.getSelectedIndex();
+		if (selectedTab == 0) {
+			pane_active.refreshMyDownloads(hardReload);
+		} else if (selectedTab == 1) {
+			pane_failed.refreshMyDownloads(hardReload);
+		}
 	}
 }

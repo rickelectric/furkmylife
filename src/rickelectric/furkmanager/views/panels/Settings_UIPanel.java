@@ -38,14 +38,15 @@ public class Settings_UIPanel extends JPanel {
 	private JCheckBox check_onTop;
 	private JCheckBox check_autohide;
 	private JRadioButton rdbtnRandomColors;
-	private JButton btn_InstallNew;
-	private JButton btn_Save_1;
+	private JButton btn_addRemoveThemes;
+	private JButton btn_saveThemes;
 	private JCheckBox check_uieffects;
 
 	public Settings_UIPanel() {
-		setPreferredSize(new Dimension(242, 363));
+		// setPreferredSize(new Dimension(245, 363));
+		setPreferredSize(new Dimension(245, 363));
 		setSize(new Dimension(242, 363));
-		
+
 		setLayout(null);
 		setBackground(UtilBox.getRandomColor());
 
@@ -62,7 +63,13 @@ public class Settings_UIPanel extends JPanel {
 		btn_Save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SettingsManager.getInstance().dimEnvironment(check_dim.isSelected());
+				SettingsManager.getInstance().dimEnvironment(
+						check_dim.isSelected());
+				SettingsManager.getInstance().autoHideEnvrionment(
+						check_autohide.isSelected());
+				SettingsManager.getInstance().slideDashWin(
+						check_slide.isSelected());
+
 				if (getTopLevelAncestor() instanceof MainEnvironment) {
 					((MainEnvironment) getTopLevelAncestor()).refreshBgc();
 				}
@@ -70,17 +77,18 @@ public class Settings_UIPanel extends JPanel {
 						: SettingsManager.WIN_MODE;
 				if (newMode != SettingsManager.getInstance().getMainWinMode()) {
 					int opt;
-					try{
+					try {
 						opt = JOptionPane.showConfirmDialog(
 								((PrimaryEnv) getTopLevelAncestor())
 										.getContentPane(),
 								"Main Window Mode Is About To Be Changed. Are You Sure You Want To Continue?",
 								"Confirm Change", JOptionPane.YES_NO_OPTION);
-					if (opt == JOptionPane.YES_OPTION) {
-						SettingsManager.getInstance().setMainWinMode(newMode);
-						FurkManager.mWinModeChanged();
-					}
-					}catch(ClassCastException ex){
+						if (opt == JOptionPane.YES_OPTION) {
+							SettingsManager.getInstance().setMainWinMode(
+									newMode);
+							FurkManager.mWinModeChanged();
+						}
+					} catch (ClassCastException ex) {
 						SettingsManager.getInstance().setMainWinMode(newMode);
 					}
 				}
@@ -105,7 +113,7 @@ public class Settings_UIPanel extends JPanel {
 				0, 0)), "Windowed Interface Mode", TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
 		panel_windowed.setOpaque(false);
-		panel_windowed.setBounds(10, 15, 205, 98);
+		panel_windowed.setBounds(10, 15, 205, 109);
 		panel_mainInterface.add(panel_windowed);
 		panel_windowed.setLayout(null);
 
@@ -116,13 +124,6 @@ public class Settings_UIPanel extends JPanel {
 		radio_windowed.setOpaque(false);
 
 		check_slide = new JCheckBox("Slide Animations");
-		check_slide.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				check_slide.setSelected(true);
-				// TODO Settings
-			}
-		});
 		check_slide.setSelected(true);
 		check_slide.setOpaque(false);
 		check_slide.setBounds(16, 44, 155, 23);
@@ -133,7 +134,7 @@ public class Settings_UIPanel extends JPanel {
 				new LineBorder(new Color(0, 0, 0)), "Desktop Environment Mode",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_env.setOpaque(false);
-		panel_env.setBounds(10, 117, 205, 164);
+		panel_env.setBounds(10, 135, 205, 164);
 		panel_mainInterface.add(panel_env);
 		panel_env.setLayout(null);
 
@@ -162,18 +163,11 @@ public class Settings_UIPanel extends JPanel {
 		panel_env.add(check_onTop);
 
 		check_autohide = new JCheckBox("Auto-Hide Buttons");
-		check_autohide.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				check_autohide.setSelected(true);
-				// TODO Settings
-			}
-		});
 		check_autohide.setSelected(false);
 		check_autohide.setOpaque(false);
 		check_autohide.setBounds(16, 97, 145, 23);
 		panel_env.add(check_autohide);
-		
+
 		check_uieffects = new JCheckBox("Enable UI Effects");
 		check_uieffects.addActionListener(new ActionListener() {
 			@Override
@@ -195,26 +189,26 @@ public class Settings_UIPanel extends JPanel {
 				TitledBorder.TOP, null, null));
 		panel_theme.setBounds(245, 11, 294, 344);
 		add(panel_theme);
-		
+
 		rdbtnRandomColors = new JRadioButton("Color Randomization");
 		rdbtnRandomColors.setOpaque(false);
 		rdbtnRandomColors.setSelected(true);
 		rdbtnRandomColors.setBounds(17, 28, 256, 23);
 		panel_theme.add(rdbtnRandomColors);
-		
-		btn_InstallNew = new JButton("Add / Remove Themes");
-		btn_InstallNew.addActionListener(new ActionListener() {
+
+		btn_addRemoveThemes = new JButton("Add / Remove Themes");
+		btn_addRemoveThemes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO Manage JSON Themes
+				// TODO Manage JSON Themes
 			}
 		});
-		btn_InstallNew.setBounds(17, 310, 157, 23);
-		panel_theme.add(btn_InstallNew);
-		
-		btn_Save_1 = new JButton("Save");
-		btn_Save_1.setBounds(184, 310, 89, 23);
-		panel_theme.add(btn_Save_1);
+		btn_addRemoveThemes.setBounds(17, 310, 157, 23);
+		panel_theme.add(btn_addRemoveThemes);
+
+		btn_saveThemes = new JButton("Save");
+		btn_saveThemes.setBounds(184, 310, 89, 23);
+		panel_theme.add(btn_saveThemes);
 
 		windowEnvLoad();
 		themeLoad();
@@ -232,6 +226,10 @@ public class Settings_UIPanel extends JPanel {
 			radio_windowed.setSelected(true);
 
 		check_dim.setSelected(SettingsManager.getInstance().dimEnvironment());
+		check_autohide.setSelected(SettingsManager.getInstance()
+				.autoHideEnvrionment());
+
+		check_slide.setSelected(SettingsManager.getInstance().slideDashWin());
 	}
 
 	public void closeOnSave(final JDialog sf) {

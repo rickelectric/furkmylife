@@ -31,7 +31,20 @@ import rickelectric.furkmanager.utils.SettingsManager;
 
 public class StreamDownloader {
 
-	public static String fileToString(String filepath) throws IOException {
+	private static StreamDownloader thisInstance;
+
+	public static synchronized StreamDownloader getInstance() {
+		if (thisInstance == null) {
+			thisInstance = new StreamDownloader();
+		}
+		return thisInstance;
+	}
+	
+	private StreamDownloader(){
+		
+	}
+
+	public String fileToString(String filepath) throws IOException {
 		FileReader f = new FileReader(filepath);
 		BufferedReader b = new BufferedReader(f);
 		String full = "", line = b.readLine();
@@ -43,21 +56,27 @@ public class StreamDownloader {
 		return full;
 	}
 
-	public static String getStringStream(String url) throws Exception {
+	public String getStringStream(String url) throws Exception {
 		return getStringStream(url, 1024);
 	}
 
-	public static String getStringStream(String url, int batchWriteSize)
+	public String getStringStream(String url, int batchWriteSize)
 			throws Exception {
+		return getStringStream(url, batchWriteSize, SettingsManager
+				.getInstance().timeout());
+	}
+
+	public String getStringStream(String url, int batchWriteSize,
+			int timeout) throws Exception {
 		URL urli = new URL(url);
 		DefaultHttpClient client = new DefaultHttpClient();
-		
-		ProxySettings settings = SettingsManager.getInstance().getProxySettings();
+
+		ProxySettings settings = SettingsManager.getInstance()
+				.getProxySettings();
 		settings.applyProxyTo(client);
-		
-		client.getParams().setParameter(
-				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
+
+		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,
+				timeout);
 
 		HttpGet get = new HttpGet(urli.toURI());
 		HttpResponse resp = client.execute(get);
@@ -84,21 +103,22 @@ public class StreamDownloader {
 		return s;
 	}
 
-	public static String postMultipartStream(String url, MultipartEntity entity)
+	public String postMultipartStream(String url, MultipartEntity entity)
 			throws Exception {
 		URL urli = new URL(url);
 
 		DefaultHttpClient client = new DefaultHttpClient();
-		
-		ProxySettings settings = SettingsManager.getInstance().getProxySettings();
+
+		ProxySettings settings = SettingsManager.getInstance()
+				.getProxySettings();
 		settings.applyProxyTo(client);
-		
+
 		client.getParams().setParameter(
 				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
 		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
 
 		HttpPost post = new HttpPost(urli.toURI());
-		//post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+		// post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 		post.setEntity(entity);
 
 		HttpResponse resp = client.execute(post);
@@ -122,15 +142,16 @@ public class StreamDownloader {
 		return re;
 	}
 
-	public static String postStringStream(String urlx, int batchWriteSize)
+	public String postStringStream(String urlx, int batchWriteSize)
 			throws Exception {
 		String[] urli = urlx.split("[?]");
 		URL url = new URL(urli[0]);
 		DefaultHttpClient client = new DefaultHttpClient();
 
-		ProxySettings settings = SettingsManager.getInstance().getProxySettings();
+		ProxySettings settings = SettingsManager.getInstance()
+				.getProxySettings();
 		settings.applyProxyTo(client);
-		
+
 		client.getParams().setParameter(
 				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
 		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
@@ -160,14 +181,15 @@ public class StreamDownloader {
 		return re;
 	}
 
-	public static String getFileStreamWithName(String url, File f,
+	public String getFileStreamWithName(String url, File f,
 			int batchWriteSize) throws Exception {
 		String nextCookie = null, titleRet = null;
 		DefaultHttpClient client = new DefaultHttpClient();
 
-		ProxySettings settings = SettingsManager.getInstance().getProxySettings();
+		ProxySettings settings = SettingsManager.getInstance()
+				.getProxySettings();
 		settings.applyProxyTo(client);
-		
+
 		client.getParams().setParameter(
 				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
 		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
@@ -230,7 +252,7 @@ public class StreamDownloader {
 		return titleRet;
 	}
 
-	public static BufferedImage getImageStream(String url, int batchWriteSize)
+	public BufferedImage getImageStream(String url, int batchWriteSize)
 			throws Exception {
 		// ImgRequest img = RequestCache.ImageR.get(fileURL);
 		// if (img != null)
@@ -239,9 +261,10 @@ public class StreamDownloader {
 		URL urli = new URL(url);
 		DefaultHttpClient client = new DefaultHttpClient();
 
-		ProxySettings settings = SettingsManager.getInstance().getProxySettings();
+		ProxySettings settings = SettingsManager.getInstance()
+				.getProxySettings();
 		settings.applyProxyTo(client);
-		
+
 		client.getParams().setParameter(
 				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
 		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
@@ -279,14 +302,15 @@ public class StreamDownloader {
 		return image;
 	}
 
-	public static void getFileStream(String fileURL, File f, int batchWriteSize)
+	public void getFileStream(String fileURL, File f, int batchWriteSize)
 			throws Exception {
 		URL urli = new URL(fileURL);
 		DefaultHttpClient client = new DefaultHttpClient();
 
-		ProxySettings settings = SettingsManager.getInstance().getProxySettings();
+		ProxySettings settings = SettingsManager.getInstance()
+				.getProxySettings();
 		settings.applyProxyTo(client);
-		
+
 		client.getParams().setParameter(
 				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
 		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);

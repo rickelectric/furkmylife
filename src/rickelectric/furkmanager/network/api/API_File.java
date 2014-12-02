@@ -3,6 +3,8 @@ package rickelectric.furkmanager.network.api;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,29 +22,46 @@ import rickelectric.furkmanager.network.FurkBridge;
  * 
  */
 public class API_File extends API {
-	
-	public enum GET_TYPE {
+
+	public enum GetType {
 		GET_DELETED, GET_FINISHED
-	};
+	}
 
-	public static final GET_TYPE GET_DELETED = GET_TYPE.GET_DELETED,
-			GET_FINISHED = GET_TYPE.GET_FINISHED;
+	public static final GetType GET_DELETED = GetType.GET_DELETED,
+			GET_FINISHED = GetType.GET_FINISHED;
 
-	private static ArrayList<FurkFile> fileList;
+	private static ArrayList<FurkFile> filesFinished;
+	private static ArrayList<FurkFile> filesDeleted;
+
+	public static class FileObservable extends Observable {
+		public void stateChanged(GetType type) {
+			System.out.println("API_File Observer Update: "+type);
+			setChanged();
+			notifyObservers(type);
+		}
+	}
+
+	private static FileObservable fo = new FileObservable();
+
+	public static void addObserver(Observer o) {
+		fo.addObserver(o);
+	}
+
+	public static void deleteObserver(Observer o) {
+		fo.deleteObserver(o);
+	}
 
 	public static ArrayList<APIObject> jsonFiles(JSONArray files) {
-		
+
 		ArrayList<APIObject> fl = new ArrayList<APIObject>();
 
 		for (int i = 0; i < files.length(); i++) {
 			JSONObject x = (JSONObject) files.get(i);
 			String tid = x.getString("name");
 			if (!tid.equals(JSONObject.NULL)) {
-
 				try {
 					Object fid = x.get("id");
-					if (fid == null || fid == JSONObject.NULL
-							|| fid.equals(""))
+					if (fid == null || fid == JSONObject.NULL || fid.equals(""))
 						throw new Exception("No ID");
 					String id = null, name = "", info_hash = "", type = null, url_dl = "", url_pls = "", url_page = "", fstatus = "", del_reason = null;
 					String[] thumbs = null, ss = null;
@@ -59,7 +78,7 @@ public class API_File extends API {
 							if (t.equals("name"))
 								name = x.getString(t);
 							if (t.equals("info_hash"))
-								info_hash =x.getString(t);
+								info_hash = x.getString(t);
 							if (t.equals("type"))
 								type = x.getString(t);
 							if (t.equals("size"))
@@ -117,25 +136,31 @@ public class API_File extends API {
 				}
 			}
 		}
-		
+
 		return fl;
 	}
 
-	public static ArrayList<FurkFile> getAllCached() {
-		return fileList;
+	public static ArrayList<FurkFile> getFinishedCache() {
+		return filesFinished;
+	}
+
+	public static ArrayList<FurkFile> getDeletedCache() {
+		return filesDeleted;
 	}
 
 	public static ArrayList<FurkFile> getAllFinished() {
-		fileList = get(GET_FINISHED, -1, -1);
-		return fileList;
+		filesFinished = get(GET_FINISHED, -1, -1);
+		fo.stateChanged(GET_FINISHED);
+		return filesFinished;
 	}
 
 	public static ArrayList<FurkFile> getAllDeleted() {
-		return get(GET_DELETED, -1, -1);
+		filesDeleted = get(GET_DELETED, -1, -1);
+		fo.stateChanged(GET_DELETED);
+		return filesDeleted;
 	}
 
-	public static ArrayList<FurkFile> get(GET_TYPE type, int limit,
-			int offset) {
+	private static ArrayList<FurkFile> get(GetType type, int limit, int offset) {
 		int[] limoffs = null;
 		if (limit > 0 && offset >= 0) {
 			limoffs = new int[2];
@@ -144,11 +169,11 @@ public class API_File extends API {
 		}
 		String json = null;
 		if (type == GET_FINISHED)
-			json = APIBridge.fileGet(FurkBridge.GET_ALL, null, limoffs,
-					null, true);
+			json = APIBridge.fileGet(FurkBridge.GET_ALL, null, limoffs, null,
+					true);
 		else if (type == GET_DELETED)
-			json = APIBridge.fileGet(FurkBridge.GET_TRASH, null, limoffs,
-					null, true);
+			json = APIBridge.fileGet(FurkBridge.GET_TRASH, null, limoffs, null,
+					true);
 		else
 			throw new IllegalArgumentException(
 					"Invalid GET Type Passed as argument 1");
@@ -157,18 +182,18 @@ public class API_File extends API {
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return null;
-		try{
+		try {
 			JSONArray m = re.getJSONArray("messages");
 			setMessages(m);
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		JSONArray filesArr = re.getJSONArray("files");
-		ArrayList<APIObject> f=jsonFiles(filesArr);
-		ArrayList<FurkFile> ff=new ArrayList<FurkFile>();
-		
-		for(APIObject o:f){
-			ff.add((FurkFile)o);
+		ArrayList<APIObject> f = jsonFiles(filesArr);
+		ArrayList<FurkFile> ff = new ArrayList<FurkFile>();
+
+		for (APIObject o : f) {
+			ff.add((FurkFile) o);
 		}
 		return ff;
 	}
@@ -176,8 +201,8 @@ public class API_File extends API {
 	public static APIObject get(String fileID) {
 		if (fileID == null || fileID.equals(""))
 			return null;
-		String json = APIBridge.fileGet(FurkBridge.GET_ID, fileID, null,
-				null, true);
+		String json = APIBridge.fileGet(FurkBridge.GET_ID, fileID, null, null,
+				true);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return null;
@@ -201,35 +226,48 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return false;
 		for (String id : fileIDs)
-			fileList.add((FurkFile)info(id));
+			filesFinished.add((FurkFile) info(id));
+		fo.stateChanged(GET_FINISHED);
 		return true;
 	}
 
 	public static boolean unlink(String[] fileIDs) {
-		String json = APIBridge.fileLinkstate(FurkBridge.LINK_UNLINK,
-				fileIDs);
+		String json = APIBridge.fileLinkstate(FurkBridge.LINK_UNLINK, fileIDs);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return false;
 		for (String fid : fileIDs) {
-			for(int i=0;i<fileList.size();i++){
-				FurkFile f = fileList.get(i);
+			for (int i = 0; i < filesFinished.size(); i++) {
+				FurkFile f = filesFinished.get(i);
 				String id = f.getID();
-				if (id.equals(fid)){
-					fileList.remove(i);
+				if (id.equals(fid)) {
+					FurkFile rem = filesFinished.remove(i);
+					filesDeleted.add(rem);
 					break;
 				}
 			}
 		}
+		fo.stateChanged(GET_FINISHED);
+		fo.stateChanged(GET_DELETED);
 		return true;
 	}
 
 	public static boolean clear(String[] fileIDs) {
-		String json = APIBridge
-				.fileLinkstate(FurkBridge.LINK_CLEAR, fileIDs);
+		String json = APIBridge.fileLinkstate(FurkBridge.LINK_CLEAR, fileIDs);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return false;
+		for (String fid : fileIDs) {
+			for (int i = 0; i < filesDeleted.size(); i++) {
+				FurkFile f = filesDeleted.get(i);
+				String id = f.getID();
+				if (id.equals(fid)) {
+					filesDeleted.remove(i);
+					break;
+				}
+			}
+		}
+		fo.stateChanged(GET_DELETED);
 		return true;
 	}
 
@@ -253,7 +291,7 @@ public class API_File extends API {
 		if (fsync.getName().equals("0-FurkManagerRoot"))
 			id = "0";
 		ArrayList<FurkFile> files = new ArrayList<FurkFile>();
-		for (APIObject f : getAllCached()) {
+		for (APIObject f : filesFinished) {
 			if (f instanceof FurkFile) {
 				String[] labels = ((FurkFile) f).getIdLabels();
 				if (labels == null || labels.length == 0) {
@@ -274,8 +312,14 @@ public class API_File extends API {
 	}
 
 	public static void flush() {
-		try{fileList.removeAll(fileList);}catch(Exception e){}
-		fileList=null;
+		try {
+			filesFinished.removeAll(filesFinished);
+			filesDeleted.removeAll(filesDeleted);
+			fo.deleteObservers();
+		} catch (Exception e) {
+		}
+		filesFinished = null;
+		filesDeleted = null;
 	}
 
 }

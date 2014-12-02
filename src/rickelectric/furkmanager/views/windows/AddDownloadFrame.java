@@ -321,7 +321,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		} else{
 			try {
 				File tmp = new File("tmp.torrent");
-				String name=StreamDownloader.getFileStreamWithName(link, tmp, 16);
+				String name=StreamDownloader.getInstance().getFileStreamWithName(link, tmp, 16);
 				if(!name.contains(".torrent")) return null;
 				if(tmp.renameTo(new File(name))) link=".\\"+name;
 				else link=".\\tmp.torrent";

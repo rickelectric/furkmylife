@@ -41,6 +41,7 @@ public class MouseActivity implements NativeMouseListener,
 	}
 	
 	public static synchronized void destroyInstance(){
+		if(a==null) return;
 		GlobalScreen.getInstance().removeNativeMouseListener(a);
 		GlobalScreen.getInstance().removeNativeMouseMotionListener(a);
 		GlobalScreen.unregisterNativeHook();

@@ -98,17 +98,18 @@ public class API_UserData extends API {
 			if (isValid) {
 				API.init(login.apiKey());
 			}
-
 			break;
 		case LoginModel.CREDENTIALS:
 			String key = FurkBridge.userLogin(login.username(),
 					UtilBox.charToString(login.password()));
-			isValid = key != null;
+			isValid = (key!=null);
 			if (isValid) {
 				API.init(key);
 				login.setApiKey(key);
 			}
 			break;
+		case LoginModel.BLANK:
+			return false;
 		default:
 			return false;
 		}
@@ -128,8 +129,13 @@ public class API_UserData extends API {
 	}
 
 	public static void flush() {
+		logout();
 		currentLogin = null;
 		isLoaded = false;
+	}
+
+	private static void logout() {
+		FurkBridge.userLogout();
 	}
 
 }

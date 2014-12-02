@@ -2,7 +2,6 @@ package rickelectric.furkmanager;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -19,13 +18,13 @@ import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.network.api.API_Label;
 import rickelectric.furkmanager.network.api.API_UserData;
-import rickelectric.furkmanager.player.AudioPlayerPanel;
-import rickelectric.furkmanager.player.VideoPlayerPanel;
+import rickelectric.furkmanager.player.AudioPlayer;
+import rickelectric.furkmanager.player.VideoPlayer;
+import rickelectric.furkmanager.setup.SetupRegistry;
 import rickelectric.furkmanager.utils.MouseActivity;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.utils.WinRegistry;
 import rickelectric.furkmanager.views.FMTrayBox;
 import rickelectric.furkmanager.views.LoginSplashWindow;
 import rickelectric.furkmanager.views.windows.APIConsole;
@@ -114,115 +113,21 @@ public class FurkManager {
 	}
 
 	private static void processProtocolHandler(String s) {
-		// TODO Add furk:// Protocol Arguments
+		// TODO Add furk:// Protocol Argument Handler
 		System.out.println("Protocol Arguments: " + s);
 	}
 
-	private static void runSetup(int s) {
-
-	}
-
-	private static void registerProtocol() throws IllegalArgumentException,
-			IllegalAccessException, InvocationTargetException {
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk");
-
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\", "AppUserModelID", "");
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\", "URL Protocol", "");
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\", "FriendlyTypeName",
-				"Rickelectric Furk Manager Protocol");
-
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk");
-
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\", "AppUserModelID", "");
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\", "URL Protocol", "");
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\", "FriendlyTypeName",
-				"Rickelectric Furk Manager Protocol");
-
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\DefaultIcon");
-		WinRegistry
-				.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-						"SOFTWARE\\Classes\\furk\\DefaultIcon", "",
-						"C:\\Users\\Ionicle\\Desktop\\ \\FurkManager\\FurkManager.exe,0");
-
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\shell");
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\shell", "", "open");
-
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\shell\\open");
-		WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\shell\\open", "CommandId",
-				"Furk.Protocol");
-
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Classes\\furk\\shell\\open\\command");
-		WinRegistry
-				.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-						"SOFTWARE\\Classes\\furk\\shell\\open\\command", "",
-						"C:\\Users\\Ionicle\\Desktop\\ \\FurkManager\\FurkManager.exe %1");
-
-	}
-
-	private static void checkRegistry() {
-		// If Furk Registry Keys Exist, Return.
-		// Else : Run First TimeSetup
-
-		try {
-			String complete = WinRegistry.readString(
-					WinRegistry.HKEY_CURRENT_USER,
-					"SOFTWARE\\Rickelectric\\FurkManager", "SetupComplete");
-			System.out.println(complete);
-			if (complete == null) {
-				// Setup Progress...
-				WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-						"SOFTWARE\\Rickelectric\\FurkManager");
-				WinRegistry.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-						"SOFTWARE\\Rickelectric\\FurkManager", "SetupComplete",
-						"0");
-
-				runSetup(0);
-			} else if (complete == "COMPLETE") {
-				return;
-			} else {
-				int s = Integer.parseInt(complete);
-				runSetup(s);
-			}
-
-			registerProtocol();
-
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public static void main(String[] args) {
-
-		checkRegistry();
+		
+		SetupRegistry.checkRegistry();
 
 		LAF(0);
 		/**
 		 * Remove
 		 */
-		// APIBridge.dummy = true;
-		//VideoPlayerPanel.dummy = true;
-		// AudioPlayerPanel.dummy = true;
+//		APIBridge.dummy = true;
+//		VideoPlayer.dummy = true;
+//		AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
@@ -257,7 +162,7 @@ public class FurkManager {
 				lWin.setText("Restoring FurkManager...");
 				Thread.sleep(2000);
 				if (addString != null) {
-					lWin.setText("Opening Torrent...");
+					lWin.setText("Opening File...");
 					ic.transmit(addString);
 					addString = null;
 				}
@@ -291,7 +196,7 @@ public class FurkManager {
 				lWin.setText("Loading User Data...");
 				API_UserData.loadUserData();
 			}
-			if (API_File.getAllCached() == null) {
+			if (API_File.getFinishedCache() == null) {
 				lWin.setText("Loading Files...");
 				API_File.getAllFinished();
 			}
@@ -324,9 +229,9 @@ public class FurkManager {
 			return;
 		}
 		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE)
-			mWin = new MainEnvironment();
+			mWin = MainEnvironment.getInstance();
 		else
-			mWin = new MainWindow();
+			mWin = MainWindow.getInstance();
 		mWin.main();
 		mWin.setLocationRelativeTo(lWin);
 		mWin.setVisible(true);
@@ -401,21 +306,22 @@ public class FurkManager {
 					RequestCache.ImageR.flush();
 
 					// RequestCache.init();
-					API.flushAll();
 					if (dwm != null)
 						DownloadManager.persist();
 					downloader(false);
 
-					AudioPlayerPanel.destroyInstance();
-					VideoPlayerPanel.destroyInstance();
+					AudioPlayer.destroyInstance();
+					VideoPlayer.destroyInstance();
 
 					mWin.setEnabled(false);
-					try {
-						APIBridge.userLogout();
-					} catch (Exception e) {
-						// TODO Log Errors
-					}
 					mWin.dispose();
+					API.flushAll();
+
+					if (mWin instanceof MainEnvironment) {
+						MainEnvironment.destroyInstance();
+					} else {
+						MainWindow.destroyInstance();
+					}
 					mWin = null;
 
 					System.gc();
@@ -444,6 +350,7 @@ public class FurkManager {
 						}
 					}
 					MouseActivity.destroyInstance();
+					DefaultParams.getMediaPlayerFactory().release();
 					System.exit(0);
 				} catch (Exception e) {
 					System.exit(e.hashCode());

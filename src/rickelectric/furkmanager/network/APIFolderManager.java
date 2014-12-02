@@ -1,6 +1,8 @@
 package rickelectric.furkmanager.network;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -18,25 +20,48 @@ public class APIFolderManager {
 	private static APIFolder root;
 	private static ArrayList<MoveableItem> register;
 
+	public enum UpdateSource {
+		INIT, NEW, RENAME, DELETE, MOVE
+	}
+
+	public static class FolderObservable extends Observable {
+		public void stateChanged(UpdateSource source) {
+			System.out.println("Folder Observer Updated: " + source);
+			setChanged();
+			notifyObservers(source);
+		}
+	}
+
+	private static FolderObservable fo = new FolderObservable();
+
+	public static void addObserver(Observer o) {
+		fo.addObserver(o);
+	}
+
+	public static void deleteObserver(Observer o) {
+		fo.deleteObserver(o);
+	}
+
 	public static void init(FurkLabel rootLabel) {
 		if (root == null || !root.getLabel().equals(rootLabel)) {
-			register=null;
+			register = null;
 			System.gc();
 			register = new ArrayList<MoveableItem>();
 			root = new APIFolder(rootLabel);
 			register(root);
 			root.populate();
 			sort();
+			fo.stateChanged(UpdateSource.INIT);
 		}
 	}
-	
+
 	public static void refresh() {
-		if(API_Label.getAll()!=null){
-			root=null;
+		if (API_Label.getAll() != null) {
+			root = null;
 			init(API_Label.root());
 		}
 	}
-	
+
 	public static boolean newFolder(APIFolder parent, String name) {
 		if (name == null || name.length() == 0)
 			return false;
@@ -47,6 +72,7 @@ public class APIFolderManager {
 				register(child);
 				parent.addItem(child);
 				sort();
+				fo.stateChanged(UpdateSource.NEW);
 				return true;
 			}
 			// Add Failed
@@ -56,7 +82,7 @@ public class APIFolderManager {
 				"Unable To Create Folder \"" + name + "\"", null);
 		return false;
 	}
-	
+
 	public static boolean isRegistered(MoveableItem i) {
 		for (MoveableItem c : register) {
 			if (i.getID().equals(c.getID())) {
@@ -69,7 +95,8 @@ public class APIFolderManager {
 	public static boolean register(MoveableItem i) {
 		if (isRegistered(i))
 			return false;
-		return register.add(i);
+		boolean r = register.add(i);
+		return r;
 	}
 
 	public static boolean rename(APIFolder folder, String name) {
@@ -79,6 +106,7 @@ public class APIFolderManager {
 			nf.setName(name);
 			if (API_Label.update(nf)) {
 				sort();
+				fo.stateChanged(UpdateSource.RENAME);
 				return true;
 			}
 			// Rename Failed
@@ -87,14 +115,15 @@ public class APIFolderManager {
 		return false;
 	}
 
-	private static void sort(){
+	private static void sort() {
 		root.sort();
 	}
 
 	public static boolean delete(APIFolder folder) {
 		if (isRegistered(folder)) {
 			FurkLabel l = folder.getLabel();
-			if (move(folder, null) && API_Label.delete(l)){
+			if (move(folder, null) && API_Label.delete(l)) {
+				fo.stateChanged(UpdateSource.DELETE);
 				return true;
 			}
 		}
@@ -120,12 +149,13 @@ public class APIFolderManager {
 					}
 				}
 				if (src != null) {
-					if (dest!=null && dest.equals(src))
+					if (dest != null && dest.equals(src)) {
 						return true;
+					}
 					System.out.println("From " + src.getName());
 					src.removeItem(obj);
 				}
-				if(dest==null){
+				if (dest == null) {
 					return true;
 				}
 				dest.addItem(obj);
@@ -144,12 +174,15 @@ public class APIFolderManager {
 					}
 					if (!dest.equals(root)) {// New Folder Is Not Root (null)
 												// Folder
-						if(API_Label.linkToFiles(dest.getID(), new String[] { id })){
-							((FurkFile) obj).setIdLabels(new String[]{dest.getID()});
+						if (API_Label.linkToFiles(dest.getID(),
+								new String[] { id })) {
+							((FurkFile) obj).setIdLabels(new String[] { dest
+									.getID() });
 						}
 					}
 				}
 				sort();
+				fo.stateChanged(UpdateSource.MOVE);
 				return true;
 			} else {
 				System.out.println("Not Registered");
@@ -169,8 +202,8 @@ public class APIFolderManager {
 
 	public static FolderTreeNode populateTree(APIFolder folder) {
 		FolderTreeNode col = new FolderTreeNode(folder);
-		//col.setParent(File_FolderView.currTree());
-		
+		// col.setParent(File_FolderView.currTree());
+
 		ArrayList<MoveableItem> list = folder.getFiles();
 		for (MoveableItem m : list) {
 			if (m instanceof APIFolder) {
@@ -178,7 +211,7 @@ public class APIFolderManager {
 				col.add(ftr);
 			} else if (m instanceof FurkFile) {
 				FileTreeNode ftr = new FileTreeNode((FurkFile) m);
-				//ftr.setParent(File_FolderView.currTree());
+				// ftr.setParent(File_FolderView.currTree());
 				col.add(ftr);
 			}
 		}

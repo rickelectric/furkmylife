@@ -53,7 +53,7 @@ public class APIBridge extends FurkBridge {
 
 				FileBody bin = new FileBody(new File(link));
 				parts.addPart("file", bin);
-				String stream = StreamDownloader.postMultipartStream(API_BASE
+				String stream = StreamDownloader.getInstance().postMultipartStream(API_BASE
 						+ "/dl/add", parts);
 				return stream;
 			} catch (Exception e) {
@@ -90,7 +90,7 @@ public class APIBridge extends FurkBridge {
 		if (dummy) {
 			try {
 				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
+						.getInstance().fileToString("./JSON_Samples_And_Docs/JSON-FurkDl.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -133,7 +133,7 @@ public class APIBridge extends FurkBridge {
 		if (dummy) {
 			try {
 				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkTFilesVideo.txt");
+						.getInstance().fileToString("./JSON_Samples_And_Docs/JSON-FurkTFilesAudio.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -151,7 +151,7 @@ public class APIBridge extends FurkBridge {
 		if (dummy) {
 			try {
 				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
+						.getInstance().fileToString("./JSON_Samples_And_Docs/JSON-FurkFile.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -243,7 +243,7 @@ public class APIBridge extends FurkBridge {
 		if (dummy) {
 			try {
 				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
+						.getInstance().fileToString("./JSON_Samples_And_Docs/JSON-FurkLabel.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -328,7 +328,7 @@ public class APIBridge extends FurkBridge {
 			parts.addPart("login", new StringBody(username));
 			parts.addPart("pwd", new StringBody(password));
 
-			json = StreamDownloader.postMultipartStream(url, parts);
+			json = StreamDownloader.getInstance().postMultipartStream(url, parts);
 		} catch (Exception e) {
 			throw new RuntimeException("Connection Error");
 		}
@@ -346,7 +346,7 @@ public class APIBridge extends FurkBridge {
 		if (dummy) {
 			try {
 				return StreamDownloader
-						.fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
+						.getInstance().fileToString("./JSON_Samples_And_Docs/JSON-FurkUser.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
@@ -418,7 +418,7 @@ public class APIBridge extends FurkBridge {
 			return false;
 		String url = API_BASE + "/ping?api_key=" + apiKey;
 		try {
-			String stat = StreamDownloader.getStringStream(url);
+			String stat = StreamDownloader.getInstance().getStringStream(url);
 			JSONObject j = new JSONObject(stat);
 			String s = j.getString("status");
 			if (s.equals("ok"))
@@ -426,7 +426,7 @@ public class APIBridge extends FurkBridge {
 			else
 				return false;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException("Connection Error");
 		}
 	}
@@ -441,12 +441,12 @@ public class APIBridge extends FurkBridge {
 				return r;
 		}
 		try {
-			String s = StreamDownloader.getStringStream(dest);
+			String s = StreamDownloader.getInstance().getStringStream(dest);
 			if (s != null)
 				RequestCache.APIR.add(dest, s, perm);
 			return s;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException("Connection Error");
 		}
 	}
@@ -461,12 +461,12 @@ public class APIBridge extends FurkBridge {
 				return r;
 		}
 		try {
-			String s = StreamDownloader.postStringStream(dest, 4);
+			String s = StreamDownloader.getInstance().postStringStream(dest, 4);
 			if (s != null)
 				RequestCache.APIR.add(dest, s, perm);
 			return s;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException("Connection Error");
 		}
 	}
@@ -475,10 +475,10 @@ public class APIBridge extends FurkBridge {
 		if (api_key == null)
 			return null;
 		try {
-			String s = StreamDownloader.postMultipartStream(url, parts);
+			String s = StreamDownloader.getInstance().postMultipartStream(url, parts);
 			return s;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new RuntimeException("Connection Error");
 		}
 	}

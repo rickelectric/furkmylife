@@ -22,6 +22,8 @@ public class CircleButton extends JComponent {
 	private String popup;
 	private BufferedImage icon;
 
+	private float strokeSize;
+
 	public CircleButton(String popup, URL icon) {
 		this.setPopup(popup);
 		setLocation(0,0);
@@ -31,8 +33,13 @@ public class CircleButton extends JComponent {
 					this.icon.getWidth(), 2)
 					+ Math.pow(this.icon.getHeight(), 2)));
 			setSize(wh,wh);
+			strokeSize=8;
 		} catch (IOException e) {
 		}
+	}
+	
+	public void setStrokeSize(int strokeSize){
+		this.strokeSize = strokeSize;
 	}
 	
 	public BalloonTip getAttachedBalloon(){
@@ -63,7 +70,7 @@ public class CircleButton extends JComponent {
 		g2d.fill(new Ellipse2D.Double(getX(), getY(), getWidth(), getHeight()));
 		
 		g2d.setColor(Color.black);
-		g2d.setStroke(new BasicStroke(8));
+		g2d.setStroke(new BasicStroke(strokeSize));
 		g2d.draw(new Ellipse2D.Double(getX()+1, getY()+1, getWidth()-2, getHeight()-2));
 		
 		g2d.drawImage(icon, getX() + (getWidth() / 2 - icon.getWidth() / 2),

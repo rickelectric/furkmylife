@@ -49,7 +49,7 @@ public class ScreenshotViewPanel extends JPanel{
 		diffSizes=false;
 		tf.getThumbURL();
 		try{
-			BufferedImage img=StreamDownloader.getImageStream(tf.getThumbURL(),8);
+			BufferedImage img=StreamDownloader.getInstance().getImageStream(tf.getThumbURL(),8);
 			int width=img.getWidth()/9;
 			int height=img.getHeight();
 			String[] imgloc=new String[9];
@@ -209,7 +209,7 @@ class ScreenshotIcon extends JLabel {
 		if (ssThumbUrl == null)
 			return;
 		try {
-			BufferedImage ci = StreamDownloader.getImageStream(ssThumbUrl, 8);
+			BufferedImage ci = StreamDownloader.getInstance().getImageStream(ssThumbUrl, 8);
 			float h = 90;
 			ci = ImageManager.scaleImage(ci, (h / ci.getHeight()) * 100f);
 			// ci=ImageManager.resizeImage(ci, 120, 90);

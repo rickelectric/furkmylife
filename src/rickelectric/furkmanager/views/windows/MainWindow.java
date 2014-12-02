@@ -7,6 +7,8 @@ import java.awt.SystemColor;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -22,8 +24,11 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.api.API;
-import rickelectric.furkmanager.player.AudioPlayerPanel;
-import rickelectric.furkmanager.player.VideoPlayerPanel;
+import rickelectric.furkmanager.player.AudioPanel;
+import rickelectric.furkmanager.player.AudioPlayer;
+import rickelectric.furkmanager.player.VideoPanel;
+import rickelectric.furkmanager.player.VideoPlayer;
+import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.menus.Main_TopMenuBar;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
@@ -39,7 +44,24 @@ import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	private static final long serialVersionUID = 1L;
 
+	private static MainWindow thisInstance = null;
+
+	public static synchronized MainWindow getInstance() {
+		if (thisInstance == null) {
+			thisInstance = new MainWindow();
+		}
+		return thisInstance;
+	}
+
+	public static synchronized void destroyInstance() {
+		if (thisInstance == null)
+			return;
+		thisInstance = null;
+		System.gc();
+	}
+
 	private JPanel contentPane;
+	private JFrame audioWin,videoWin;
 
 	public static void main(String[] args) {
 		JFrame f = new MainWindow();
@@ -50,7 +72,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	private TranslucentPane[] currPanel;
 	private int cpNum = 0;
 
-	public MainWindow() {
+	private MainWindow() {
 		windowClose();
 
 		Main_TopMenuBar bar = new Main_TopMenuBar();
@@ -316,11 +338,11 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	public void dispose() {
 		super.dispose();
 		if (FurkManager.mediaEnabled()) {
-			if (AudioPlayerPanel.getInstance().getAudioWin().isVisible()) {
-				AudioPlayerPanel.getInstance().getAudioWin().dispose();
+			if (audioWin != null && audioWin.isVisible()) {
+				audioWin.dispose();
 			}
-			if (VideoPlayerPanel.getInstance().getVideoWin().isVisible()) {
-				VideoPlayerPanel.getInstance().getVideoWin().dispose();
+			if (videoWin != null && videoWin.isVisible()) {
+				videoWin.dispose();
 			}
 		}
 
@@ -330,10 +352,14 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 		if (!FurkManager.mediaEnabled())
 			return;
 		try {
-			if (AudioPlayerPanel.getInstance().isActive())
-				AudioPlayerPanel.getInstance().getAudioWin().setVisible(true);
-			if (VideoPlayerPanel.getInstance().isActive())
-				VideoPlayerPanel.getInstance().getVideoWin().setVisible(true);
+			if (AudioPlayer.getInstance().isActive()) {
+				constructAudioWindow();
+				audioWin.setVisible(true);
+			}
+			if (VideoPlayer.getInstance().isActive()) {
+				constructVideoWindow();
+				videoWin.setVisible(true);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -367,46 +393,58 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 			return;
 		paneChanging = true;
 
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Point loc = currPanel[cpNum].getLocation();
-				if (!currPanel[cpNum].isVisible())
-					throw new RuntimeException("Invisible Current Panel");
-				try {
-					int direction = Slideable.LEFT;
-					int locIn = 25;
-					if (sec < cpNum) {
-						direction = Slideable.RIGHT;
-						locIn = -5;
+		if (SettingsManager.getInstance().slideDashWin()) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					Point loc = currPanel[cpNum].getLocation();
+					if (!currPanel[cpNum].isVisible())
+						throw new RuntimeException("Invisible Current Panel");
+					try {
+						int direction = Slideable.LEFT;
+						int locIn = 25;
+						if (sec < cpNum) {
+							direction = Slideable.RIGHT;
+							locIn = -5;
+						}
+						OpacEffects.slide(currPanel[cpNum], 15, direction, 50,
+								Opacible.OUT);
+						UtilBox.pause(100);
+						while (currPanel[cpNum].isSliding())
+							;
+
+						currPanel[sec].setLocation(locIn, 124);
+						OpacEffects.slide(currPanel[sec], 15, direction, 18,
+								Opacible.IN);
+						cpNum = sec;
+						paneChanging = false;
+						dashUpdate();
+					} catch (RuntimeException e) {
+						e.printStackTrace();
+						currPanel[cpNum].setLocation(loc);
+						currPanel[cpNum].setAlpha(1f);
+
+						currPanel[sec].setVisible(false);
+						currPanel[sec].setAlpha(0f);
+						cpNum = sec;
+						paneChanging = false;
+						throw e;
 					}
-					OpacEffects.slide(currPanel[cpNum], 15, direction, 50,
-							Opacible.OUT);
-					UtilBox.pause(100);
-					while (currPanel[cpNum].isSliding())
-						;
-
-					currPanel[sec].setLocation(locIn, 124);
-					OpacEffects.slide(currPanel[sec], 15, direction, 18,
-							Opacible.IN);
-					cpNum = sec;
 					paneChanging = false;
-					dashUpdate();
-				} catch (RuntimeException e) {
-					e.printStackTrace();
-					currPanel[cpNum].setLocation(loc);
-					currPanel[cpNum].setAlpha(1f);
-
-					currPanel[sec].setVisible(false);
-					currPanel[sec].setAlpha(0f);
-					cpNum = sec;
-					paneChanging = false;
-					throw e;
 				}
-				paneChanging = false;
+			}).start();
+		} else {
+			if (cpNum != sec) {
+				currPanel[sec].setLocation(currPanel[cpNum].getLocation());
+				currPanel[cpNum].setVisible(false);
+				currPanel[cpNum].setAlpha(0f);
+				currPanel[sec].setAlpha(1f);
+				currPanel[sec].setVisible(true);
+				cpNum = sec;
 			}
-		}).start();
-		;
+			paneChanging = false;
+			dashUpdate();
+		}
 	}
 
 	protected void dashUpdate() {
@@ -439,11 +477,52 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 		if (!FurkManager.mediaEnabled())
 			return;
 		if (mediaType == AUDIO) {
-			AudioPlayerPanel.getInstance().play(mrl);
-			AudioPlayerPanel.getInstance().getAudioWin().setVisible(true);
+			constructAudioWindow();
+			audioWin.setVisible(true);
+			AudioPlayer.getInstance().play(mrl);
 		} else if (mediaType == VIDEO) {
-			VideoPlayerPanel.getInstance().getVideoWin().setVisible(true);
-			VideoPlayerPanel.getInstance().play(mrl);
+			VideoPlayer.getInstance().play(mrl);
+			constructVideoWindow();
+			videoWin.setVisible(true);
+		}
+	}
+
+	private void constructAudioWindow() {
+		if (audioWin == null) {
+			audioWin = new JFrame("Furk Music Player");
+			audioWin.setIconImage(new ImageIcon(getClass().getResource(
+					"/rickelectric/furkmanager/img/tree/audio-48.png"))
+					.getImage());
+			audioWin.setContentPane(new AudioPanel());
+			audioWin.setResizable(false);
+			audioWin.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					AudioPlayer.getInstance().stop();
+				}
+			});
+			audioWin.pack();
+			audioWin.setLocationRelativeTo(this);
+			audioWin.setLocation(this.getWidth(), this.getY());
+		}
+	}
+	
+	private void constructVideoWindow() {
+		if (videoWin == null) {
+			videoWin = new JFrame("Furk Music Player");
+			videoWin.setIconImage(new ImageIcon(getClass().getResource(
+					"/rickelectric/furkmanager/img/tree/video-48.png"))
+					.getImage());
+			videoWin.setContentPane(new VideoPanel());
+			//videoWin.setResizable(false);
+			videoWin.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					VideoPlayer.getInstance().stop();
+				}
+			});
+			videoWin.setMinimumSize(videoWin.getContentPane().getPreferredSize());
+			videoWin.pack();
+			videoWin.setLocationRelativeTo(this);
+			videoWin.setLocation(this.getWidth(), this.getY());
 		}
 	}
 
@@ -453,7 +532,17 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	}
 
 	@Override
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		mediaCheck();
+	}
+
+	@Override
 	public void mediaNotify() {
 
+	}
+
+	public TranslucentPane getView(int i) {
+		return currPanel[i];
 	}
 }

@@ -15,7 +15,6 @@ import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.panels.File_FolderView;
 import rickelectric.furkmanager.views.panels.TFileTreePanel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 
@@ -247,7 +246,6 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 							// Recycle
 							String id = cFile.getID();
 							API_File.unlink(new String[] { id });
-							parentRef(true);
 						}
 					} catch (Exception e) {
 					}
@@ -258,9 +256,11 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		}
 	}
 
-	public void parentRef(boolean hard) {
-		File_FolderView.getInstance().refreshMyFolders(hard);
-	}
+//	public void parentRef(boolean hard) {
+//		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE)
+//			((File_FolderView) ((Main_FileView) MainEnvironment.getInstance()
+//					.getView(1)).getTabContent(2)).refreshMyFolders(false);
+//	}
 
 	@Override
 	public boolean draggable() {

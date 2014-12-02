@@ -79,63 +79,9 @@ public class LoginSplashWindow extends JFrame {
 
 	private JPanel panel_login;
 	private Rectangle label_loading;
-	private ImageObserver loadingImageObserver = new ImageObserver() {
-		@Override
-		public boolean imageUpdate(Image img, int infoflags, int x, int y,
-				int width, int height) {
-			if (panel_login.isVisible())
-				return false;
-			repaint(label_loading.x, label_loading.y, width, height);
-			return true;
-		}
-	};
-	private ImageObserver frameImageObserver = new ImageObserver() {
-		@Override
-		public boolean imageUpdate(Image img, int infoflags, int x, int y,
-				int width, int height) {
-			repaint(x, y, width, height);
-			return true;
-		}
-	};
-	private Timer fader;
-
-	public MouseMotionListener pointMotion = new MouseMotionAdapter() {
-		@Override
-		public synchronized void mouseDragged(MouseEvent e) {
-			if (startPoint == null)
-				return;
-			Point mp = MouseInfo.getPointerInfo().getLocation();
-			int x = mp.x - startPoint.x;
-			int y = mp.y - startPoint.y;
-			LoginSplashWindow.this.setLocation(new Point(x, y));
-			repaint();
-		}
-	};
-
-	public MouseListener pointInit = new MouseAdapter() {
-		@Override
-		public void mousePressed(MouseEvent e) {
-			startPoint = null;
-			if (moveable)
-				startPoint = LoginSplashWindow.this.getMousePosition();
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			startPoint = null;
-		}
-	};
-	private JCheckBox check_savecreds;
+	private JCheckBox check_savecreds,check_auto;
 	private JDialog sf = null, uf = null;
-	private JButtonLabel btn_apihelp;
-	private JButtonLabel buttonLabel;
-
-	public void addListeners() {
-		UtilBox.addMouseListenerToAll(contentPane, pointInit);
-		UtilBox.addMouseMotionListenerToAll(contentPane, pointMotion,
-				new Class<?>[] { JButton.class, JTextField.class,
-						JPasswordField.class, JButtonLabel.class });
-	}
+	private JButtonLabel btn_apihelp,btn_env;
 
 	public LoginSplashWindow() {
 		setUndecorated(true);
@@ -179,7 +125,7 @@ public class LoginSplashWindow extends JFrame {
 		panel_login.setBounds(218, 171, 424, 208);
 		contentPane.add(panel_login);
 		panel_login.setLayout(null);
-
+		
 		label_loading = new Rectangle(420, 207, 298, 208);
 		loadingImage = Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource(
@@ -289,8 +235,13 @@ public class LoginSplashWindow extends JFrame {
 
 		check_savecreds = new JCheckBox("Save Credentials");
 		check_savecreds.setOpaque(false);
-		check_savecreds.setBounds(143, 100, 128, 23);
+		check_savecreds.setBounds(10, 141, 123, 23);
 		panel_login.add(check_savecreds);
+		
+		check_auto = new JCheckBox("Auto-Login");
+		check_auto.setOpaque(false);
+		check_auto.setBounds(10, 173, 123, 23);
+		panel_login.add(check_auto);
 
 		btn_apihelp = new JButtonLabel("  API Key Help", new Runnable() {
 			@Override
@@ -317,7 +268,7 @@ public class LoginSplashWindow extends JFrame {
 		btn_apihelp.setIcon(new ImageIcon(getClass().getResource(
 				"/rickelectric/furkmanager/img/dash/User-16.png")));
 		btn_apihelp.setForeground(Color.BLUE);
-		btn_apihelp.setBounds(10, 140, 123, 25);
+		btn_apihelp.setBounds(10, 93, 123, 25);
 		panel_login.add(btn_apihelp);
 
 		JButtonLabel btn_settings = new JButtonLabel("  Proxy Settings",
@@ -347,10 +298,10 @@ public class LoginSplashWindow extends JFrame {
 		btn_settings.setHorizontalAlignment(SwingConstants.LEFT);
 		btn_settings.setIcon(new ImageIcon(getClass().getResource(
 				"/rickelectric/furkmanager/img/dash/Settings-16.png")));
-		btn_settings.setBounds(10, 99, 123, 25);
+		btn_settings.setBounds(10, 52, 123, 25);
 		panel_login.add(btn_settings);
 
-		buttonLabel = new JButtonLabel("  Environment", new Runnable() {
+		btn_env = new JButtonLabel("  Environment", new Runnable() {
 			@Override
 			public void run() {
 				if (uf != null) {
@@ -371,14 +322,14 @@ public class LoginSplashWindow extends JFrame {
 				uf.setVisible(true);
 			}
 		});
-		buttonLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		btn_env.setHorizontalAlignment(SwingConstants.LEFT);
 		btn_apihelp.setForeground(Color.RED);
-		buttonLabel
+		btn_env
 				.setIcon(new ImageIcon(
 						LoginSplashWindow.class
 								.getResource("/rickelectric/furkmanager/img/sm/menu_expand.png")));
-		buttonLabel.setBounds(10, 58, 123, 25);
-		panel_login.add(buttonLabel);
+		btn_env.setBounds(10, 11, 123, 25);
+		panel_login.add(btn_env);
 
 		splashImage = ImageManager
 				.classLoadImage("/rickelectric/furkmanager/img/Splash_Big.png");
@@ -390,6 +341,60 @@ public class LoginSplashWindow extends JFrame {
 		addListeners();
 	}
 
+	private ImageObserver loadingImageObserver = new ImageObserver() {
+		@Override
+		public boolean imageUpdate(Image img, int infoflags, int x, int y,
+				int width, int height) {
+			if (panel_login.isVisible())
+				return false;
+			repaint(label_loading.x, label_loading.y, width, height);
+			return true;
+		}
+	};
+	private ImageObserver frameImageObserver = new ImageObserver() {
+		@Override
+		public boolean imageUpdate(Image img, int infoflags, int x, int y,
+				int width, int height) {
+			repaint(x, y, width, height);
+			return true;
+		}
+	};
+	private Timer fader;
+
+	public MouseMotionListener pointMotion = new MouseMotionAdapter() {
+		@Override
+		public synchronized void mouseDragged(MouseEvent e) {
+			if (startPoint == null)
+				return;
+			Point mp = MouseInfo.getPointerInfo().getLocation();
+			int x = mp.x - startPoint.x;
+			int y = mp.y - startPoint.y;
+			LoginSplashWindow.this.setLocation(new Point(x, y));
+			repaint();
+		}
+	};
+
+	public MouseListener pointInit = new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			startPoint = null;
+			if (moveable)
+				startPoint = LoginSplashWindow.this.getMousePosition();
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			startPoint = null;
+		}
+	};
+
+	public void addListeners() {
+		UtilBox.addMouseListenerToAll(contentPane, pointInit);
+		UtilBox.addMouseMotionListenerToAll(contentPane, pointMotion,
+				new Class<?>[] { JButton.class, JTextField.class,
+						JPasswordField.class, JButtonLabel.class });
+	}
+	
 	public void splashMode() {
 		panel_login.setVisible(false);
 	}
@@ -433,10 +438,21 @@ public class LoginSplashWindow extends JFrame {
 		furkAnimate(4);
 		String username = input_username.getText();
 		char[] password = input_password.getPassword();
+		
+		if(username==null||username.equals("")){
+			setText("Error: Username Is Blank");
+			furkAnimate(0);
+			return;
+		}
+		if(password==null||password.length==0){
+			setText("Error: No Password Entered");
+			furkAnimate(0);
+			return;
+		}
 
 		LoginModel userLogin = new LoginModel(username, password);
-		userLogin.save(true);
-		userLogin.autoLogin(false);
+		userLogin.save(check_savecreds.isSelected());
+		userLogin.autoLogin(check_auto.isSelected());
 
 		try {
 			setText("User Login In Progress...");
@@ -463,10 +479,15 @@ public class LoginSplashWindow extends JFrame {
 		loggingIn = true;
 		furkAnimate(4);
 		String apiKey = input_apikey.getText();
+		if(apiKey==null || apiKey.equals("")){
+			setText("Error: Blank API Key");
+			furkAnimate(0);
+			return;
+		}
 
 		LoginModel apiLogin = new LoginModel(apiKey);
-		apiLogin.save(true);
-		apiLogin.autoLogin(false);
+		apiLogin.save(check_savecreds.isSelected());
+		apiLogin.autoLogin(check_auto.isSelected());
 
 		try {
 			setText("API Login In Progress...");
@@ -489,9 +510,15 @@ public class LoginSplashWindow extends JFrame {
 	}
 
 	public void loadLoginData() {
-		input_username.setText(SettingsManager.getInstance().getUsername());
-		input_password.setText(SettingsManager.getInstance().getPassword());
-		input_apikey.setText(SettingsManager.getInstance().getApiKey());
+		LoginModel savedLogin = SettingsManager.getInstance().loginModel();
+		if(savedLogin==null) savedLogin = new LoginModel(LoginModel.BLANK);
+		
+		input_username.setText(savedLogin.username());
+		input_password.setText(UtilBox.charToString(savedLogin.password()));
+		input_apikey.setText(savedLogin.apiKey());
+		
+		check_savecreds.setSelected(savedLogin.save());
+		check_auto.setSelected(savedLogin.autoLogin());
 		loggingIn = false;
 	}
 

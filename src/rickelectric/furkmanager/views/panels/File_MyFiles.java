@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -23,7 +25,7 @@ import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
 
-public class File_MyFiles extends JPanel implements Runnable{
+public class File_MyFiles extends JPanel implements Runnable, Observer {
 	private static final long serialVersionUID = 1L;
 
 	private enum Mode {
@@ -42,14 +44,14 @@ public class File_MyFiles extends JPanel implements Runnable{
 
 	private boolean loading;
 
-	private int numResults=0;
-	
+	private int numResults = 0;
+
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public File_MyFiles(Mode mode,boolean hardReload){
+	public File_MyFiles(Mode mode, boolean hardReload) {
 		this(mode);
-		
+
 		refreshMyFiles(hardReload);
 	}
 
@@ -59,9 +61,9 @@ public class File_MyFiles extends JPanel implements Runnable{
 			return;
 		}
 		this.mode = mode;
-		this.hardReload=false;
-		this.loading=false;
-		
+		this.hardReload = false;
+		this.loading = false;
+
 		setLayout(null);
 		setBackground(UtilBox.getRandomColor());
 		resultScroller = new JScrollPane(
@@ -76,15 +78,18 @@ public class File_MyFiles extends JPanel implements Runnable{
 		resultPanel = new JPanel();
 		resultPanel.setBackground(getBackground());
 		resultScroller.setViewportView(resultPanel);
+
+		API_File.addObserver(this);
 	}
 
-	public void refreshMyFiles(final boolean hardReload){
-		if(loading) return;
+	public void refreshMyFiles(final boolean hardReload) {
+		if (loading)
+			return;
 		resultPanel.removeAll();
 		resultPanel.setLayout(null);
-		
-		this.hardReload=hardReload;
-		
+
+		this.hardReload = hardReload;
+
 		label_loading = new JLabel();
 		label_loading.setHorizontalAlignment(SwingConstants.CENTER);
 		label_loading.setIcon(new ImageIcon(FurkManager.class
@@ -97,7 +102,7 @@ public class File_MyFiles extends JPanel implements Runnable{
 		new Thread(this).start();
 
 	}
-	
+
 	private void populateFileManager(FurkFile[] o) {
 		JPanel pane;
 		pane = new JPanel();
@@ -105,8 +110,8 @@ public class File_MyFiles extends JPanel implements Runnable{
 		pane.setPreferredSize(new Dimension(510, 142));
 		int i = 0;
 		while (i < 3 && i < o.length && o[i] != null) {
-			FileIcon ico=new FileIcon(o[i]);
-			ico.num(numResults+i+1);
+			FileIcon ico = new FileIcon(o[i]);
+			ico.num(numResults + i + 1);
 			pane.add(ico);
 			i++;
 		}
@@ -117,25 +122,22 @@ public class File_MyFiles extends JPanel implements Runnable{
 
 	@Override
 	public void run() {
-		if(loading==true) return;
-		loading=true;
+		if (loading == true)
+			return;
+		loading = true;
 		try {
-			int position = resultScroller.getVerticalScrollBar()
-					.getValue();
+			int position = resultScroller.getVerticalScrollBar().getValue();
 			if (hardReload)
-				position = resultScroller.getHorizontalScrollBar()
-						.getMinimum();
+				position = resultScroller.getHorizontalScrollBar().getMinimum();
 
 			ArrayList<FurkFile> ffarray = hardReload ? (mode == MYFILES ? API_File
 					.getAllFinished() : API_File.getAllDeleted())
-					: (mode == RECYCLER ? API_File.getAllDeleted()
-							: API_File.getAllCached());
-			
+					: (mode == RECYCLER ? API_File.getDeletedCache() : API_File
+							.getFinishedCache());
+
 			resultPanel.removeAll();
-			resultPanel.setLayout(new BoxLayout(resultPanel,
-					BoxLayout.Y_AXIS));
-			resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3,
-					3, 3));
+			resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
+			resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 			if (ffarray == null)
 				return;
 
@@ -145,7 +147,7 @@ public class File_MyFiles extends JPanel implements Runnable{
 			for (FurkFile o : ffarray) {
 				oArr[i] = o;
 				i++;
-				if(i==3){
+				if (i == 3) {
 					populateFileManager(oArr);
 					oArr = new FurkFile[3];
 					i = 0;
@@ -161,11 +163,9 @@ public class File_MyFiles extends JPanel implements Runnable{
 			try {
 				getTopLevelAncestor().repaint();
 				((AppFrameClass) getTopLevelAncestor())
-						.setStatus("Loaded: "
-								+ numResults
-								+ " "
-								+ (mode == MYFILES ? "Finished"
-										: "Deleted") + " Files");
+						.setStatus("Loaded: " + numResults + " "
+								+ (mode == MYFILES ? "Finished" : "Deleted")
+								+ " Files");
 			} catch (Exception e) {
 			}
 		} catch (Exception e) {
@@ -180,7 +180,7 @@ public class File_MyFiles extends JPanel implements Runnable{
 			}
 		} catch (Exception e) {
 		}
-		loading=false;
+		loading = false;
 	}
 
 	public void removeIcon(FileIcon icon) {
@@ -189,46 +189,47 @@ public class File_MyFiles extends JPanel implements Runnable{
 		int prevNum = 0;
 		Component[] cpl = resultPanel.getComponents();
 		List<JPanel> cps = getPanels(cpl);
-		for(int i=0;i<cps.size();i++){
+		for (int i = 0; i < cps.size(); i++) {
 			JPanel c = cps.get(i);
 			prev = c;
 			List<FileIcon> pIcons = getIcons(prev);
 			int index = pIcons.indexOf(icon);
-			if(index>=0){
+			if (index >= 0) {
 				prev.remove(icon);
 				prevNum = icon.num();
-				if(index==0){
+				if (index == 0) {
 					pIcons.get(0).num(prevNum++);
 					pIcons.get(1).num(prevNum++);
 				}
-				if(index==1){
+				if (index == 1) {
 					pIcons.get(1).num(prevNum++);
 				}
 				propagate = true;
 			}
-			if(propagate && i<cps.size()-1){
-				JPanel next = cps.get(i+1);
+			if (propagate && i < cps.size() - 1) {
+				JPanel next = cps.get(i + 1);
 				List<FileIcon> ics = getIcons(next);
-				for(FileIcon s:ics) s.num(prevNum++);
+				for (FileIcon s : ics)
+					s.num(prevNum++);
 				next.remove(ics.get(0));
 				prev.add(ics.get(0));
 				prev.repaint();
 				next.repaint();
 			}
-			if(i==cps.size()-1){
+			if (i == cps.size() - 1) {
 				JPanel next = cps.get(i);
 				List<FileIcon> ics = getIcons(next);
-				if(ics.size()==0)
+				if (ics.size() == 0)
 					resultPanel.remove(next);
 			}
 		}
 		resultPanel.repaint();
 	}
-	
-	private List<JPanel> getPanels(Component[] cs){
-		ArrayList<JPanel> panel =new ArrayList<JPanel>();
-		for(Component c:cs){
-			if(c instanceof JPanel){
+
+	private List<JPanel> getPanels(Component[] cs) {
+		ArrayList<JPanel> panel = new ArrayList<JPanel>();
+		for (Component c : cs) {
+			if (c instanceof JPanel) {
 				panel.add((JPanel) c);
 			}
 		}
@@ -237,11 +238,19 @@ public class File_MyFiles extends JPanel implements Runnable{
 
 	private List<FileIcon> getIcons(JPanel prev) {
 		ArrayList<FileIcon> icons = new ArrayList<FileIcon>();
-		for(Component c:prev.getComponents()){
-			if(c instanceof FileIcon){
-				icons.add((FileIcon)c);
+		for (Component c : prev.getComponents()) {
+			if (c instanceof FileIcon) {
+				icons.add((FileIcon) c);
 			}
 		}
 		return icons;
+	}
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		if (arg1 == API_File.GET_FINISHED && mode == MYFILES)
+			refreshMyFiles(false);
+		if (arg1 == API_File.GET_DELETED && mode == RECYCLER)
+			refreshMyFiles(false);
 	}
 }

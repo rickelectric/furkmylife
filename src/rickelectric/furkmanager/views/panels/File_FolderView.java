@@ -6,6 +6,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.DropMode;
 import javax.swing.ImageIcon;
@@ -23,36 +25,35 @@ import javax.swing.tree.TreeSelectionModel;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.APIFolderManager;
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.iconutil.FolderTreeRenderer;
 import rickelectric.furkmanager.views.iconutil.FolderTreeTransferHandler;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.swingmods.OpacEffects;
+import java.awt.BorderLayout;
 
 public class File_FolderView extends JLayeredPane implements MouseListener,
-		KeyListener {
+		KeyListener, Observer {
 	private static final long serialVersionUID = 1L;
-	private JTree folder_tree;
-	private static File_FolderView thisInstance = null;
+	
 	private Thread thisRun;
-	protected JScrollPane scroller;
+	
+	private JTree folder_tree;
+	private JScrollPane scroller;
 	private TransferHandler transferer;
 	private TreeCellRenderer renderer;
 	private JFadeLabel loading;
 	private JPopupMenu menu;
 
-	public JTree currTree() {
-		return folder_tree;
-	}
-
-	private File_FolderView() {
+	public File_FolderView() {
 		setBorder(new EmptyBorder(5, 5, 5, 5));
-		setLayout(null);
+		setLayout(new BorderLayout(0, 0));
 
 		scroller = new JScrollPane(folder_tree);
 
-		add(scroller);
+		add(scroller, BorderLayout.CENTER);
 
 		loading = new JFadeLabel(
 				new ImageIcon(
@@ -60,20 +61,14 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 								.getResource("/rickelectric/furkmanager/img/ajax-loader.gif")));
 		loading.setAlpha(1.0f);
 		setLayer(loading, 10);
-		loading.setBounds(225, 137, 54, 55);
 		add(loading);
 
 		transferer = new FolderTreeTransferHandler();
 		renderer = new FolderTreeRenderer();
 
+		APIFolderManager.addObserver(this);
+		API_File.addObserver(this);
 		refreshMyFolders(false);
-	}
-	
-	public static File_FolderView getInstance(){
-		if(thisInstance==null){
-			thisInstance = new File_FolderView();
-		}
-		return thisInstance;
 	}
 
 	@Override
@@ -81,6 +76,10 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		if (scroller != null)
 			scroller.setBounds(5, 5, getWidth() - 10, getHeight() - 10);
 		super.repaint();
+	}
+
+	public JScrollPane getScroller() {
+		return scroller;
 	}
 
 	private DefaultTreeModel getTreeModel(boolean hardReload) {
@@ -91,7 +90,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		return new DefaultTreeModel(root);
 	}
 
-	public void refreshMyFolders(final boolean hardReload) {
+	protected void refreshMyFolders(final boolean hardReload) {
 		thisRun = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -254,6 +253,18 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void update(Observable o, Object arg1) {
+		if(o instanceof API_File.FileObservable){
+			if(arg1 == API_File.GET_FINISHED) 
+				refreshMyFolders(false);
+		}
+		else {
+			if(arg1!=APIFolderManager.UpdateSource.INIT)
+				refreshMyFolders(true);
+		}
 	}
 
 }

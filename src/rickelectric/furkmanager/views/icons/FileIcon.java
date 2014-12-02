@@ -1,7 +1,6 @@
 package rickelectric.furkmanager.views.icons;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -30,7 +29,6 @@ import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.panels.File_MyFiles;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 
@@ -39,8 +37,6 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 	private static final long serialVersionUID = 1L;
 
 	private Color bgc;
-
-	private FileIcon thisPanel;
 
 	private APIObject cFile;
 	public static final int WIDE_MODE = 100, SMALL_MODE = 200;
@@ -72,31 +68,31 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 
 	private int number = 0;
 
-	private void parentRemoveIcon(FileIcon icon) {
-		Container parent = thisPanel;
-		try {
-			do {
-				parent = parent.getParent();
-			} while (!(parent instanceof File_MyFiles));
-			((File_MyFiles) parent).removeIcon(icon);
-		} catch (Exception e) {
-			System.err.println("Could Not Find Proper Parent");
-			e.printStackTrace();
-		}
-	}
+//	private void parentRemoveIcon(FileIcon icon) {
+//		Container parent = this;
+//		try {
+//			do {
+//				parent = parent.getParent();
+//			} while (!(parent instanceof File_MyFiles));
+//			((File_MyFiles) parent).removeIcon(icon);
+//		} catch (Exception e) {
+//			System.err.println("Could Not Find Proper Parent");
+//			e.printStackTrace();
+//		}
+//	}
 
-	private void parentRefresh() {
-		Container parent = thisPanel;
-		try {
-			do {
-				parent = parent.getParent();
-			} while (!(parent instanceof File_MyFiles));
-			((File_MyFiles) parent).refreshMyFiles(false);
-		} catch (Exception e) {
-			System.err.println("Could Not Find Proper Parent");
-			e.printStackTrace();
-		}
-	}
+//	private void parentRefresh() {
+//		Container parent = this;
+//		try {
+//			do {
+//				parent = parent.getParent();
+//			} while (!(parent instanceof File_MyFiles));
+//			((File_MyFiles) parent).refreshMyFiles(false);
+//		} catch (Exception e) {
+//			System.err.println("Could Not Find Proper Parent");
+//			e.printStackTrace();
+//		}
+//	}
 
 	public class ContextMenu extends JPopupMenu implements ActionListener {
 		private static final long serialVersionUID = 1L;
@@ -269,7 +265,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 								((FurkFile) cFile).setLinked(true);
 								check_linked.setSelected(true);
 							}
-							parentRefresh();
+							//parentRefresh();
 						}
 						if (src.equals(add_dl)) {
 							// Add To My Downloads
@@ -335,13 +331,13 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 										"Deleted", "File '" + cFile.getName()
 												+ "' Sent To Recycle Bin", null);
 							}
-							parentRemoveIcon(FileIcon.this);
+							//parentRemoveIcon(FileIcon.this);
 						}
 						if (src.equals(delete)) {
 							// Permanently Delete
 							String id = ((FurkFile) cFile).getID();
 							API_File.clear(new String[] { id });
-							parentRemoveIcon(FileIcon.this);
+							//parentRemoveIcon(FileIcon.this);
 						}
 					} catch (Exception e) {
 					}
@@ -365,7 +361,6 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		setOpaque(true);
 		this.cFile = o;
 		this.mode = WIDE_MODE;
-		this.thisPanel = this;
 
 		bgc = UtilBox.getColor(Math.abs(o.getInfoHash().hashCode()));
 		setBackground(bgc);
@@ -396,7 +391,6 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		setOpaque(true);
 		this.cFile = o;
 		this.mode = SMALL_MODE;
-		this.thisPanel = this;
 
 		bgc = UtilBox.getColor(Math.abs(o.getInfoHash().hashCode()));
 		setBackground(bgc);

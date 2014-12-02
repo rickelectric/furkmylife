@@ -1,6 +1,7 @@
 package rickelectric.furkmanager.views.panels;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 
@@ -22,11 +23,14 @@ public class Main_FileView extends TranslucentPane {
 
 	private File_MyFiles pane_recycler;
 
+	private JTabbedPane tabbedPane;
+
 	public Main_FileView() {
 		super();
 		setAlpha(1);
-		setPreferredSize(new Dimension(561, 400));
 		setLayout(null);
+
+		setPreferredSize(new Dimension(561, 400));
 		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE) {
 			setBackground(Color.darkGray);
 			setPreferredSize(new Dimension(561,
@@ -34,7 +38,7 @@ public class Main_FileView extends TranslucentPane {
 							.getMaximumWindowBounds().height - 200));
 		}
 
-		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
+		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.setBounds(4, 0, 554, getPreferredSize().height - 8);
 		add(tabbedPane);
 
@@ -43,17 +47,17 @@ public class Main_FileView extends TranslucentPane {
 		tabbedPane.addTab(
 				"My Files",
 				new ImageIcon(FurkManager.class
-						.getResource("img/dash/Files-16.png")), pane_myfiles.resultScroller,
-				"All My Files");
+						.getResource("img/dash/Files-16.png")),
+				pane_myfiles.resultScroller, "All My Files");
 		pane_myfiles.setLayout(null);
 
-		pane_folders = File_FolderView.getInstance();
+		pane_folders = new File_FolderView();
 		tabbedPane.addTab(
 				"Folders (Labels)",
 				new ImageIcon(FurkManager.class
 						.getResource("img/tree/folder-blue-16.png")),
-				pane_folders.scroller, "Organize Files In Folders");
-		pane_folders.setLayout(null);
+				pane_folders, "Organize Files In Folders");
+		//pane_folders.setLayout(null);
 
 		JPanel pane_find = new SearchPanel(SearchPanel.FILESEARCH);
 		tabbedPane.addTab(
@@ -70,14 +74,33 @@ public class Main_FileView extends TranslucentPane {
 		tabbedPane.addTab(
 				"Recycle Bin",
 				new ImageIcon(FurkManager.class
-						.getResource("img/sm/recycler.png")), pane_recycler.resultScroller,
-				null);
+						.getResource("img/sm/recycler.png")),
+				pane_recycler.resultScroller, null);
 
 	}
 
 	public void refreshMyFiles(boolean hardReload) {
 		pane_myfiles.refreshMyFiles(hardReload);
 		pane_recycler.refreshMyFiles(hardReload);
+	}
+
+	public void refreshActive(boolean hardReload) {
+		int selectedTab = tabbedPane.getSelectedIndex();
+		if (selectedTab == 0) {
+			pane_myfiles.refreshMyFiles(hardReload);
+		} else if (selectedTab == 1) {
+			pane_folders.refreshMyFolders(hardReload);
+		} else if (selectedTab == tabbedPane.getTabCount() - 1) {
+			pane_recycler.refreshMyFiles(hardReload);
+		}
+	}
+
+	public void switchPrepare() {
+		getParent().remove(this);
+	}
+
+	public Component getTabContent(int i) {
+		return tabbedPane.getTabComponentAt(i);
 	}
 
 }

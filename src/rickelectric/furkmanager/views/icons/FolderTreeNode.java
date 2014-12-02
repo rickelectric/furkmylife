@@ -1,6 +1,5 @@
 package rickelectric.furkmanager.views.icons;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -9,14 +8,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIFolder;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.panels.File_FolderView;
 import rickelectric.furkmanager.views.windows.MainEnvironment;
 import rickelectric.furkmanager.views.windows.MainWindow;
 
@@ -25,16 +22,15 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 	private static final long serialVersionUID = 1L;
 
 	private APIFolder folder;
-	private JTree parentTree;
 
 	@Override
 	public APIFolder getUserObject() {
 		return folder;
 	}
 
-	public void setParent(JTree parent) {
-		this.parentTree = parent;
-	}
+//	public void setParent(JTree parent) {
+//		this.parentTree = parent;
+//	}
 
 	public FolderTreeNode(APIFolder folder) {
 		super(folder.getName());
@@ -114,8 +110,9 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 				if (resp == JOptionPane.OK_OPTION) {
 					String name = f.getText();
 					if (name != null && name.length() >= 0) {
-						if (APIFolderManager.newFolder(folder, name))
-							parentRef(false);
+						if (APIFolderManager.newFolder(folder, name)){
+							//parentRef(false);
+						}
 					}
 
 				}
@@ -139,7 +136,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 					String name = f.getText();
 					if (name != null && name.length() >= 0)
 						if (APIFolderManager.rename(folder, name)) {
-							parentRef(false);
+							//parentRef(false);
 						}
 				}
 			} else if (src == folder_delete) {
@@ -155,25 +152,25 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 								JOptionPane.QUESTION_MESSAGE);
 				if (resp == JOptionPane.YES_OPTION) {
 					if (APIFolderManager.delete(folder)) {
-						parentRef(true);
+						//parentRef(true);
 					}
 				}
 			}
 		}
 	}
 
-	private void parentRef(boolean hard) {
-		try {
-			Container parent = parentTree.getParent();
-			do {
-				parent = parent.getParent();
-			} while (!(parent instanceof File_FolderView));
-			((File_FolderView) parent).refreshMyFolders(hard);
-		} catch (Exception ex) {
-			System.err.println("Could Not Find Proper Parent");
-			ex.printStackTrace();
-		}
-	}
+//	private void parentRef(boolean hard) {
+//		try {
+//			Container parent = parentTree.getParent();
+//			do {
+//				parent = parent.getParent();
+//			} while (!(parent instanceof File_FolderView));
+//			((File_FolderView) parent).refreshMyFolders(hard);
+//		} catch (Exception ex) {
+//			System.err.println("Could Not Find Proper Parent");
+//			ex.printStackTrace();
+//		}
+//	}
 
 	@Override
 	public boolean draggable() {

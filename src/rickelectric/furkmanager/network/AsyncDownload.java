@@ -28,7 +28,7 @@ import rickelectric.furkmanager.utils.SettingsManager;
 public class AsyncDownload extends Observable implements Runnable, Serializable {
 	private static final long serialVersionUID = 1L;
 
-	protected static final int MAX_BUFFER_SIZE = 1;
+	protected static final int MAX_BUFFER_SIZE = 512;
 
 	public static final String STATUSES[] = { "Downloading", "Paused",
 			"Complete", "Cancelled", "Error", "Idle / Connecting" };

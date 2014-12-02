@@ -1,8 +1,10 @@
 package rickelectric.furkmanager.views.windows;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
@@ -16,12 +18,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.java.balloontip.BalloonTip;
+import net.java.balloontip.BalloonTip.AttachLocation;
+import net.java.balloontip.BalloonTip.Orientation;
+import net.java.balloontip.styles.BalloonTipStyle;
 import net.java.balloontip.styles.RoundedBalloonStyle;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.api.API;
-import rickelectric.furkmanager.player.AudioPlayerPanel;
-import rickelectric.furkmanager.player.VideoPlayerPanel;
+import rickelectric.furkmanager.player.AudioPanel;
+import rickelectric.furkmanager.player.AudioPlayer;
+import rickelectric.furkmanager.player.VideoPanel;
+import rickelectric.furkmanager.player.VideoPlayer;
 import rickelectric.furkmanager.utils.MouseActivity;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -31,19 +38,38 @@ import rickelectric.furkmanager.views.panels.Main_FeedView;
 import rickelectric.furkmanager.views.panels.Main_FileView;
 import rickelectric.furkmanager.views.panels.Main_SettingsView;
 import rickelectric.furkmanager.views.panels.Main_UserView;
+import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 import rickelectric.furkmanager.views.swingmods.balloon.BTipPositioner;
 
 public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		MouseListener {
 	private static final long serialVersionUID = 1L;
 
+	private static MainEnvironment thisInstance = null;
+
+	public static synchronized MainEnvironment getInstance() {
+		if (thisInstance == null) {
+			thisInstance = new MainEnvironment();
+		}
+		thisInstance.mediaCheck();
+		return thisInstance;
+	}
+
+	public static synchronized void destroyInstance() {
+		if (thisInstance == null)
+			return;
+		thisInstance = null;
+		System.gc();
+	}
+
 	private CircleButton[] buttons;
 	private CircleButton[] fnButtons;
+	private CircleButton[] refreshButtons;
 
 	private BalloonTip[] balloons;
 	private BalloonTip[] fnBalloons;
 
-	private JComponent[] sections;
+	private TranslucentPane[] sections;
 	private JComponent[] fnSections;
 
 	private JPanel contentPane;
@@ -122,12 +148,17 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 					}
 				}
 			}
+
+			for (int i = 0; i < refreshButtons.length; i++) {
+				if (balloons[i].isVisible())
+					refreshButtons[i].paint(g);
+			}
 		}
 	}
 
 	int darkness = 40;
 
-	public MainEnvironment() {
+	private MainEnvironment() {
 		super();
 		setUndecorated(true);
 		setTitle("Furk Desktop Environment");
@@ -156,6 +187,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		fnButtons = new CircleButton[2];
 		fnBalloons = new BalloonTip[2];
 
+		refreshButtons = new CircleButton[2];
+
 		setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		setLocationRelativeTo(null);
 
@@ -173,27 +206,26 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 		generateButtons();
 		generateFnButtons();
+		generateRefreshButtons();
 
 		balloonConstruct();
 		fnBalloonConstruct();
 
 		mediaActiveCheck();
+		mediaCheck();
 
 		addMouseListener(this);
 		new Thread(this).start();
 	}
 
 	public void mediaNotify() {
-		if (VideoPlayerPanel.getInstance().isFullscreen()) {
 
-		}
 	}
 
 	public void dispose() {
 		if (mediaReady && FurkManager.mediaEnabled()) {
-			fnBalloons[0].remove(AudioPlayerPanel.getInstance());
-			contentPane.remove(fnButtons[0]);
-			fnBalloons[0].remove(VideoPlayerPanel.getInstance());
+			((AudioPanel) fnSections[0]).detachObserver();
+			((VideoPanel) fnSections[1]).detachObserver();
 			contentPane.remove(fnButtons[1]);
 		}
 		super.dispose();
@@ -204,15 +236,16 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 	public void mediaActiveCheck() {
 		if (!FurkManager.mediaEnabled())
 			return;
-		if (AudioPlayerPanel.getInstance().isActive()) {
+		if (AudioPlayer.getInstance().isActive()) {
 			if (!mediaReady) {
 				fnBalloonConstruct();
 			}
 			audioPlayerActive = true;
+			((AudioPanel) fnSections[0]).reattachObserver();
 			fnButtons[0].setVisible(true);
 			fnBalloons[0].setVisible(true);
 		}
-		if (VideoPlayerPanel.getInstance().isActive()) {
+		if (VideoPlayer.getInstance().isActive()) {
 			if (!mediaReady) {
 				fnBalloonConstruct();
 			}
@@ -232,7 +265,7 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 			fnBalloonConstruct();
 		}
 		if (mediaType == AUDIO) {
-			if (AudioPlayerPanel.getInstance().play(mrl)) {
+			if (AudioPlayer.getInstance().play(mrl)) {
 				audioPlayerActive = true;
 				fnButtons[0].setVisible(true);
 				fnBalloons[0].setVisible(true);
@@ -243,7 +276,7 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 			fnButtons[1].setVisible(true);
 			fnBalloons[1].setVisible(true);
 			repaint();
-			VideoPlayerPanel.getInstance().play(mrl);
+			VideoPlayer.getInstance().play(mrl);
 		}
 	}
 
@@ -312,16 +345,63 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 	}
 
+	private void generateRefreshButtons() {
+		refreshButtons[0] = new CircleButton("Refresh Files",
+				getClass().getResource(
+						"/rickelectric/furkmanager/img/dash/Reload-32.png"));
+		refreshButtons[0].setStrokeSize(3);
+		Point loc0 = buttons[0].getLocation();
+		Dimension sz0 = buttons[0].getSize();
+		refreshButtons[0].setLocation(
+				loc0.x + sz0.width - refreshButtons[0].getWidth(), loc0.y
+						+ sz0.height - refreshButtons[0].getHeight());
+
+		refreshButtons[1] = new CircleButton("Refresh Downloads",
+				getClass().getResource(
+						"/rickelectric/furkmanager/img/dash/Reload-32.png"));
+		refreshButtons[1].setStrokeSize(3);
+		Point loc1 = buttons[1].getLocation();
+		Dimension sz1 = buttons[1].getSize();
+		refreshButtons[1].setLocation(
+				loc1.x + sz1.width - refreshButtons[1].getWidth(), loc1.y
+						+ sz1.height - refreshButtons[1].getHeight());
+	}
+
 	private void balloonConstruct() {
-		sections = new JComponent[] { new Main_FileView(),
+		sections = new TranslucentPane[] { new Main_FileView(),
 				new Main_DownloadView(), new Main_FeedView(),
 				new Main_SettingsView(), new Main_UserView() };
 
 		for (int i = 0; i < balloons.length; i++) {
-			balloons[i] = new BalloonTip(buttons[i], sections[i],
-					new RoundedBalloonStyle(10, 10,
-							sections[i].getBackground(), Color.BLUE),
-					new BTipPositioner(), null);
+			// balloons[i] = new BalloonTip(buttons[i], sections[i],
+			// new RoundedBalloonStyle(10, 10,
+			// sections[i].getBackground(), Color.BLUE),
+			// new BTipPositioner(), null);
+
+			JComponent attachedComponent = buttons[i];
+			JComponent contents = sections[i];
+			BalloonTipStyle style = new RoundedBalloonStyle(10, 10,
+					sections[i].getBackground(), Color.blue);
+			Orientation orientation = i < 3 ? Orientation.LEFT_ABOVE
+					: Orientation.RIGHT_ABOVE;
+			AttachLocation attachLocation = AttachLocation.NORTH;
+			int horizontalOffset;
+			if (i < 3)
+				horizontalOffset = (buttons[i].getX() - buttons[0].getX())
+						+ buttons[i].getWidth() / 2;
+			else {
+				horizontalOffset = (((buttons[4].getX() + buttons[4].getWidth()) - (buttons[i]
+						.getX() + buttons[i].getWidth())) + buttons[i]
+						.getWidth() / 2);
+				horizontalOffset += 5;
+			}
+
+			int verticalOffset = 30;
+			boolean useCloseButton = false;
+
+			balloons[i] = new BalloonTip(attachedComponent, contents, style,
+					orientation, attachLocation, horizontalOffset,
+					verticalOffset, useCloseButton);
 
 			balloons[i].setVisible(false);
 		}
@@ -330,14 +410,24 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 	private void fnBalloonConstruct() {
 		if (!FurkManager.mediaEnabled())
 			return;
-		fnSections = new JComponent[] { AudioPlayerPanel.getInstance(),
-				VideoPlayerPanel.getInstance() };
+		fnSections = new JComponent[] { new AudioPanel(), new VideoPanel() };
 
 		for (int i = 0; i < fnBalloons.length; i++) {
 			fnBalloons[i] = new BalloonTip(fnButtons[i], fnSections[i],
 					new RoundedBalloonStyle(10, 10, fnSections[i]
 							.getBackground(), Color.red),
-					new BTipPositioner(), null);
+					new BTipPositioner(), null) {
+				private static final long serialVersionUID = 1L;
+
+				public void setVisible(boolean b) {
+					super.setVisible(b);
+					if (getContents() instanceof VideoPanel
+							&& VideoPlayer.getInstance().isActive()) {
+						((VideoPanel) getContents()).start();
+						VideoPlayer.getInstance().getOverlay().setVisible(b);
+					}
+				}
+			};
 
 			fnBalloons[i].setVisible(false);
 		}
@@ -426,76 +516,79 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		long lastInTime = System.currentTimeMillis();
 		long timeout = 3000;
 		while (API.key() != null) {
-			try {
-				if (MainEnvironment.this.isVisible()) {
-					sleepTime = 100;
-					if (MouseActivity.getInstance().getMouseY() < (UtilBox
-							.getTaskbarOrientation() != UtilBox.NONEXISTANT ? getHeight()
-							- UtilBox.getTaskbarHeight()
-							: bHeight)
-							&& !balloonIsShowing())
-						showButtons = (System.currentTimeMillis() - lastInTime < timeout) ? true
-								: false;
-					else {
-						lastInTime = System.currentTimeMillis();
-						if (balloonIsShowing()) {
-							showButtons = true;
-						} else if (MouseActivity.getInstance().getMouseX() < 200
-								|| MouseActivity.getInstance().getMouseX() > MainEnvironment.this
-										.getSize().width - 200) {
-							showButtons = true;
-						}
-					}
-
-					if (showButtons) {
-						if (currHeight > bHeight) {
-							// Slide Down
-							currHeight -= 8;
-							if (currHeight <= bHeight) {
-								currHeight = bHeight;
+			if (SettingsManager.getInstance().autoHideEnvrionment())
+				try {
+					if (MainEnvironment.this.isVisible()) {
+						sleepTime = 100;
+						if (MouseActivity.getInstance().getMouseY() < (UtilBox
+								.getTaskbarOrientation() != UtilBox.NONEXISTANT ? getHeight()
+								- UtilBox.getTaskbarHeight()
+								: bHeight)
+								&& !balloonIsShowing())
+							showButtons = (System.currentTimeMillis()
+									- lastInTime < timeout) ? true : false;
+						else {
+							lastInTime = System.currentTimeMillis();
+							if (balloonIsShowing()) {
+								showButtons = true;
+							} else if (MouseActivity.getInstance().getMouseX() < 200
+									|| MouseActivity.getInstance().getMouseX() > MainEnvironment.this
+											.getSize().width - 200) {
+								showButtons = true;
 							}
-							update();
-							if (currHeight <= bHeight) {
-								if (FurkManager.mediaEnabled()) {
-									if (audioPlayerActive) {
-										fnButtons[0].setVisible(true);
-									}
+						}
 
-									if (videoPlayerActive) {
-										fnButtons[1].setVisible(true);
+						if (showButtons) {
+							if (currHeight > bHeight) {
+								// Slide Down
+								currHeight -= 8;
+								if (currHeight <= bHeight) {
+									currHeight = bHeight;
+								}
+								update();
+								if (currHeight <= bHeight) {
+									if (FurkManager.mediaEnabled()) {
+										if (audioPlayerActive) {
+											fnButtons[0].setVisible(true);
+										}
+
+										if (videoPlayerActive) {
+											fnButtons[1].setVisible(true);
+										}
 									}
 								}
+								sleepTime = 40;
+								repaint();
 							}
-							sleepTime = 40;
-							repaint();
-						}
-					} else if (System.currentTimeMillis() - lastInTime >= timeout) {
-						if (FurkManager.mediaEnabled()) {
-							fnButtons[0].setVisible(false);
-							fnButtons[1].setVisible(false);
-						}
-						if (currHeight < MainEnvironment.this.getHeight()) {
-							currHeight += 8;
-							if (currHeight > MainEnvironment.this.getHeight() + 4) {
-								currHeight = MainEnvironment.this.getHeight() + 4;
+						} else if (System.currentTimeMillis() - lastInTime >= timeout) {
+							if (FurkManager.mediaEnabled()) {
+								fnButtons[0].setVisible(false);
+								fnButtons[1].setVisible(false);
 							}
-							update();
-							sleepTime = 40;
-							repaint();
+							if (currHeight < MainEnvironment.this.getHeight()) {
+								currHeight += 8;
+								if (currHeight > MainEnvironment.this
+										.getHeight() + 4) {
+									currHeight = MainEnvironment.this
+											.getHeight() + 4;
+								}
+								update();
+								sleepTime = 40;
+								repaint();
+							}
 						}
+					} else if (balloonIsShowing()) {
+						showButtons = true;
+						sleepTime = 20;
+					} else {
+						sleepTime = 400;
 					}
-				} else if (balloonIsShowing()) {
-					showButtons = true;
-					sleepTime = 20;
-				} else {
-					sleepTime = 400;
+					MainEnvironment.this.setAlwaysOnTop(!MainEnvironment.this
+							.balloonIsShowing());
+					MainEnvironment.this.repaint();
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException e) {
 				}
-				MainEnvironment.this.setAlwaysOnTop(!MainEnvironment.this
-						.balloonIsShowing());
-				MainEnvironment.this.repaint();
-				Thread.sleep(sleepTime);
-			} catch (InterruptedException e) {
-			}
 
 		}
 	}
@@ -519,6 +612,16 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		for (int i = 0; i < buttons.length; i++) {
 			buttons[i].setLocation(buttons[i].getX(), currHeight);
 		}
+		Point loc1 = buttons[1].getLocation();
+		Dimension sz1 = buttons[1].getSize();
+		Point loc0 = buttons[0].getLocation();
+		Dimension sz0 = buttons[0].getSize();
+		refreshButtons[0].setLocation(
+				loc0.x + sz0.width - refreshButtons[0].getWidth(), loc0.y
+						+ sz0.height - refreshButtons[0].getHeight());
+		refreshButtons[1].setLocation(
+				loc1.x + sz1.width - refreshButtons[1].getWidth(), loc1.y
+						+ sz1.height - refreshButtons[1].getHeight());
 	}
 
 	@Override
@@ -530,10 +633,17 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 			 * Check Regular Buttons & Balloons
 			 */
 			for (int i = 0; i < balloons.length; i++) {
-				if (contains(e, buttons[i])) {
+				if ((i == 0 || i == 1) && balloons[i].isVisible()
+						&& contains(e, refreshButtons[i])) {
+					if (i == 0) {
+						((Main_FileView) balloons[i].getContents())
+								.refreshActive(e.getClickCount() == 2);
+					} else {
+						((Main_DownloadView) balloons[i].getContents())
+								.refreshActive(e.getClickCount() == 2);
+					}
+				} else if (contains(e, buttons[i])) {
 					balloons[i].setVisible(!balloons[i].isVisible());
-					// requestDimEnvironment(balloons[i].isVisible());
-
 					active = balloons[i].isVisible();
 
 				} else {
@@ -573,17 +683,20 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 			return;
 		if (!mediaReady)
 			return;
-		if (fnBalloons[0].isVisible()
-				|| AudioPlayerPanel.getInstance().isActive())
+		if (fnBalloons[0].isVisible() || AudioPlayer.getInstance().isActive()) {
 			return;
-		fnButtons[0].setVisible(false);
-		audioPlayerActive = false;
+		} else {
+			fnButtons[0].setVisible(false);
+			audioPlayerActive = false;
+		}
 
-		if (fnBalloons[1].isVisible()
-				|| VideoPlayerPanel.getInstance().isActive())
+		if (fnBalloons[1].isVisible() || VideoPlayer.getInstance().isActive()) {
 			return;
-		fnButtons[1].setVisible(false);
-		videoPlayerActive = false;
+		} else {
+			fnButtons[1].setVisible(false);
+			VideoPlayer.getInstance().getOverlay().setVisible(false);
+			videoPlayerActive = false;
+		}
 	}
 
 	private void requestDimEnvironment(boolean dark) {
@@ -628,5 +741,9 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 	public void setAudioPlayerActive(boolean audioPlayerActive) {
 		this.audioPlayerActive = audioPlayerActive;
+	}
+
+	public TranslucentPane getView(int i) {
+		return sections[i];
 	}
 }

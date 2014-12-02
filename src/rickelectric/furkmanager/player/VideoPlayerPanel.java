@@ -33,7 +33,6 @@ import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.JButtonLabel;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CanvasVideoSurface;
@@ -45,7 +44,6 @@ public class VideoPlayerPanel extends JPanel {
 
 	private String playerString;
 
-	private static MediaPlayerFactory factory = null;
 	private static EmbeddedMediaPlayer player = null;
 
 	public static boolean dummy = false;
@@ -78,22 +76,35 @@ public class VideoPlayerPanel extends JPanel {
 	public static synchronized VideoPlayerPanel getInstance() {
 		if (thisInstance == null) {
 			try {
-				factory = DefaultParams.getMediaPlayerFactory();
-				if(factory==null) return null;
-				player = factory
-						.newEmbeddedMediaPlayer(new DefaultFullScreenStrategy(
-								FurkManager.mediaWindow));
+				if (DefaultParams.getMediaPlayerFactory() == null)
+					return null;
+				player = DefaultParams.getMediaPlayerFactory()
+						.newEmbeddedMediaPlayer(
+								new DefaultFullScreenStrategy(
+										FurkManager.mediaWindow));
 				player.setEnableMouseInputHandling(false);
 				player.setEnableKeyInputHandling(false);
 				thisInstance = new VideoPlayerPanel();
 			} catch (Exception e) {
 				e.printStackTrace();
-				FurkManager.trayAlert(FurkManager.TRAY_WARNING, "VLC Not Found",
-						"Unable To Find Suitable VLC Version On Your PC. \nYou Will Be Unable To Stream Music & Video. \nPlease Install VLC Media Player ("+System.getProperty("os.arch")+") If You Wish To Use These Features.", null);
+				FurkManager
+						.trayAlert(
+								FurkManager.TRAY_WARNING,
+								"VLC Not Found",
+								"Unable To Find Suitable VLC Version On Your PC. \nYou Will Be Unable To Stream Music & Video. \nPlease Install VLC Media Player ("
+										+ System.getProperty("os.arch")
+										+ ") If You Wish To Use These Features.",
+								null);
 			} catch (Error e) {
 				e.printStackTrace();
-				FurkManager.trayAlert(FurkManager.TRAY_ERROR, "VLC Not Found",
-						"Unable To Find Suitable VLC Version On Your PC. \nYou Will Be Unable To Stream Music & Video. \nPlease Install VLC Media Player ("+System.getProperty("os.arch")+") If You Wish To Use These Features.", null);
+				FurkManager
+						.trayAlert(
+								FurkManager.TRAY_ERROR,
+								"VLC Not Found",
+								"Unable To Find Suitable VLC Version On Your PC. \nYou Will Be Unable To Stream Music & Video. \nPlease Install VLC Media Player ("
+										+ System.getProperty("os.arch")
+										+ ") If You Wish To Use These Features.",
+								null);
 			}
 
 		}
@@ -105,8 +116,6 @@ public class VideoPlayerPanel extends JPanel {
 			player.stop();
 		player.release();
 		player = null;
-		factory.release();
-		factory = null;
 		thisInstance.setVisible(false);
 		thisInstance = null;
 		System.gc();
@@ -121,7 +130,8 @@ public class VideoPlayerPanel extends JPanel {
 					+ "Video\\ReKoMe.mp4";// TODO For Testing
 		if (player.isPlaying())
 			player.stop();
-		String[] mediaOptions = SettingsManager.getInstance().getProxySettings().toVlcjArgs();
+		String[] mediaOptions = SettingsManager.getInstance()
+				.getProxySettings().toVlcjArgs();
 		return active = player.playMedia(mrl, mediaOptions);
 	}
 
@@ -144,15 +154,18 @@ public class VideoPlayerPanel extends JPanel {
 
 		videoPane.add(videoCanvas, BorderLayout.CENTER);
 
-		videoSurface = factory.newVideoSurface(videoCanvas);
+		videoSurface = DefaultParams.getMediaPlayerFactory().newVideoSurface(
+				videoCanvas);
 		videoSurface.canvas().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					if (e.getClickCount() == 2) {
-						if (!player.isFullScreen())
+						detach();
+						if (!player.isFullScreen()){
 							FurkManager.mediaWindow
 									.setContentPane(VideoPlayerPanel.this);
+						}
 						else {
 							if (videoWin != null && videoWin.isVisible()) {
 								videoWin.contentPaneSet();
@@ -168,6 +181,7 @@ public class VideoPlayerPanel extends JPanel {
 				}
 			}
 		});
+		player.enableOverlay(true);
 		videoSurface.canvas().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -267,6 +281,10 @@ public class VideoPlayerPanel extends JPanel {
 
 		setVisible(true);
 		addMediaListener();
+	}
+
+	protected void detach() {
+		getParent().remove(this);
 	}
 
 	private void addMediaListener() {

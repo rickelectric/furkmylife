@@ -179,7 +179,7 @@ public class ImgCacheViewer extends JFrame {
 						}
 						if (src.equals(update)) {
 							// Re-Download
-							BufferedImage img=StreamDownloader.getImageStream(im.getUrl(),4);
+							BufferedImage img=StreamDownloader.getInstance().getImageStream(im.getUrl(),4);
 							if(img!=null){
 								RequestCache.ImageR.add(im.getUrl(), img);
 							}

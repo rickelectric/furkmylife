@@ -8,31 +8,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.apache.xerces.impl.dv.util.Base64;
-
 import rickelectric.furkmanager.models.LoginModel;
 
 public class SettingsManager implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private static float version = 1.4f;
 	private static SettingsManager sMan = null;
-	
+
 	private static File sFile = null;
-	
-	public static synchronized SettingsManager getInstance(){
-		if(sMan==null){
+
+	public static synchronized SettingsManager getInstance() {
+		if (sMan == null) {
 			init();
 		}
 		return sMan;
 	}
-	
+
 	public static final int ENV_MODE = 0, WIN_MODE = 1;
-	
+
 	private int mainWinMode = 0;
 
 	private int localPort = 33250, webSockPort = 33251, timeout = 20000;
-	private String apiKey = "", username = "", password = "";
 
 	private ProxySettings proxySettings;
 
@@ -46,15 +43,16 @@ public class SettingsManager implements Serializable {
 
 	private int downloadBuffer = 1024;
 
-	private boolean autoLogin = false, userRemember = false,
-			apiRemember = false;
-
 	private boolean idm;
 	private String idmPath;
 
 	private LoginModel loginModel;
 
 	private boolean dimEnvironment = true;
+
+	private boolean autoHideEnvrionment = true;
+
+	private boolean slideDashWin = true;
 
 	private SettingsManager() {
 		localPort = 33250;
@@ -63,9 +61,10 @@ public class SettingsManager implements Serializable {
 		searchResultsPerPage = 20;
 		timeout = 20000;
 		downloadBuffer = 1024;
-		
+
 		mainWinMode = ENV_MODE;
 		dimEnvironment = true;
+		autoHideEnvrionment = true;
 
 		idmPath = checkPaths();
 		idm = true;
@@ -77,15 +76,6 @@ public class SettingsManager implements Serializable {
 		askFolderOnDownload = true;
 		downloadFolder = System.getProperty("user.home") + "/FurkDownloads";
 
-		autoLogin = false;
-
-		apiRemember = false;
-		apiKey = "";
-
-		userRemember = false;
-		username = "";
-		password = "";
-
 		loginModel = null;
 
 		useTunnel = false;
@@ -96,6 +86,7 @@ public class SettingsManager implements Serializable {
 		if (!sFile.exists()) {
 			try {
 				sFile.createNewFile();
+				sMan = new SettingsManager();
 				save();
 			} catch (IOException e) {
 			}
@@ -181,37 +172,6 @@ public class SettingsManager implements Serializable {
 		this.webSockPort = webSock;
 	}
 
-	public String getApiKey() {
-		return this.apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
-
-	public String getUsername() {
-		return this.username;
-	}
-
-	public String getPassword() {
-		byte[] pass = Base64.decode(this.password);
-		String s = new String(pass);
-		return s;
-	}
-
-	public void setLogin(String username, String password) {
-		this.username = username;
-		this.password = Base64.encode(password.getBytes());
-	}
-
-	public boolean autoLogin() {
-		return this.autoLogin;
-	}
-
-	public void autoLogin(boolean al) {
-		this.autoLogin = al;
-	}
-
 	public void searchResultsPerPage(int val) {
 		this.searchResultsPerPage = val;
 	}
@@ -260,22 +220,6 @@ public class SettingsManager implements Serializable {
 		this.idmPath = s;
 	}
 
-	public boolean isUserRemember() {
-		return this.userRemember;
-	}
-
-	public void setUserRemember(boolean userRemember) {
-		this.userRemember = userRemember;
-	}
-
-	public boolean isApiRemember() {
-		return this.apiRemember;
-	}
-
-	public void setApiRemember(boolean apiRemember) {
-		this.apiRemember = apiRemember;
-	}
-
 	public void loginModel(LoginModel loginModel) {
 		this.loginModel = loginModel;
 	}
@@ -303,13 +247,29 @@ public class SettingsManager implements Serializable {
 	public boolean dimEnvironment() {
 		return this.dimEnvironment;
 	}
-	
+
 	public void dimEnvironment(boolean dimEnvironment) {
 		this.dimEnvironment = dimEnvironment;
 	}
 
 	public ProxySettings getProxySettings() {
 		return this.proxySettings;
+	}
+
+	public boolean autoHideEnvrionment() {
+		return this.autoHideEnvrionment;
+	}
+
+	public void autoHideEnvrionment(boolean autoHide) {
+		this.autoHideEnvrionment = autoHide;
+	}
+
+	public boolean slideDashWin() {
+		return this.slideDashWin;
+	}
+
+	public void slideDashWin(boolean slide) {
+		this.slideDashWin = slide;
 	}
 
 }

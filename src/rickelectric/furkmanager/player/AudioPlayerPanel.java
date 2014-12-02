@@ -26,7 +26,6 @@ import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.JButtonLabel;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 public class AudioPlayerPanel extends JPanel {
@@ -34,8 +33,7 @@ public class AudioPlayerPanel extends JPanel {
 
 	private static AudioPlayerPanel thisInstance = null;
 	private String playerString;
-
-	private static MediaPlayerFactory factory = null;
+	
 	private static EmbeddedMediaPlayer player = null;
 
 	public static boolean dummy = false;
@@ -59,9 +57,8 @@ public class AudioPlayerPanel extends JPanel {
 	public static synchronized AudioPlayerPanel getInstance() {
 		if (thisInstance == null) {
 			try {
-				factory = DefaultParams.getMediaPlayerFactory();
-				if(factory==null) return null;
-				player = factory.newEmbeddedMediaPlayer();
+				if(DefaultParams.getMediaPlayerFactory()==null) return null;
+				player = DefaultParams.getMediaPlayerFactory().newEmbeddedMediaPlayer();
 				thisInstance = new AudioPlayerPanel();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -87,8 +84,6 @@ public class AudioPlayerPanel extends JPanel {
 			player.stop();
 		player.release();
 		player = null;
-		factory.release();
-		factory = null;
 		thisInstance.setVisible(false);
 		thisInstance = null;
 		System.gc();

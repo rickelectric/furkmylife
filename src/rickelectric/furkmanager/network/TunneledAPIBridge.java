@@ -321,7 +321,7 @@ public class TunneledAPIBridge extends FurkBridge {
 			return false;
 		String url = API_BASE + "/?object=ping&api_key=" + apiKey;
 		try {
-			String stat = StreamDownloader.getStringStream(url, 8);
+			String stat = StreamDownloader.getInstance().getStringStream(url, 8);
 			JSONObject j = new JSONObject(stat);
 			String s = j.getString("status");
 			if (s.equals("ok"))
@@ -343,7 +343,7 @@ public class TunneledAPIBridge extends FurkBridge {
 				return r;
 		}
 		try {
-			String s = StreamDownloader.getStringStream(dest, 4);
+			String s = StreamDownloader.getInstance().getStringStream(dest, 4,2000);
 			if (s != null)
 				RequestCache.APIR.add(dest, s, perm);
 			return s;
@@ -362,7 +362,7 @@ public class TunneledAPIBridge extends FurkBridge {
 				return r;
 		}
 		try {
-			String s = StreamDownloader.postStringStream(dest, 4);
+			String s = StreamDownloader.getInstance().postStringStream(dest, 4);
 			if (s != null)
 				RequestCache.APIR.add(dest, s, perm);
 			return s;
@@ -376,7 +376,7 @@ public class TunneledAPIBridge extends FurkBridge {
 		if (api_key == null)
 			return null;
 		try {
-			String s = StreamDownloader.postMultipartStream(url, parts);
+			String s = StreamDownloader.getInstance().postMultipartStream(url, parts);
 			return s;
 		} catch (Exception e) {
 			e.printStackTrace();
