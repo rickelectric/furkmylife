@@ -1,12 +1,18 @@
 package rickelectric.furkmanager.models;
 
+import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
 import rickelectric.furkmanager.network.api.API_UserData;
+
+import com.xeiam.xchart.Chart;
+import com.xeiam.xchart.ChartBuilder;
+import com.xeiam.xchart.StyleManager.ChartType;
 
 public class FurkUserData {
 
@@ -56,9 +62,9 @@ public class FurkUserData {
 		}
 
 		public static void save(final Runnable after) {
-			new Thread(new Runnable(){
+			new Thread(new Runnable() {
 				@Override
-				public void run(){
+				public void run() {
 					save();
 					after.run();
 				}
@@ -70,13 +76,17 @@ public class FurkUserData {
 			signupDate = j.getString("ctime");
 			dlHost = URI_Enums.URI_Host.eval(j.getString("dl_uri_host"));
 			emailVerified = j.getInt("email_is_ver");
-			
-			flags=URI_Enums.Prefs_Flags.eval(j.getString("prefs_flags"));
-			
+
+			flags = URI_Enums.Prefs_Flags.eval(j.getString("prefs_flags"));
+
 			dlScheme = URI_Enums.URI_Scheme.eval(j.getString("dl_uri_scheme"));
 			login = j.getString("login");
 			email = j.getString("email");
-			try{proxyGroupID = j.getInt("id_dl_proxies_groups");}catch(Exception e){proxyGroupID=0;}
+			try {
+				proxyGroupID = j.getInt("id_dl_proxies_groups");
+			} catch (Exception e) {
+				proxyGroupID = 0;
+			}
 			uriKey = j.getInt("dl_uri_key");
 
 			jsonPreferences = j.getString("prefs_json");
@@ -161,6 +171,67 @@ public class FurkUserData {
 				subnetMonthly.add(s);
 			}
 
+		}
+
+		private static int numDaysIn(int year,int month){
+			if(month==9||month==4||month==6||month==11) return 30;
+			if(month==2){
+				if(isLeapYear(year)) return 29;
+				return 28;
+			}
+			return 31;
+		}
+
+		private static boolean isLeapYear(int year) {
+			if (year / 400 == 1) {
+				return true;
+			} else if (year / 100 == 1) {
+				return false;
+			} else if (year / 4 == 1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public static Chart getChart() {
+			int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+			int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			
+			ArrayList<String> x = new ArrayList<String>();
+			ArrayList<Integer> y = new ArrayList<Integer>();
+			ArrayList<Integer> y2 = new ArrayList<Integer>();
+			
+			for (int i=0;i<bandwidthMonthly.size();i++) {
+				BWStat user = bandwidthMonthly.get(i);
+				SubnetStat sub = subnetMonthly.get(i);
+				y.add((int) (sub.bytes / 1000000));
+				y2.add((int) (user.bytes / 1000000));
+				
+				x.add(day+"");
+				day--;
+				if(day==0){
+					month--;
+					if(month==0){
+						month=12;
+						year--;
+					}
+					day=numDaysIn(year,month);
+				}
+			}
+			
+			Chart chart = new ChartBuilder().chartType(ChartType.Bar)
+					.width(800).height(600).title("Bandwidth Stats")
+					.xAxisTitle("Time (Today --> ---> ---> 30 Days Ago").yAxisTitle("Data Used (MB)").build();
+			chart.addSeries("Subnet", x, y);
+			chart.addSeries("User", x, y2);
+
+			chart.getStyleManager().setYAxisMin(0);
+			chart.getStyleManager().setAxisTickLabelsFont(new Font(Font.DIALOG,Font.PLAIN,9));
+			// chart.getStyleManager().setYAxisMax(70);
+
+			return chart;
 		}
 	}
 }

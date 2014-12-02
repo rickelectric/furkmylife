@@ -23,6 +23,7 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.ecf.protocol.bittorrent-0.3.0.v20130605-1748.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/swing_addons/forms-1.3.0.jar" sourcepath="lib/swing_addons/forms-1.3.0-src.zip"/>
+	<classpathentry kind="lib" path="lib/chart/xchart-2.4.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre7x86"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

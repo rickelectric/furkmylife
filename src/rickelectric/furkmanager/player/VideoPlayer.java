@@ -96,9 +96,8 @@ public class VideoPlayer extends Observable {
 
 	public boolean play(String mrl) {
 		if (VideoPlayer.dummy)
-			mrl = "C:\\Users\\Ionicle\\Videos\\Series\\"
-					+ "Doctor Who\\Doctor.Who.2005-s04e13.Journeys.End.mkv";// TODO For
-																		// Testing
+			mrl = "https://reko.me/video/movie.mp4";// TODO For
+													// Testing
 		if (thisInstance == null)
 			getInstance();
 		if (player.isPlaying())
@@ -126,11 +125,16 @@ public class VideoPlayer extends Observable {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					if (e.getClickCount() == 2) {
 						player.toggleFullScreen();
+						mediaOverlay.setAlwaysOnTop(player.isFullScreen());
+						if(player.isFullScreen()){
+							setChanged();
+							notifyObservers(new Object[]{FRAME});
+						}
 					}
 				}
 			}
 		});
-		masterCanvas.addKeyListener(new KeyAdapter() {
+		mediaOverlay.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -181,7 +185,6 @@ public class VideoPlayer extends Observable {
 			@Override
 			public void run() {
 				player.stop();
-
 			}
 		};
 
@@ -233,13 +236,13 @@ public class VideoPlayer extends Observable {
 
 			@Override
 			public void buffering(MediaPlayer p, float newCache) {
-				setStatus("Buffering: " + (int) newCache + "%");
 				if (newCache == 100.0)
 					p.play();
 				else {
 					if (p.isPlaying())
 						p.pause();
 				}
+				setStatus("Buffering: " + (int) newCache + "%");
 				active = true;
 			}
 
@@ -287,7 +290,6 @@ public class VideoPlayer extends Observable {
 				mediaPlayer.setPosition(0.0f);
 				player.setFullScreen(false);
 				mediaPlayer.stop();
-				active = false;
 			}
 
 			@Override
@@ -317,8 +319,8 @@ public class VideoPlayer extends Observable {
 
 			@Override
 			public void error(MediaPlayer mediaPlayer) {
-				setStatus("Stream Connection Error");
 				mediaPlayer.stop();
+				setStatus("Stream Connection Error");
 			}
 
 		});
@@ -338,6 +340,10 @@ public class VideoPlayer extends Observable {
 
 	public void stop() {
 		player.stop();
+	}
+	
+	public void pauseResume(){
+		player.pause();
 	}
 
 	public int getVolume() {

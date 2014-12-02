@@ -151,7 +151,7 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 						VideoPlayer.getInstance().getOverlay()
 								.setVisible(getTopLevelAncestor().isVisible());
 				}
-
+				
 				Thread.sleep(20);
 			} catch (Exception e) {
 			}
@@ -201,6 +201,8 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 			}
 			break;
 		case VideoPlayer.FRAME:
+			requestFocus();
+			requestFocusInWindow();
 			break;
 		case VideoPlayer.STATUS:
 			String status = (String) args[1];

@@ -26,6 +26,7 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
+import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.Statable;
 import rickelectric.furkmanager.views.panels.ScreenshotViewPanel;
@@ -68,7 +69,7 @@ public class FurkFileView extends JDialog implements Statable {
 						FurkFileView.class
 								.getResource("/rickelectric/furkmanager/img/dash/Files-16.png")));
 		setModalityType(ModalityType.DOCUMENT_MODAL);
-		//setModal(true);
+		setModal(SettingsManager.getInstance().getMainWinMode()==SettingsManager.WIN_MODE);
 		this.ff = ff;
 		// if(windowlist==null) windowlist=new ArrayList<FurkFileView>();
 		// int i=windowlist.indexOf(this);

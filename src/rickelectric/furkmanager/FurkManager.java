@@ -5,7 +5,6 @@ import java.awt.Window;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JWindow;
 import javax.swing.UIManager;
 
 import rickelectric.furkmanager.data.DefaultParams;
@@ -49,7 +48,6 @@ public class FurkManager {
 
 	private static APIConsole console = null;
 	private static ImgCacheViewer cache = null;
-	public static JWindow mediaWindow;
 	private static boolean mediaEnabled = true;
 
 	private static enum AlertType {
@@ -84,8 +82,6 @@ public class FurkManager {
 	}
 
 	public static void LAF(int i) {
-
-		mediaWindow = new JWindow();
 		try {
 			if (i == 0)
 				UIManager.setLookAndFeel(UIManager
@@ -125,9 +121,9 @@ public class FurkManager {
 		/**
 		 * Remove
 		 */
-//		APIBridge.dummy = true;
-//		VideoPlayer.dummy = true;
-//		AudioPlayer.dummy = true;
+		APIBridge.dummy = true;
+		VideoPlayer.dummy = true;
+		AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
