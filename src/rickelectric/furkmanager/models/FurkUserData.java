@@ -3,6 +3,7 @@ package rickelectric.furkmanager.models;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -170,7 +171,6 @@ public class FurkUserData {
 
 				subnetMonthly.add(s);
 			}
-
 		}
 
 		private static int numDaysIn(int year,int month){
@@ -193,23 +193,38 @@ public class FurkUserData {
 				return false;
 			}
 		}
+		
+		private static String printDate(int day,int mth,int year){
+		     String[] dName={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+		     String suffix="th";
+		     
+		     if(!(day>10&&day<=20)){
+		        if(day%10==1) suffix="st";
+		        else if(day%10==2) suffix="nd";
+		        else if(day%10==3) suffix="rd";
+		     }
+		     
+		     return dName[mth-1]+" "+day+suffix+", "+year;
+		}
 
 		public static Chart getChart() {
 			int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 			int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
 			int year = Calendar.getInstance().get(Calendar.YEAR);
 			
+			String start = printDate(day-1, month, year);
+			
 			ArrayList<String> x = new ArrayList<String>();
 			ArrayList<Integer> y = new ArrayList<Integer>();
 			ArrayList<Integer> y2 = new ArrayList<Integer>();
 			
+			day+=1;
 			for (int i=0;i<bandwidthMonthly.size();i++) {
 				BWStat user = bandwidthMonthly.get(i);
 				SubnetStat sub = subnetMonthly.get(i);
 				y.add((int) (sub.bytes / 1000000));
 				y2.add((int) (user.bytes / 1000000));
 				
-				x.add(day+"");
 				day--;
 				if(day==0){
 					month--;
@@ -219,11 +234,18 @@ public class FurkUserData {
 					}
 					day=numDaysIn(year,month);
 				}
+				x.add(day+"");
 			}
 			
+			String end = printDate(day, month, year);
+			
+			Collections.reverse(x);
+			Collections.reverse(y);
+			Collections.reverse(y2);
+			
 			Chart chart = new ChartBuilder().chartType(ChartType.Bar)
-					.width(800).height(600).title("Bandwidth Stats")
-					.xAxisTitle("Time (Today --> ---> ---> 30 Days Ago").yAxisTitle("Data Used (MB)").build();
+					.width(800).height(600).title("Bandwidth Stats ("+end+" to "+start+")")
+					.xAxisTitle("Time (Dates)").yAxisTitle("Data Used (MB)").build();
 			chart.addSeries("Subnet", x, y);
 			chart.addSeries("User", x, y2);
 

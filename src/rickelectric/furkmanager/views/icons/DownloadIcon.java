@@ -21,7 +21,6 @@ import javax.swing.border.EtchedBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkDownload;
-import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -283,7 +282,7 @@ public class DownloadIcon extends JPanel implements
 								"Download Complete", "Finished Downloading '"
 										+ cDownload.getName() + "'",
 								null);
-						APIBridge.fileGet(FurkBridge.GET_ALL, null, null, null,
+						FurkBridge.fileGet(FurkBridge.GET_ALL, null, null, null,
 								false);
 						this.cancel();
 					} else if (ex.getMessage().equals("Connection Error")) {

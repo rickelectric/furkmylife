@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import rickelectric.furkmanager.models.LoginModel;
+import rickelectric.furkmanager.network.FurkBridge;
 
 public class SettingsManager implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -229,7 +230,7 @@ public class SettingsManager implements Serializable {
 	}
 
 	public boolean useTunnel() {
-		return this.useTunnel;
+		return this.useTunnel&&!FurkBridge.dummy();
 	}
 
 	public void useTunnel(boolean useTunnel) {

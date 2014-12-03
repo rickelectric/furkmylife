@@ -40,8 +40,7 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 	private JLabel loading;
 	private JSlider slider_position;
 	private JPanel panel_controls;
-	private JButtonLabel btn_playpause;
-	private JButtonLabel btn_stop;
+	private JButtonLabel btn_playpause,btn_stop,btn_max;
 	private JSlider slider_volume;
 
 	private Thread overThread;
@@ -59,6 +58,8 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 				new ImageIcon(getClass().getResource("media_pause.png")));
 		icons.put("stop", new ImageIcon(getClass()
 				.getResource("media_stop.png")));
+		icons.put("fullscreen", new ImageIcon(getClass()
+				.getResource("media_fullscreen.png")));
 
 		videoPane = new JPanel();
 		videoPane.setBorder(new CompoundBorder(new LineBorder(Color.black, 2),
@@ -96,6 +97,10 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 		btn_stop = new JButtonLabel("");
 		panel_controls.add(btn_stop);
 		btn_stop.setIcon(icons.get("stop"));
+		
+		btn_max = new JButtonLabel("");
+		panel_controls.add(btn_max);
+		btn_max.setIcon(icons.get("fullscreen"));
 
 		Component glue = Box.createGlue();
 		glue.setPreferredSize(new Dimension(180, 0));
@@ -222,6 +227,11 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 	@Override
 	public JButtonLabel getStopButton() {
 		return btn_stop;
+	}
+	
+	@Override
+	public JButtonLabel getFullscreenButton() {
+		return btn_max;
 	}
 
 	@Override

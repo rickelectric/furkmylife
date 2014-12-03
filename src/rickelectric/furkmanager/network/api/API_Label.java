@@ -7,7 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.FurkLabel;
-import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
+import rickelectric.furkmanager.utils.SettingsManager;
 
 /**
  * Responsible For The Placing Of Files In Labeled Folders
@@ -15,7 +16,7 @@ import rickelectric.furkmanager.network.APIBridge;
  * @author Rick Lewis (Ionicle)
  * 
  */
-public class API_Label extends API{
+public class API_Label extends API {
 
 	private static ArrayList<FurkLabel> allLabels;
 
@@ -53,7 +54,7 @@ public class API_Label extends API{
 	}
 
 	public static ArrayList<FurkLabel> getAll() {
-		String json = APIBridge.labelGet(false);
+		String json = FurkBridge.labelGet(false);
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return null;
@@ -62,15 +63,15 @@ public class API_Label extends API{
 		return allLabels;
 	}
 
-	public static FurkLabel add(FurkLabel l){
+	public static FurkLabel add(FurkLabel l) {
 		try {
-			String url = APIBridge.API_BASE + "/label/upsert?"
-					+ APIBridge.key() + "&name="
+			String url = FurkBridge.API_BASE()
+					+ (SettingsManager.getInstance().useTunnel() ? "/?object=label&function=upsert&"
+							: "/label/upsert?") + FurkBridge.key() + "&name="
 					+ URLEncoder.encode(l.getName(), "utf-8");
 			url += "&sorder=" + l.getSortOrder();
 			if (l.getBackground() != null && !l.getBackground().equals(""))
-				url += "&bg="
-						+ URLEncoder.encode(l.getBackground(), "utf-8");
+				url += "&bg=" + URLEncoder.encode(l.getBackground(), "utf-8");
 
 			if (l.getColor() != null && !l.getColor().equals(""))
 				url += "&color=" + URLEncoder.encode(l.getColor(), "utf-8");
@@ -79,12 +80,13 @@ public class API_Label extends API{
 				url += "&id_labels="
 						+ URLEncoder.encode(l.getParentID(), "utf-8");
 
-			String json = APIBridge.jsonPost(url, false, false);
+			String json = FurkBridge.jsonPost(url, false, false);
 			JSONObject re = new JSONObject(json);
 			if (re.get("status").equals("error"))
 				return null;
 			l.setID(re.getJSONObject("label").getString("id"));
-			if(allLabels!=null) allLabels.add(l);
+			if (allLabels != null)
+				allLabels.add(l);
 			return l;
 		} catch (Exception e) {
 			return null;
@@ -98,15 +100,15 @@ public class API_Label extends API{
 			return false;
 		}
 		try {
-			String url = APIBridge.API_BASE + "/label/upsert?"
-					+ APIBridge.key() + "&id="
+			String url = FurkBridge.API_BASE()
+					+ (SettingsManager.getInstance().useTunnel() ? "/?object=label&function=upsert&"
+							: "/label/upsert?") + FurkBridge.key() + "&id="
 					+ URLEncoder.encode(l.getID(), "utf-8") + "&name="
 					+ URLEncoder.encode(l.getName(), "utf-8");
 			url += "&sorder=" + l.getSortOrder();
 
 			if (l.getBackground() != null && !l.getBackground().equals(""))
-				url += "&bg="
-						+ URLEncoder.encode(l.getBackground(), "utf-8");
+				url += "&bg=" + URLEncoder.encode(l.getBackground(), "utf-8");
 
 			if (l.getColor() != null && !l.getColor().equals(""))
 				url += "&color=" + URLEncoder.encode(l.getColor(), "utf-8");
@@ -115,7 +117,7 @@ public class API_Label extends API{
 				url += "&id_labels="
 						+ URLEncoder.encode(l.getParentID(), "utf-8");
 
-			String json = APIBridge.jsonPost(url, false, false);
+			String json = FurkBridge.jsonPost(url, false, false);
 			JSONObject re = new JSONObject(json);
 			if (re.get("status").equals("error"))
 				return false;
@@ -130,12 +132,14 @@ public class API_Label extends API{
 			if (labelID == null || labelID.length() == 0 || fileIDs == null
 					|| fileIDs.length == 0)
 				return false;
-			String url = APIBridge.API_BASE + "/label/link?"
-					+ APIBridge.key() + "&id_labels=" + labelID;
+			String url = FurkBridge.API_BASE()
+					+ (SettingsManager.getInstance().useTunnel() ? "/?object=label&function=link&"
+							: "/label/link?") + FurkBridge.key()
+					+ "&id_labels=" + labelID;
 			for (String fid : fileIDs) {
 				url += "&id_files=" + fid;
 			}
-			String json = APIBridge.jsonPost(url, false, false);
+			String json = FurkBridge.jsonPost(url, false, false);
 			JSONObject re = new JSONObject(json);
 			if (re.get("status").equals("error"))
 				return false;
@@ -150,12 +154,14 @@ public class API_Label extends API{
 			if (labelID == null || labelID.length() == 0 || fileIDs == null
 					|| fileIDs.length == 0)
 				return false;
-			String url = APIBridge.API_BASE + "/label/unlink?"
-					+ APIBridge.key() + "&id_labels=" + labelID;
+			String url = FurkBridge.API_BASE()
+					+ (SettingsManager.getInstance().useTunnel() ? "/?object=label&function=unlink&"
+							: "/label/unlink?") + FurkBridge.key()
+					+ "&id_labels=" + labelID;
 			for (String fid : fileIDs) {
 				url += "&id_files=" + fid;
 			}
-			String json = APIBridge.jsonPost(url, false, false);
+			String json = FurkBridge.jsonPost(url, false, false);
 			JSONObject re = new JSONObject(json);
 			if (re.get("status").equals("error"))
 				return false;
@@ -167,10 +173,11 @@ public class API_Label extends API{
 
 	public static boolean delete(FurkLabel l) {
 		try {
-			String url = APIBridge.API_BASE + "/label/delete?"
-					+ APIBridge.key() + "&id="
+			String url = FurkBridge.API_BASE()
+					+ (SettingsManager.getInstance().useTunnel() ? "/?object=label&function=delete&"
+							: "/label/delete?") + FurkBridge.key() + "&id="
 					+ URLEncoder.encode(l.getID(), "utf-8");
-			String json = APIBridge.jsonPost(url, false, false);
+			String json = FurkBridge.jsonPost(url, false, false);
 			JSONObject re = new JSONObject(json);
 			if (re.get("status").equals("error"))
 				return false;
@@ -183,12 +190,11 @@ public class API_Label extends API{
 	public static ArrayList<FurkLabel> childrenOf(FurkLabel parent) {
 		String fsync = parent.getID();
 		ArrayList<FurkLabel> labels = new ArrayList<FurkLabel>();
-		for (FurkLabel l : getAllCached()){
-			if(l.getParentID()==null || l.getParentID().equals("0")){
-				if(parent.equals(root()))
+		for (FurkLabel l : getAllCached()) {
+			if (l.getParentID() == null || l.getParentID().equals("0")) {
+				if (parent.equals(root()))
 					labels.add(l);
-			}
-			else if (l.getParentID().equals(fsync))
+			} else if (l.getParentID().equals(fsync))
 				labels.add(l);
 		}
 		return labels;
@@ -200,13 +206,16 @@ public class API_Label extends API{
 				return l;
 		}
 		FurkLabel root = new FurkLabel(null, "0-FurkManagerRoot");
-		root=add(root);
+		root = add(root);
 		return root;
 	}
 
 	public static void flush() {
-		try{allLabels.removeAll(allLabels);}catch(Exception e){}
-		allLabels=null;
+		try {
+			allLabels.removeAll(allLabels);
+		} catch (Exception e) {
+		}
+		allLabels = null;
 	}
 
 }

@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.FurkDownload;
-import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.FurkBridge;
 
 /**
@@ -86,13 +85,13 @@ public class API_Download extends API{
 		}
 		String json = null;
 		if (status == STATUS_ACTIVE)
-			json = APIBridge.dlGet(FurkBridge.GET_STATUS, "active", limoffs,
+			json = FurkBridge.dlGet(FurkBridge.GET_STATUS, "active", limoffs,
 					true);
 		else if (status == STATUS_FAILED)
-			json = APIBridge.dlGet(FurkBridge.GET_STATUS, "failed", limoffs,
+			json = FurkBridge.dlGet(FurkBridge.GET_STATUS, "failed", limoffs,
 					true);
 		else
-			json = APIBridge.dlGet(FurkBridge.GET_ALL, null, limoffs, true);
+			json = FurkBridge.dlGet(FurkBridge.GET_ALL, null, limoffs, true);
 		if (json == null)
 			return null;
 		JSONObject j = new JSONObject(json);
@@ -103,7 +102,7 @@ public class API_Download extends API{
 	}
 
 	public static FurkDownload get(String downloadID) throws Exception {
-		String json = APIBridge.dlGet(FurkBridge.GET_ID, downloadID, null,
+		String json = FurkBridge.dlGet(FurkBridge.GET_ID, downloadID, null,
 				false);
 		JSONObject j = new JSONObject(json);
 		if (j.getString("status").equals("error"))
@@ -120,7 +119,7 @@ public class API_Download extends API{
 	}
 
 	public static boolean addHash(String hash) {
-		String json = APIBridge.dlAdd(FurkBridge.DL_ADD_INFO_HASH, hash);
+		String json = FurkBridge.dlAdd(FurkBridge.DL_ADD_INFO_HASH, hash);
 		JSONObject j = new JSONObject(json);
 		if (j.getString("status").equals("error")) {
 			lastError = j.getString("error");
@@ -131,7 +130,7 @@ public class API_Download extends API{
 	}
 
 	public static boolean addURL(String url) {
-		String json = APIBridge.dlAdd(FurkBridge.DL_ADD_URL, url);
+		String json = FurkBridge.dlAdd(FurkBridge.DL_ADD_URL, url);
 		JSONObject j = new JSONObject(json);
 		if (j.getString("status").equals("error")) {
 			lastError = j.getString("error");
@@ -142,7 +141,7 @@ public class API_Download extends API{
 	}
 
 	public static boolean addTorrentFile(String filename) {
-		String json = APIBridge.dlAdd(FurkBridge.DL_ADD_TORRENT, filename);
+		String json = FurkBridge.dlAdd(FurkBridge.DL_ADD_TORRENT, filename);
 		JSONObject j = new JSONObject(json);
 		if (j.getString("status").equals("error")) {
 			lastError = j.getString("error");
@@ -153,7 +152,7 @@ public class API_Download extends API{
 	}
 
 	public static boolean unlink(String[] dlIDs) {
-		String json = APIBridge.dlUnlink(dlIDs);
+		String json = FurkBridge.dlUnlink(dlIDs);
 		JSONObject j = new JSONObject(json);
 		if (j.get("status").equals("error")) {
 			lastError = j.getString("error");

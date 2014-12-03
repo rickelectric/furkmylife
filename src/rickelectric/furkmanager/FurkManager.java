@@ -9,8 +9,8 @@ import javax.swing.UIManager;
 
 import rickelectric.furkmanager.data.DefaultParams;
 import rickelectric.furkmanager.idownloader.DownloadManager;
-import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.APIFolderManager;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.InstanceConn;
 import rickelectric.furkmanager.network.RequestCache;
 import rickelectric.furkmanager.network.api.API;
@@ -121,9 +121,9 @@ public class FurkManager {
 		/**
 		 * Remove
 		 */
-		APIBridge.dummy = true;
-		VideoPlayer.dummy = true;
-		AudioPlayer.dummy = true;
+		//FurkBridge.dummy(true);
+		//VideoPlayer.dummy = true;
+		//AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
@@ -185,7 +185,7 @@ public class FurkManager {
 	}
 
 	public static void appRun() {
-		if (APIBridge.key() == null)
+		if (FurkBridge.key() == null)
 			lWin.loginMode();
 		else {
 			if (!API_UserData.isLoaded()) {

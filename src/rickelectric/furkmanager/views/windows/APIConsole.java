@@ -23,7 +23,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API;
 
 public class APIConsole extends JFrame {
@@ -124,10 +124,10 @@ public class APIConsole extends JFrame {
 		input_text.setVisible(false);
 		bar.setVisible(true);
 
-		if (APIBridge.key() == null) {
+		if (FurkBridge.key() == null) {
 			API.init("5323228d687ed9f7f1bdf9ce87050a1fa672e485");
 		}
-		String key = APIBridge.key();
+		String key = FurkBridge.key();
 		String[] q = s.split("[?]");
 		s = q[0] += "?" + key + "&pretty=1";
 		if (q.length > 1) {
@@ -139,9 +139,9 @@ public class APIConsole extends JFrame {
 
 			String json;
 			if (m.equals("GET"))
-				json = APIBridge.jsonGet(s, false, false);
+				json = FurkBridge.jsonGet(s, false, false);
 			else
-				json = APIBridge.jsonPost(s, false, false);
+				json = FurkBridge.jsonPost(s, false, false);
 
 			output_result.setText(json);
 		} catch (Exception e) {

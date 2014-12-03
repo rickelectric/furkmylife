@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.utils.UtilBox;
@@ -65,7 +65,7 @@ public class FurkTrayIcon {
 				}
 			});
 
-			if (APIBridge.key() != null) {
+			if (FurkBridge.key() != null) {
 				addDl = new MenuItem("Add Furk Download");
 				addDl.addActionListener(this);
 				add(addDl);
@@ -100,7 +100,7 @@ public class FurkTrayIcon {
 					if (e.getSource().equals(dlsView))
 						FurkManager.downloader(true);
 					if (e.getSource().equals(hardExitApp)) {
-						if (APIBridge.key() != null) {
+						if (FurkBridge.key() != null) {
 							popupMessage("Exiting",
 									"Logging out. Please wait.", null);
 							try {
@@ -129,7 +129,7 @@ public class FurkTrayIcon {
 			ActionListener exitAction = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (APIBridge.key() != null)
+					if (FurkBridge.key() != null)
 						popupMessage("Exiting", "Logging out. Please wait.",
 								null);
 					FurkManager.exit();
@@ -150,7 +150,7 @@ public class FurkTrayIcon {
 					new AddDownloadFrame().setVisible(true);
 				}
 			});
-			if (APIBridge.key() != null)
+			if (FurkBridge.key() != null)
 				popup.add(addDl);
 
 			MenuItem dlsView = new MenuItem("Show File Download Manager");
@@ -160,7 +160,7 @@ public class FurkTrayIcon {
 					FurkManager.downloader(true);
 				}
 			});
-			if (APIBridge.key() != null)
+			if (FurkBridge.key() != null)
 				popup.add(dlsView);
 			popup.setFont(new Font("Dialog", Font.BOLD, 12));
 

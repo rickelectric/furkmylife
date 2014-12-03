@@ -22,7 +22,7 @@ import javax.swing.border.EtchedBorder;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
-import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.player.AudioPanel;
 import rickelectric.furkmanager.player.AudioPlayer;
@@ -193,9 +193,9 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 									new Thread(new Runnable() {
 										@Override
 										public void run() {
-											APIBridge.overrideCache(true);
+											FurkBridge.overrideCache(true);
 											UtilBox.pause(500);
-											APIBridge.overrideCache(false);
+											FurkBridge.overrideCache(false);
 										}
 									}).start();
 								}

@@ -6,6 +6,8 @@ import rickelectric.furkmanager.utils.SettingsManager;
 
 public class FurkBridge {
 
+	private static boolean dummy;
+
 	public static String key() {
 		return SettingsManager.getInstance().useTunnel() 
 				? TunneledAPIBridge.key()
@@ -17,6 +19,17 @@ public class FurkBridge {
 			TunneledAPIBridge.initialize(api_key);
 		else
 			APIBridge.initialize(api_key);
+	}
+	
+
+
+	public static void dummy(boolean d) {
+		dummy=d;
+		APIBridge.dummy=dummy;
+	}
+	
+	public static boolean dummy(){
+		return dummy;
 	}
 
 	private static boolean overrideCache = false;
@@ -162,7 +175,7 @@ public class FurkBridge {
 
 	public static String jsonGet(String dest, boolean cacheCheck, boolean perm) {
 		return SettingsManager.getInstance().useTunnel() 
-				? TunneledAPIBridge.jsonGet(dest, cacheCheck, perm)
+				? null
 				: APIBridge.jsonGet(dest, cacheCheck, perm);
 	}
 

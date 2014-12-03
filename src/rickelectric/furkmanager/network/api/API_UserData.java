@@ -7,9 +7,7 @@ import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
-import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.FurkBridge;
-import rickelectric.furkmanager.network.TunneledAPIBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.UtilBox;
 
@@ -23,7 +21,7 @@ public class API_UserData extends API {
 		int numFails = 0;
 		while (json == null)
 			try {
-				json = APIBridge.userLoad();
+				json = FurkBridge.userLoad();
 			} catch (RuntimeException e) {
 				numFails++;
 				if (numFails > 5)
@@ -75,12 +73,12 @@ public class API_UserData extends API {
 		saveString += "&" + dl_uri_port;
 		saveString += "&" + dl_uri_key;
 		if (SettingsManager.getInstance().useTunnel()) {
-			saveString = TunneledAPIBridge.API_BASE
-					+ "?object=account&function=save_prefs&api_key="
-					+ TunneledAPIBridge.key() + "&pretty=1" + saveString;
+			saveString = FurkBridge.API_BASE()
+					+ "/?object=account&function=save_prefs&api_key="
+					+ FurkBridge.key() + "&pretty=1" + saveString;
 		} else {
-			saveString = APIBridge.API_BASE + "/account/save_prefs?"
-					+ APIBridge.key() + "&pretty=1" + saveString;
+			saveString = FurkBridge.API_BASE() + "/account/save_prefs?"
+					+ FurkBridge.key() + "&pretty=1" + saveString;
 		}
 
 		FurkBridge.jsonPost(saveString, false, false);

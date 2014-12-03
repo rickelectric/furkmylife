@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
-import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 
 /**
  * Access Files Within Furk Files
@@ -94,7 +94,7 @@ public class API_TFile extends API {
 	}
 
 	public static ArrayList<FurkTFile> getFrom(FurkFile f) {
-		String json = APIBridge.TFileInfo(f.getID());
+		String json = FurkBridge.TFileInfo(f.getID());
 		JSONObject o = new JSONObject(json);
 		if (o.getString("status").equals("error"))
 			return null;

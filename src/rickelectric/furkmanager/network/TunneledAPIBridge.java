@@ -15,7 +15,7 @@ public class TunneledAPIBridge extends FurkBridge {
 		return "api_key=" + api_key;
 	}
 
-	public static final String API_BASE = "https://www.trick.net16.net/fsapi";
+	public static final String API_BASE = "https://tricknet-rickelectric.c9.io/fsapi";//"https://www.trick.net16.net/fsapi";
 
 	public static void initialize(String api_key) {
 		TunneledAPIBridge.api_key = api_key;
@@ -41,7 +41,7 @@ public class TunneledAPIBridge extends FurkBridge {
 			dest += "&info_hash=";
 		else if (type == DL_ADD_TORRENT) {
 			throw new RuntimeException(
-					"Cannot Upload Torrent Files Over The Tunnel");
+					"Cannot Add Torrent Files When Using The Tunnel");
 		} else
 			throw new RuntimeException("Invalid Type Parameter");
 		dest += link;
@@ -86,7 +86,7 @@ public class TunneledAPIBridge extends FurkBridge {
 				throw new RuntimeException("Invalid Offset");
 			dest += "&limit=" + lim_ofs[0] + "&offset=" + lim_ofs[1];
 		}
-		return jsonGet(dest, checkCache, false);
+		return jsonPost(dest, checkCache, false);
 	}
 
 	public static String fileInfo(String info_hash) {
@@ -147,7 +147,7 @@ public class TunneledAPIBridge extends FurkBridge {
 			return null;
 		if (ids.length == 0)
 			return null;
-		String destdl = API_BASE + "?object=dl&function=unlink&" + key();
+		String destdl = API_BASE + "/?object=dl&function=unlink&" + key();
 		String jsil = "";
 		for (int i = 0; i < ids.length; i++) {
 			jsil += "id=" + ids[i];
@@ -155,7 +155,7 @@ public class TunneledAPIBridge extends FurkBridge {
 				jsil += "&";
 		}
 		destdl += jsil;
-		return jsonGet(destdl, false, false);
+		return jsonPost(destdl, false, false);
 	}
 
 	public static String fileLinkstate(int action, String[] ids) {
@@ -182,21 +182,21 @@ public class TunneledAPIBridge extends FurkBridge {
 				jsil += "&";
 		}
 		destfile += "&" + key() + "&" + jsil;
-		return jsonGet(destfile, false, false);
+		return jsonPost(destfile, false, false);
 	}
 
 	public static String msgGet(boolean checkCache) {
 		if (key() == null)
 			return null;
 		String dest = API_BASE + "/?object=msg&function=get&" + key();
-		return jsonGet(dest, checkCache, false);
+		return jsonPost(dest, checkCache, false);
 	}
 
 	public static String labelGet(boolean checkCache) {
 		if (api_key == null)
 			return null;
 		String dest = API_BASE + "/?object=label&function=get&" + key();
-		return jsonGet(dest, checkCache, false);
+		return jsonPost(dest, checkCache, false);
 	}
 
 	public static String labelAdd(String name) {
@@ -256,7 +256,7 @@ public class TunneledAPIBridge extends FurkBridge {
 	public static String userLoad() {
 		if (api_key == null)
 			return null;
-		String dest = API_BASE + "/object=account&function=info&" + key();
+		String dest = API_BASE + "/?object=account&function=info&" + key();
 		return jsonPost(dest, false, false);
 	}
 	
@@ -268,8 +268,8 @@ public class TunneledAPIBridge extends FurkBridge {
 	public static boolean userLogout() {
 		if (api_key == null)
 			return true;
-		String url = API_BASE + "/object=login&function=logout&" + key();
-		jsonGet(url, false, false);
+		String url = API_BASE + "/?object=login&function=logout&" + key();
+		jsonPost(url, false, false);
 		api_key = null;
 		return true;
 	}
@@ -297,14 +297,14 @@ public class TunneledAPIBridge extends FurkBridge {
 		} catch (Exception e) {
 		}
 		if (sMode == 0) {
-			frag = "?object=file&function=get";
+			frag = "/?object=file&function=get";
 			txt = "&name_like=" + txt;
 		}
 		if (sMode == 1) {
-			frag = "?object=search";
+			frag = "/?object=search";
 			txt = "&q=" + txt;
 		} else if (sMode == 2) {
-			frag = "?object=plugins&function=metasearch";
+			frag = "/?object=plugins&function=metasearch";
 			txt = "&q=" + txt;
 		}
 		String url = API_BASE + "/" + frag + "&" + key();
@@ -334,24 +334,24 @@ public class TunneledAPIBridge extends FurkBridge {
 		}
 	}
 
-	public static String jsonGet(String dest, boolean cacheCheck, boolean perm) {
-		if (api_key == null)
-			return null;
-		if (!overrideCache && cacheCheck) {
-			String r = RequestCache.APIR.find(dest);
-			if (r != null)
-				return r;
-		}
-		try {
-			String s = StreamDownloader.getInstance().getStringStream(dest, 4,2000);
-			if (s != null)
-				RequestCache.APIR.add(dest, s, perm);
-			return s;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Connection Error");
-		}
-	}
+//	public static String jsonGet(String dest, boolean cacheCheck, boolean perm) {
+//		if (api_key == null)
+//			return null;
+//		if (!overrideCache && cacheCheck) {
+//			String r = RequestCache.APIR.find(dest);
+//			if (r != null)
+//				return r;
+//		}
+//		try {
+//			String s = StreamDownloader.getInstance().getStringStream(dest, 4,2000);
+//			if (s != null)
+//				RequestCache.APIR.add(dest, s, perm);
+//			return s;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw new RuntimeException("Connection Error");
+//		}
+//	}
 
 	public static String jsonPost(String dest, boolean cacheCheck, boolean perm) {
 		if (api_key == null)

@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.network.APIBridge;
+import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.windows.AddDownloadFrame;
 
@@ -146,7 +146,7 @@ public class ServerLink {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (APIBridge.key() == null)
+				while (FurkBridge.key() == null)
 					;
 				new AddDownloadFrame(link);
 			}
@@ -158,8 +158,12 @@ public class ServerLink {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (APIBridge.key() == null)
-					;
+				while (FurkBridge.key() == null){
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+					}
+				}
 				new AddDownloadFrame(link);
 			}
 		}).start();
@@ -170,7 +174,7 @@ public class ServerLink {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (APIBridge.key() == null)
+				while (FurkBridge.key() == null)
 					;
 				new AddDownloadFrame(link);
 			}

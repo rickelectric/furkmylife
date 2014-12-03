@@ -157,14 +157,16 @@ public class StreamDownloader {
 		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
 
 		HttpPost post = new HttpPost(url.toURI());
-		post.setHeader("Content-Type", "application/x-www-form-urlencoded");
-
-		post.setEntity(new StringEntity(urli[1]));
+		
+		if(urli.length>1){
+			post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+			post.setEntity(new StringEntity(urli[1]));
+		}
 		HttpResponse resp = client.execute(post);
 		int response = resp.getStatusLine().getStatusCode();
 
 		if (response < 200 || response > 299)
-			throw new IOException("HTTP Response " + response);
+			throw new IOException("HTTP Response {"+urlx+"} = " + response);
 
 		BufferedInputStream bis = new BufferedInputStream(resp.getEntity()
 				.getContent());

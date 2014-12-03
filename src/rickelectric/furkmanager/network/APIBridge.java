@@ -10,7 +10,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONObject;
 
-public class APIBridge extends FurkBridge {
+class APIBridge extends FurkBridge {
 
 	private static String api_key = null;
 

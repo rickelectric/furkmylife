@@ -48,7 +48,7 @@ public class VideoPlayer extends Observable {
 
 	private String statusText;
 
-	private Runnable playAction, stopAction;
+	private Runnable playAction, stopAction, fullscreenAction;
 
 	/**
 	 * For Future Next/Back Functionality When Multiple Media TFiles Found.
@@ -126,9 +126,9 @@ public class VideoPlayer extends Observable {
 					if (e.getClickCount() == 2) {
 						player.toggleFullScreen();
 						mediaOverlay.setAlwaysOnTop(player.isFullScreen());
-						if(player.isFullScreen()){
+						if (player.isFullScreen()) {
 							setChanged();
-							notifyObservers(new Object[]{FRAME});
+							notifyObservers(new Object[] { FRAME });
 						}
 					}
 				}
@@ -188,6 +188,20 @@ public class VideoPlayer extends Observable {
 			}
 		};
 
+		fullscreenAction = new Runnable() {
+			@Override
+			public void run() {
+				if (player.isPlaying()) {
+					player.toggleFullScreen();
+					mediaOverlay.setAlwaysOnTop(player.isFullScreen());
+					if (player.isFullScreen()) {
+						setChanged();
+						notifyObservers(new Object[] { FRAME });
+					}
+				}
+			}
+		};
+
 		addMediaListener();
 	}
 
@@ -214,6 +228,7 @@ public class VideoPlayer extends Observable {
 	public void addVideoObserver(VideoObserver o) {
 		o.getPlayButton().setAction(playAction);
 		o.getStopButton().setAction(stopAction);
+		o.getFullscreenButton().setAction(fullscreenAction);
 		o.getPositionSlider().addMouseListener(sliderMouseListener);
 
 		o.update(this, new Object[] { LENGTH, time });
@@ -341,8 +356,8 @@ public class VideoPlayer extends Observable {
 	public void stop() {
 		player.stop();
 	}
-	
-	public void pauseResume(){
+
+	public void pauseResume() {
 		player.pause();
 	}
 

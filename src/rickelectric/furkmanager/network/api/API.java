@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.models.APIObject;
-import rickelectric.furkmanager.network.APIBridge;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.views.panels.APIMessagePanel;
 
@@ -21,13 +20,13 @@ public class API {
 	private static APIMessagePanel msgPanel;
 
 	public static void init(String key) {
-		APIBridge.initialize(key);
+		FurkBridge.initialize(key);
 		msgCache = new ArrayList<APIMessage>();
 		msgPanel = new APIMessagePanel();
 	}
 
 	public static String key() {
-		return APIBridge.getKey();
+		return FurkBridge.getKey();
 	}
 
 	public static Iterator<APIMessage> messages() {
@@ -81,9 +80,9 @@ public class API {
 	public static ArrayList<APIObject> search(String text, SearchMode mode) {
 		String jsonResult = null;
 		if (mode == FURKSEARCH)
-			jsonResult = APIBridge.searchFurk(text, true);
+			jsonResult = FurkBridge.searchFurk(text, true);
 		else if (mode == METASEARCH)
-			jsonResult = APIBridge.searchWeb(text, true);
+			jsonResult = FurkBridge.searchWeb(text, true);
 		else {
 		}
 		if (jsonResult == null)

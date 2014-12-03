@@ -13,5 +13,6 @@ public interface VideoObserver extends Observer {
 	JSlider getPositionSlider();
 	void detachObserver();
 	void reattachObserver();
+	JButtonLabel getFullscreenButton();
 
 }
