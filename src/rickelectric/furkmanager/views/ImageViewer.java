@@ -24,11 +24,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.AsyncDownload;
 import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.swingmods.OpacEffects;
+import rickelectric.img.ImageLoader;
 
 public class ImageViewer extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -55,9 +55,8 @@ public class ImageViewer extends JDialog {
 	public static void main(String[] args) throws MalformedURLException {
 		// loadAll("Pictures", "C:\\Users\\Ionicle\\", true);
 		// viewAll(20);
-		AsyncDownload d = new AsyncDownload(
-				new URL(
-						"https://j5h7rua7iqqvh35k5nmake7rio.gcdn.biz/ss/4764133/3"));
+		AsyncDownload d = new AsyncDownload(new URL(
+				"https://j5h7rua7iqqvh35k5nmake7rio.gcdn.biz/ss/4764133/3"));
 		new ImageViewer(d).setVisible(true);
 	}
 
@@ -132,9 +131,8 @@ public class ImageViewer extends JDialog {
 		next.setBorder(null);
 		next.setBackground(Color.BLACK);
 		next.setOpaque(false);
-		next.setIcon(new ImageIcon(
-				ImageViewer.class
-						.getResource("/rickelectric/furkmanager/img/arrow_double_right.png")));
+		next.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"arrow_double_right.png")));
 		contentPane.add(next, BorderLayout.EAST);
 
 		prev = new JButton();
@@ -152,9 +150,8 @@ public class ImageViewer extends JDialog {
 		prev.setBorder(null);
 		prev.setBackground(Color.BLACK);
 		prev.setOpaque(false);
-		prev.setIcon(new ImageIcon(
-				ImageViewer.class
-						.getResource("/rickelectric/furkmanager/img/arrow_double_left.png")));
+		prev.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"arrow_double_left.png")));
 		contentPane.add(prev, BorderLayout.WEST);
 	}
 
@@ -165,8 +162,8 @@ public class ImageViewer extends JDialog {
 	 */
 	public ImageViewer(final AsyncDownload d) {
 		construct("Downloading...");
-		image_poster.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif")));
+		image_poster.setIcon(new ImageIcon(ImageLoader.class
+				.getResource("ajax-loader.gif")));
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -199,11 +196,7 @@ public class ImageViewer extends JDialog {
 	}
 
 	public ImageViewer(String title, BufferedImage image) {
-		setIconImage(Toolkit
-				.getDefaultToolkit()
-				.getImage(
-						ImageViewer.class
-								.getResource("/rickelectric/furkmanager/img/image-48.png")));
+		setIconImage(ImageLoader.getInstance().getImage("image-48.png"));
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		construct(title);
 		imageToDisplay(image);
@@ -238,9 +231,7 @@ public class ImageViewer extends JDialog {
 		btn_X = new JButton("");
 		btn_X.setDoubleBuffered(true);
 		btn_X.setFocusTraversalPolicyProvider(true);
-		btn_X.setIcon(new ImageIcon(
-				ImageViewer.class
-						.getResource("/rickelectric/furkmanager/img/sm/edit_delete.png")));
+		btn_X.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("sm/edit_delete.png")));
 		btn_X.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -259,8 +250,7 @@ public class ImageViewer extends JDialog {
 		infobar = new JLabel();
 		infobar.setPreferredSize(new Dimension(0, 15));
 		infobar.setFont(new Font("Dialog", Font.BOLD, 12));
-		infobar.setIcon(new ImageIcon(ImageViewer.class
-				.getResource("/rickelectric/furkmanager/img/tree/image-16.png")));
+		infobar.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("tree/image-16.png")));
 		infobar.setForeground(Color.WHITE);
 		contentPane.add(infobar, BorderLayout.SOUTH);
 		image_poster.requestFocus();
@@ -296,11 +286,10 @@ public class ImageViewer extends JDialog {
 			@Override
 			public void run() {
 				imageLoading = true;
-				image_poster.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/ajax-loader.gif")));
+				image_poster.setIcon(new ImageIcon(ImageLoader.class
+						.getResource("ajax-loader.gif")));
 				if (x == null) {
-					image_poster.setIcon(new ImageIcon(FurkManager.class
-							.getResource("img/remove.png")));
+					image_poster.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("remove.png")));
 					imageLoading = false;
 					return;
 				}

@@ -7,6 +7,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import rickelectric.img.ImageLoader;
+
 public class LoadingCircle extends JLabel {
 	private static final long serialVersionUID = 1L;
 
@@ -14,8 +16,7 @@ public class LoadingCircle extends JLabel {
 
 	public LoadingCircle() {
 		setFont(new Font("Dialog", Font.BOLD, 12));
-		setIcon(new ImageIcon(getClass()
-				.getResource("/rickelectric/furkmanager/img/ajax-loader-128.gif")));
+		setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader-128.gif")));
 		setHorizontalAlignment(SwingConstants.CENTER);
 		setVerticalAlignment(SwingConstants.CENTER);
 	}

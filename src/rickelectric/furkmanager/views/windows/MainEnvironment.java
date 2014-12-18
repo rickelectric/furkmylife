@@ -11,7 +11,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -22,24 +21,25 @@ import net.java.balloontip.BalloonTip.AttachLocation;
 import net.java.balloontip.BalloonTip.Orientation;
 import net.java.balloontip.styles.BalloonTipStyle;
 import net.java.balloontip.styles.RoundedBalloonStyle;
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.api.API;
-import rickelectric.furkmanager.player.AudioPanel;
-import rickelectric.furkmanager.player.AudioPlayer;
-import rickelectric.furkmanager.player.VideoPanel;
-import rickelectric.furkmanager.player.VideoPlayer;
 import rickelectric.furkmanager.utils.MouseActivity;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.CircleButton;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
 import rickelectric.furkmanager.views.panels.Main_FeedView;
 import rickelectric.furkmanager.views.panels.Main_FileView;
 import rickelectric.furkmanager.views.panels.Main_SettingsView;
 import rickelectric.furkmanager.views.panels.Main_UserView;
+import rickelectric.furkmanager.views.swingmods.CircleButton;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 import rickelectric.furkmanager.views.swingmods.balloon.BTipPositioner;
+import rickelectric.img.ImageLoader;
+import rickelectric.media.AudioPanel;
+import rickelectric.media.AudioPlayer;
+import rickelectric.media.VideoPanel;
+import rickelectric.media.VideoPlayer;
 
 public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		MouseListener {
@@ -162,8 +162,7 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		super();
 		setUndecorated(true);
 		setTitle("Furk Desktop Environment");
-		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png"))
-				.getImage());
+		setIconImage(ImageLoader.getInstance().getImage("fr.png"));
 
 		bgc = new Color(Color.darkGray.getRed(), Color.darkGray.getBlue(),
 				Color.darkGray.getGreen(), 0);
@@ -200,8 +199,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		getContentPane().add(message);
 
 		bHeight = getHeight()
-				- (UtilBox.getTaskbarOrientation() == UtilBox.BOTTOM ? UtilBox
-						.getTaskbarHeight() : 0) - 100;
+				- (UtilBox.getInstance().getTaskbarOrientation() == UtilBox.BOTTOM ? UtilBox
+						.getInstance().getTaskbarHeight() : 0) - 100;
 		currHeight = bHeight;
 
 		generateButtons();
@@ -218,16 +217,7 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		new Thread(this).start();
 	}
 
-	public void mediaNotify() {
-
-	}
-
 	public void dispose() {
-		if (mediaReady && FurkManager.mediaEnabled()) {
-			((AudioPanel) fnSections[0]).detachObserver();
-			((VideoPanel) fnSections[1]).detachObserver();
-			contentPane.remove(fnButtons[1]);
-		}
 		super.dispose();
 		MouseActivity.destroyInstance();
 
@@ -241,7 +231,6 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 				fnBalloonConstruct();
 			}
 			audioPlayerActive = true;
-			((AudioPanel) fnSections[0]).reattachObserver();
 			fnButtons[0].setVisible(true);
 			fnBalloons[0].setVisible(true);
 		}
@@ -259,7 +248,12 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 	@Override
 	public void mediaCall(int mediaType, String mrl) {
-		if (!FurkManager.mediaEnabled())
+		boolean me=false;
+		try{
+			Class<?> c = Class.forName("rickelectric.media.AudioPlayer");
+			if(c!=null) me=true;
+		}catch(Exception e){}
+		if (!FurkManager.mediaEnabled()&&!me)
 			return;
 		if (!mediaReady) {
 			fnBalloonConstruct();
@@ -282,39 +276,38 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 	private void generateButtons() {
 		int xLoc = 50, inc = 120;
-		buttons[0] = new CircleButton("My Files", getClass().getResource(
-				"/rickelectric/furkmanager/img/dash/Files-64.png"));
+		buttons[0] = new CircleButton("My Files", ImageLoader.getInstance()
+				.getImage("dash/Files-64.png"));
 		buttons[0].setLocation(xLoc, bHeight);
 		contentPane.add(buttons[0]);
 		xLoc += inc;
 
-		buttons[1] = new CircleButton("My Downloads", getClass().getResource(
-				"/rickelectric/furkmanager/img/dash/Download-64.png"));
+		buttons[1] = new CircleButton("My Downloads", ImageLoader.getInstance()
+				.getImage("dash/Download-64.png"));
 		buttons[1].setLocation(xLoc, bHeight);
 		contentPane.add(buttons[1]);
 		xLoc += inc;
 
-		buttons[2] = new CircleButton("RSS Feeds", getClass().getResource(
-				"/rickelectric/furkmanager/img/dash/RSS-64.png"));
+		buttons[2] = new CircleButton("RSS Feeds", ImageLoader.getInstance()
+				.getImage("dash/RSS-64.png"));
 		buttons[2].setLocation(xLoc, bHeight);
 		contentPane.add(buttons[2]);
 		xLoc += inc;
 
-		buttons[3] = new CircleButton("Application Settings", getClass()
-				.getResource(
-						"/rickelectric/furkmanager/img/dash/Settings-64.png"));
+		buttons[3] = new CircleButton("Application Settings", ImageLoader
+				.getInstance().getImage("dash/Settings-64.png"));
 		buttons[3].setLocation(xLoc, bHeight);
 		contentPane.add(buttons[3]);
 		xLoc += inc;
 
-		buttons[4] = new CircleButton("Furk User Options", getClass()
-				.getResource("/rickelectric/furkmanager/img/dash/User-64.png"));
+		buttons[4] = new CircleButton("Furk User Options", ImageLoader
+				.getInstance().getImage("dash/User-64.png"));
 		buttons[4].setLocation(xLoc, bHeight);
 		contentPane.add(buttons[4]);
 		// xLoc += inc;
 
-		buttons[5] = new CircleButton("Exit", getClass().getResource(
-				"/rickelectric/furkmanager/img/remove.png"));
+		buttons[5] = new CircleButton("Exit", ImageLoader.getInstance()
+				.getImage("remove.png"));
 		buttons[5].setSize(buttons[4].getSize());
 		buttons[5]
 				.setLocation(getWidth() - buttons[5].getWidth() - 10, bHeight);
@@ -327,8 +320,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 		int xLoc = 700, inc = 120;
 		int yLoc = 555;
 
-		fnButtons[1] = new CircleButton("Video Player", getClass().getResource(
-				"/rickelectric/furkmanager/img/tree/video-48.png"));
+		fnButtons[1] = new CircleButton("Video Player", ImageLoader
+				.getInstance().getImage("tree/video-48.png"));
 		fnButtons[1].setLocation(xLoc, yLoc);
 		fnButtons[1].setSize(buttons[0].getSize());
 		fnButtons[1].setVisible(false);
@@ -336,8 +329,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 		xLoc += inc;
 
-		fnButtons[0] = new CircleButton("Music Player", getClass().getResource(
-				"/rickelectric/furkmanager/img/tree/audio-48.png"));
+		fnButtons[0] = new CircleButton("Music Player", ImageLoader
+				.getInstance().getImage("tree/audio-48.png"));
 		fnButtons[0].setLocation(xLoc, yLoc);
 		fnButtons[0].setSize(buttons[0].getSize());
 		fnButtons[0].setVisible(false);
@@ -346,9 +339,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 	}
 
 	private void generateRefreshButtons() {
-		refreshButtons[0] = new CircleButton("Refresh Files",
-				getClass().getResource(
-						"/rickelectric/furkmanager/img/dash/Reload-32.png"));
+		refreshButtons[0] = new CircleButton("Refresh Files", ImageLoader
+				.getInstance().getImage("dash/Reload-32.png"));
 		refreshButtons[0].setStrokeSize(3);
 		Point loc0 = buttons[0].getLocation();
 		Dimension sz0 = buttons[0].getSize();
@@ -356,9 +348,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 				loc0.x + sz0.width - refreshButtons[0].getWidth(), loc0.y
 						+ sz0.height - refreshButtons[0].getHeight());
 
-		refreshButtons[1] = new CircleButton("Refresh Downloads",
-				getClass().getResource(
-						"/rickelectric/furkmanager/img/dash/Reload-32.png"));
+		refreshButtons[1] = new CircleButton("Refresh Downloads", ImageLoader
+				.getInstance().getImage("dash/Reload-32.png"));
 		refreshButtons[1].setStrokeSize(3);
 		Point loc1 = buttons[1].getLocation();
 		Dimension sz1 = buttons[1].getSize();
@@ -503,9 +494,10 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 
 	@Override
 	public void setVisible(boolean b) {
-		if (b)
+		if (b) {
 			MouseActivity.getInstance();
-		else
+			mediaActiveCheck();
+		} else
 			MouseActivity.destroyInstance();
 		super.setVisible(b);
 	}
@@ -521,8 +513,8 @@ public class MainEnvironment extends JDialog implements PrimaryEnv, Runnable,
 					if (MainEnvironment.this.isVisible()) {
 						sleepTime = 100;
 						if (MouseActivity.getInstance().getMouseY() < (UtilBox
-								.getTaskbarOrientation() != UtilBox.NONEXISTANT ? getHeight()
-								- UtilBox.getTaskbarHeight()
+								.getInstance().getTaskbarOrientation() != UtilBox.NONEXISTANT ? getHeight()
+								- UtilBox.getInstance().getTaskbarHeight()
 								: bHeight)
 								&& !balloonIsShowing())
 							showButtons = (System.currentTimeMillis()

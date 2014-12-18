@@ -27,10 +27,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.ProxySettings;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class FileDownload extends Observable implements Runnable, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -282,7 +282,7 @@ public class FileDownload extends Observable implements Runnable, Serializable {
 							+ "' is complete", new Runnable() {
 						@Override
 						public void run() {
-							UtilBox.openFileLocation(dwFile);
+							UtilBox.getInstance().openFileLocation(dwFile);
 						}
 					});
 			stateChanged();
@@ -381,7 +381,7 @@ public class FileDownload extends Observable implements Runnable, Serializable {
 							null);
 				}
 			} else if (src == dir) {
-				UtilBox.openFileLocation(dwFile);
+				UtilBox.getInstance().openFileLocation(dwFile);
 			}
 		}
 

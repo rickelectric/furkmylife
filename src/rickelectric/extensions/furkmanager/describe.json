@@ -1,0 +1,27 @@
+{
+	"name":"FurkManager",
+	"mainIcon":"fr.png",
+	"preload":[
+		{
+			"className":"rickelectric.furkmanager.network.api.API",
+			"method":"init",
+			"param":"5323228d687ed9f7f1bdf9ce87050a1fa672e485"
+		}
+	],
+	"buttons":[
+		{
+			"name":"Furk Manager",
+			"icon":"fr.png",
+			"dropTargetEnabled":false,
+			"location":{
+				"x":100,
+				"y":630
+			},
+			"balloon":{
+				"contents":"rickelectric.extensions.furkmanager.FurkPopup",
+				"background":"#ffab03",
+				"outline":"#0000ff"
+			}
+		}
+	]
+}

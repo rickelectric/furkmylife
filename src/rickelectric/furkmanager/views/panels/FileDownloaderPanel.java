@@ -3,8 +3,8 @@ package rickelectric.furkmanager.views.panels;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.idownloader.DownloadTable;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class FileDownloaderPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
@@ -13,7 +13,7 @@ public class FileDownloaderPanel extends JPanel{
 	
 	public FileDownloaderPanel() {
 		setLayout(null);
-		setBackground(UtilBox.getRandomColor());
+		setBackground(UtilBox.getInstance().getRandomColor());
 		
 		tmodel=new DownloadTable();
 		

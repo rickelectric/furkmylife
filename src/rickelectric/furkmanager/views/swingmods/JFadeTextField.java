@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 
 /**
  * 
@@ -147,7 +147,7 @@ public class JFadeTextField extends JTextField implements Opacible, Slideable {
 						setAlpha(getAlpha() + alphaInc);
 					}
 					repaint();
-					UtilBox.pause(time);
+					UtilBox.getInstance().wait(time);
 				}
 				isSliding = false;
 			}

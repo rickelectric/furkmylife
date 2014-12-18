@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -22,15 +21,16 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.Statable;
 import rickelectric.furkmanager.views.panels.ScreenshotViewPanel;
 import rickelectric.furkmanager.views.panels.TFileTreePanel;
+import rickelectric.img.ImageLoader;
 
 public class FurkFileView extends JDialog implements Statable {
 
@@ -63,13 +63,9 @@ public class FurkFileView extends JDialog implements Statable {
 
 	public FurkFileView(final FurkFile ff) {
 		super(FurkManager.getMainWindow().getWindow());
-		setIconImage(Toolkit
-				.getDefaultToolkit()
-				.getImage(
-						FurkFileView.class
-								.getResource("/rickelectric/furkmanager/img/dash/Files-16.png")));
+		setIconImage(ImageLoader.getInstance().getImage("dash/Files-16.png"));
 		setModalityType(ModalityType.DOCUMENT_MODAL);
-		setModal(SettingsManager.getInstance().getMainWinMode()==SettingsManager.WIN_MODE);
+		setModal(SettingsManager.getInstance().getMainWinMode() == SettingsManager.WIN_MODE);
 		this.ff = ff;
 		// if(windowlist==null) windowlist=new ArrayList<FurkFileView>();
 		// int i=windowlist.indexOf(this);
@@ -246,7 +242,7 @@ public class FurkFileView extends JDialog implements Statable {
 		btn_copyLink.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				UtilBox.sendToClipboard(ff.getUrlDl());
+				UtilBox.getInstance().sendToClipboard(ff.getUrlDl());
 				FurkManager.trayAlert(FurkManager.TRAY_INFO, "Copied",
 						"URL Copied To Clipboard", null);
 			}
@@ -258,7 +254,7 @@ public class FurkFileView extends JDialog implements Statable {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String url = ff.getUrlPage();
-				UtilBox.openUrl("https://www.furk.net" + url);
+				UtilBox.getInstance().openUrl("https://www.furk.net" + url);
 			}
 		});
 		btn_viewfurk.setBounds(10, 427, 124, 20);
@@ -277,8 +273,8 @@ public class FurkFileView extends JDialog implements Statable {
 
 		btn_changeview = new JButton("Show File Tree");
 		btn_changeview.setHorizontalAlignment(SwingConstants.LEFT);
-		btn_changeview.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/arrow_double_right.png")));
+		btn_changeview.setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("arrow_double_right.png")));
 
 		boolean showScreenshots = (ff.getType() != null
 				&& ff.getType().equals("video") && ff.getThumbs() != null);
@@ -291,8 +287,8 @@ public class FurkFileView extends JDialog implements Statable {
 
 		final JPanel tmp = new JPanel();
 		tmp.setLayout(new GridBagLayout());
-		tmp.add(new JLabel(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif"))));
+		tmp.add(new JLabel(new ImageIcon(ImageLoader.class
+				.getResource("ajax-loader.gif"))));
 		tmp.setBounds(10, 192, 418, 201);
 		tmp.setBorder(new LineBorder(Color.BLACK));
 		if (!showScreenshots)
@@ -325,12 +321,12 @@ public class FurkFileView extends JDialog implements Statable {
 					}
 				}
 				if (btn_changeview.getText().equals("Show File Tree")) {
-					btn_changeview.setIcon(new ImageIcon(FurkManager.class
-							.getResource("img/arrow_double_left.png")));
+					btn_changeview.setIcon(new ImageIcon(ImageLoader
+							.getInstance().getImage("arrow_double_left.png")));
 					btn_changeview.setText("Back To Screenshots");
 				} else {
-					btn_changeview.setIcon(new ImageIcon(FurkManager.class
-							.getResource("img/arrow_double_right.png")));
+					btn_changeview.setIcon(new ImageIcon(ImageLoader
+							.getInstance().getImage("arrow_double_right.png")));
 					btn_changeview.setText("Show File Tree");
 				}
 

@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.player;
+package rickelectric.media;
 
 import java.util.Observer;
 

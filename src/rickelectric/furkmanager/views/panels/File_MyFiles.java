@@ -18,12 +18,13 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API_File;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
+import rickelectric.img.ImageLoader;
 
 public class File_MyFiles extends JPanel implements Runnable, Observer {
 	private static final long serialVersionUID = 1L;
@@ -65,7 +66,7 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 		this.loading = false;
 
 		setLayout(null);
-		setBackground(UtilBox.getRandomColor());
+		setBackground(UtilBox.getInstance().getRandomColor());
 		resultScroller = new JScrollPane(
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -92,8 +93,7 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 
 		label_loading = new JLabel();
 		label_loading.setHorizontalAlignment(SwingConstants.CENTER);
-		label_loading.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif")));
+		label_loading.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		label_loading.setBounds(200, 123, 107, 91);
 		resultPanel.add(label_loading);
 

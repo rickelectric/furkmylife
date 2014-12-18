@@ -10,9 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
-import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
+import rickelectric.img.ImageLoader;
 
 public class Main_FileView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;
@@ -46,24 +46,21 @@ public class Main_FileView extends TranslucentPane {
 
 		tabbedPane.addTab(
 				"My Files",
-				new ImageIcon(FurkManager.class
-						.getResource("img/dash/Files-16.png")),
+				new ImageIcon(ImageLoader.getInstance().getImage("dash/Files-16.png")),
 				pane_myfiles.resultScroller, "All My Files");
 		pane_myfiles.setLayout(null);
 
 		pane_folders = new File_FolderView();
 		tabbedPane.addTab(
 				"Folders (Labels)",
-				new ImageIcon(FurkManager.class
-						.getResource("img/tree/folder-blue-16.png")),
+				new ImageIcon(ImageLoader.getInstance().getImage("tree/folder-blue-16.png")),
 				pane_folders, "Organize Files In Folders");
 		//pane_folders.setLayout(null);
 
 		JPanel pane_find = new SearchPanel(SearchPanel.FILESEARCH);
 		tabbedPane.addTab(
 				"Find In My Files",
-				new ImageIcon(FurkManager.class
-						.getResource("img/sm/web_view.png")), pane_find, null);
+				new ImageIcon(ImageLoader.getInstance().getImage("sm/web_view.png")), pane_find, null);
 		pane_find.setLayout(null);
 
 		JPanel pane_search = new SearchPanel(SearchPanel.FURKSEARCH);
@@ -73,8 +70,7 @@ public class Main_FileView extends TranslucentPane {
 		pane_recycler = new File_MyFiles(File_MyFiles.RECYCLER, true);
 		tabbedPane.addTab(
 				"Recycle Bin",
-				new ImageIcon(FurkManager.class
-						.getResource("img/sm/recycler.png")),
+				new ImageIcon(ImageLoader.getInstance().getImage("sm/recycler.png")),
 				pane_recycler.resultScroller, null);
 
 	}

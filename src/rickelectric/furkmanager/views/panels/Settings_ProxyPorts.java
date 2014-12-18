@@ -18,9 +18,10 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ProxySettings;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
+
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
@@ -48,7 +49,7 @@ public class Settings_ProxyPorts extends JPanel {
 	public Settings_ProxyPorts() {
 		setPreferredSize(new Dimension(336, 314));
 
-		setBackground(UtilBox.getRandomColor());
+		setBackground(UtilBox.getInstance().getRandomColor());
 		setLayout(null);
 
 		panel_proxy = new JPanel();
@@ -120,7 +121,7 @@ public class Settings_ProxyPorts extends JPanel {
 				
 				ps.DOMAIN = input_prox_domain.getText();
 				ps.USER = input_prox_username.getText();
-				ps.PASS = UtilBox.charToString(input_prox_password.getPassword());
+				ps.PASS = UtilBox.getInstance().charToString(input_prox_password.getPassword());
 				SettingsManager.getInstance().useTunnel(check_tunnel.isSelected());
 				SettingsManager.save();
 			}

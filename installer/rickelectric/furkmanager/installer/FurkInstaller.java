@@ -2,7 +2,7 @@ package rickelectric.furkmanager.installer;
 
 import java.lang.reflect.InvocationTargetException;
 
-import rickelectric.furkmanager.utils.WinRegistry;
+import rickelectric.WinRegistry;
 
 public class FurkInstaller {
 

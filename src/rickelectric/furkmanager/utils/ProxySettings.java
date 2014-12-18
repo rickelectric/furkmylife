@@ -35,7 +35,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import rickelectric.furkmanager.data.DefaultParams;
+import rickelectric.media.DefaultParams;
 
 public class ProxySettings implements Serializable {
 

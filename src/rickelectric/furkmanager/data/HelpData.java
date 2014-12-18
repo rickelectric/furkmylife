@@ -5,7 +5,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.UtilBox;
 
 public class HelpData {
 	
@@ -19,7 +19,7 @@ public class HelpData {
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent e) {
 				if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-					UtilBox.openUrl(e.getURL().toExternalForm());
+					UtilBox.getInstance().openUrl(e.getURL().toExternalForm());
 				}
 			}
 		});

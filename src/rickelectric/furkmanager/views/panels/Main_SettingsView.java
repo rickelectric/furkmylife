@@ -19,10 +19,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 import rickelectric.furkmanager.views.windows.MainEnvironment;
 import rickelectric.furkmanager.views.windows.MainWindow;
@@ -61,7 +61,7 @@ public class Main_SettingsView extends TranslucentPane {
 		tabbedPane.addTab("Connection", null, pane_connection, null);
 
 		JPanel panel_downloader = new JPanel();
-		panel_downloader.setBackground(UtilBox.getRandomColor());
+		panel_downloader.setBackground(UtilBox.getInstance().getRandomColor());
 		tabbedPane.addTab("Downloader", null, panel_downloader, null);
 		panel_downloader.setLayout(null);
 
@@ -95,7 +95,7 @@ public class Main_SettingsView extends TranslucentPane {
 		button_browse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String f = UtilBox.openFile(SettingsManager.getInstance().getDownloadFolder());
+				String f = UtilBox.getInstance().openFile(SettingsManager.getInstance().getDownloadFolder());
 				if (f != null && !f.equals(""))
 					input_dwFolder.setText(f);
 			}
@@ -216,7 +216,7 @@ public class Main_SettingsView extends TranslucentPane {
 		btn_idmbrowse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String f = UtilBox.openFile(
+				String f = UtilBox.getInstance().openFile(
 						"IDMExecutable",
 						((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
 								.getMainWindow() : (MainWindow) FurkManager
@@ -256,7 +256,7 @@ public class Main_SettingsView extends TranslucentPane {
 		panel_idm.add(btn_idmSave);
 
 		JPanel panel = new JPanel();
-		panel.setBackground(UtilBox.getRandomColor());
+		panel.setBackground(UtilBox.getInstance().getRandomColor());
 		panel.setLayout(null);
 		tabbedPane.addTab("API Access", null, panel, null);
 

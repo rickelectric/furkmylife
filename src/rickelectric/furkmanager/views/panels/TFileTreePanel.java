@@ -1,32 +1,27 @@
 package rickelectric.furkmanager.views.panels;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.network.api.API_TFile;
 import rickelectric.furkmanager.views.Statable;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.icons.TFileTreeNode;
-import rickelectric.furkmanager.views.iconutil.NodeImageObserver;
+import rickelectric.furkmanager.views.iconutil.FolderTreeRenderer;
 
 public class TFileTreePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -87,86 +82,7 @@ public class TFileTreePanel extends JPanel {
 		model = new DefaultTreeModel(root);
 		jtree = new JTree(model);
 
-		jtree.setCellRenderer(new DefaultTreeCellRenderer() {
-			private static final long serialVersionUID = 1L;
-
-			private Toolkit tk = Toolkit.getDefaultToolkit();
-
-			private ImageIcon folderY = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/folder-yellow-16.png")));
-
-			private ImageIcon folderB = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/folder-blue-16.png")));
-
-			private ImageIcon audio = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/audio-16.png")));
-
-			private ImageIcon video = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/video-16.png")));
-
-			private ImageIcon image = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/image-16.png")));
-
-			private ImageIcon text = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/text-16.png")));
-
-			private ImageIcon pdf = new ImageIcon(tk.
-					getImage(FurkManager.class
-							.getResource("img/tree/pdf-16.png")));
-
-			private ImageIcon def = new ImageIcon(tk.
-					getImage(FurkManager.class
-							.getResource("img/fr-16.png")));
-
-			private ImageIcon loading = new ImageIcon(tk
-					.getImage(FurkManager.class
-							.getResource("img/tree/loading-16.gif")));
-
-			@Override
-			public Component getTreeCellRendererComponent(JTree tree,
-					Object value, boolean selected, boolean expanded,
-					boolean isLeaf, int row, boolean focused) {
-
-				Component c = super.getTreeCellRendererComponent(tree, value,
-						selected, expanded, isLeaf, row, focused);
-
-				if (value instanceof TFileTreeNode) {
-					TFileTreeNode val = (TFileTreeNode) value;
-					if (val.isBusy()) {
-						setIcon(loading);
-						def.setImageObserver(new NodeImageObserver(tree, val));
-					} else {
-						FurkTFile curr = val.getUserObject();
-						String type = curr.getContentType();
-						if (type.contains("audio")) {
-							setIcon(audio);
-						} else if (type.contains("video")) {
-							setIcon(video);
-						} else if (type.contains("image")) {
-							setIcon(image);
-						} else if (type.contains("msword")
-								|| type.contains("text")) {
-							setIcon(text);
-						} else if (type.contains("pdf")) {
-							setIcon(pdf);
-						} else
-							setIcon(def);
-					}
-				} else if (value instanceof DefaultMutableTreeNode) {
-					if (selected)
-						setIcon(folderY);
-					else
-						setIcon(folderB);
-				}
-				return c;
-			}
-		});
+		jtree.setCellRenderer(new FolderTreeRenderer());
 
 		int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 		int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;

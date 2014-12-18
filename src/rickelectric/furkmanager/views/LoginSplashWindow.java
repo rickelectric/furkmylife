@@ -21,7 +21,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
 import javax.swing.ImageIcon;
@@ -41,22 +40,22 @@ import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.data.HelpData;
 import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_UserData;
-import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Settings_ProxyPorts;
 import rickelectric.furkmanager.views.panels.Settings_UIPanel;
 import rickelectric.furkmanager.views.swingmods.JButtonLabel;
+import rickelectric.img.ImageLoader;
 
 public class LoginSplashWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private BufferedImage splashImage;
+	private Image splashImage;
 	private Image loadingImage;
 
 	private JPanel contentPane;
@@ -86,7 +85,7 @@ public class LoginSplashWindow extends JFrame {
 	public LoginSplashWindow() {
 		setUndecorated(true);
 		setBackground(new Color(255, 255, 255, 0));
-		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png"))
+		setIconImage(new ImageIcon(ImageLoader.getInstance().getImage("fr.png"))
 				.getImage());
 
 		contentPane = new JPanel();
@@ -103,8 +102,7 @@ public class LoginSplashWindow extends JFrame {
 			}
 		});
 		btn_X.setIcon(new ImageIcon(
-				LoginSplashWindow.class
-						.getResource("/rickelectric/furkmanager/img/sm/edit_delete.png")));
+				ImageLoader.getInstance().getImage("sm/edit_delete.png")));
 		btn_X.setBounds(639, 11, 39, 23);
 		contentPane.add(btn_X);
 
@@ -128,8 +126,7 @@ public class LoginSplashWindow extends JFrame {
 		
 		label_loading = new Rectangle(420, 207, 298, 208);
 		loadingImage = Toolkit.getDefaultToolkit().getImage(
-				getClass().getResource(
-						"/rickelectric/furkmanager/img/ajax-loader-128.gif"));
+				ImageLoader.class.getResource("ajax-loader-128.gif"));
 
 		lblUsername = new JLabel("Username / Email:");
 		lblUsername.setBounds(143, 11, 89, 14);
@@ -235,12 +232,12 @@ public class LoginSplashWindow extends JFrame {
 
 		check_savecreds = new JCheckBox("Save Credentials");
 		check_savecreds.setOpaque(false);
-		check_savecreds.setBounds(10, 141, 123, 23);
+		check_savecreds.setBounds(10, 170, 123, 23);
 		panel_login.add(check_savecreds);
 		
 		check_auto = new JCheckBox("Auto-Login");
 		check_auto.setOpaque(false);
-		check_auto.setBounds(10, 173, 123, 23);
+		check_auto.setBounds(143, 169, 101, 23);
 		panel_login.add(check_auto);
 
 		btn_apihelp = new JButtonLabel("  API Key Help", new Runnable() {
@@ -255,7 +252,7 @@ public class LoginSplashWindow extends JFrame {
 					@Override
 					public void hyperlinkUpdate(HyperlinkEvent e) {
 						if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-							UtilBox.openUrl(e.getURL().toExternalForm());
+							UtilBox.getInstance().openUrl(e.getURL().toExternalForm());
 						}
 					}
 				});
@@ -265,10 +262,9 @@ public class LoginSplashWindow extends JFrame {
 			}
 		});
 		btn_apihelp.setHorizontalAlignment(SwingConstants.LEFT);
-		btn_apihelp.setIcon(new ImageIcon(getClass().getResource(
-				"/rickelectric/furkmanager/img/dash/User-16.png")));
+		btn_apihelp.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("dash/User-16.png")));
 		btn_apihelp.setForeground(Color.BLUE);
-		btn_apihelp.setBounds(10, 93, 123, 25);
+		btn_apihelp.setBounds(10, 139, 123, 25);
 		panel_login.add(btn_apihelp);
 
 		JButtonLabel btn_settings = new JButtonLabel("  Proxy Settings",
@@ -296,9 +292,8 @@ public class LoginSplashWindow extends JFrame {
 					}
 				});
 		btn_settings.setHorizontalAlignment(SwingConstants.LEFT);
-		btn_settings.setIcon(new ImageIcon(getClass().getResource(
-				"/rickelectric/furkmanager/img/dash/Settings-16.png")));
-		btn_settings.setBounds(10, 52, 123, 25);
+		btn_settings.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("dash/Settings-16.png")));
+		btn_settings.setBounds(10, 67, 123, 25);
 		panel_login.add(btn_settings);
 
 		btn_env = new JButtonLabel("  Environment", new Runnable() {
@@ -326,14 +321,12 @@ public class LoginSplashWindow extends JFrame {
 		btn_apihelp.setForeground(Color.RED);
 		btn_env
 				.setIcon(new ImageIcon(
-						LoginSplashWindow.class
-								.getResource("/rickelectric/furkmanager/img/sm/menu_expand.png")));
-		btn_env.setBounds(10, 11, 123, 25);
+						ImageLoader.getInstance().getImage("sm/menu_expand.png")));
+		btn_env.setBounds(10, 25, 123, 25);
 		panel_login.add(btn_env);
 
-		splashImage = ImageManager
-				.classLoadImage("/rickelectric/furkmanager/img/Splash_Big.png");
-		setSize(splashImage.getWidth(), splashImage.getHeight());
+		splashImage = ImageLoader.getInstance().getImage("Splash_Big.png");
+		setSize(splashImage.getWidth(null), splashImage.getHeight(null));
 
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -389,8 +382,8 @@ public class LoginSplashWindow extends JFrame {
 	};
 
 	public void addListeners() {
-		UtilBox.addMouseListenerToAll(contentPane, pointInit);
-		UtilBox.addMouseMotionListenerToAll(contentPane, pointMotion,
+		UtilBox.getInstance().addMouseListenerToAll(contentPane, pointInit);
+		UtilBox.getInstance().addMouseMotionListenerToAll(contentPane, pointMotion,
 				new Class<?>[] { JButton.class, JTextField.class,
 						JPasswordField.class, JButtonLabel.class });
 	}
@@ -514,7 +507,7 @@ public class LoginSplashWindow extends JFrame {
 		if(savedLogin==null) savedLogin = new LoginModel(LoginModel.BLANK);
 		
 		input_username.setText(savedLogin.username());
-		input_password.setText(UtilBox.charToString(savedLogin.password()));
+		input_password.setText(UtilBox.getInstance().charToString(savedLogin.password()));
 		input_apikey.setText(savedLogin.apiKey());
 		
 		check_savecreds.setSelected(savedLogin.save());

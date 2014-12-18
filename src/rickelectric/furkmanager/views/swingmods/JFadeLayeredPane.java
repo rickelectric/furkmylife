@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import javax.swing.JLayeredPane;
 import javax.swing.Timer;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 	private static final long serialVersionUID = 1L;
@@ -90,7 +90,7 @@ public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 			public void run() {
 				while (getAlpha() < 1f) {
 					setAlpha(alpha + 0.02f);
-					UtilBox.pause(1000 / msec);
+					UtilBox.getInstance().wait(1000 / msec);
 				}
 				setAlpha(1f);
 			}
@@ -103,7 +103,7 @@ public class JFadeLayeredPane extends JLayeredPane implements Opacible{
 			public void run() {
 				while (getAlpha() > 0f) {
 					setAlpha(alpha - 0.02f);
-					UtilBox.pause(1000 / msec);
+					UtilBox.getInstance().wait(1000 / msec);
 				}
 				setAlpha(0f);
 			}

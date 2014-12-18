@@ -3,13 +3,13 @@ package rickelectric.furkmanager.network.api;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class API_UserData extends API {
 
@@ -99,7 +99,7 @@ public class API_UserData extends API {
 			break;
 		case LoginModel.CREDENTIALS:
 			String key = FurkBridge.userLogin(login.username(),
-					UtilBox.charToString(login.password()));
+					UtilBox.getInstance().charToString(login.password()));
 			isValid = (key!=null);
 			if (isValid) {
 				API.init(key);

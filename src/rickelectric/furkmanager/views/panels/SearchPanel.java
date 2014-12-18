@@ -22,15 +22,15 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import rickelectric.furkmanager.FurkManager;
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_File;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.FileIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
+import rickelectric.img.ImageLoader;
 
 public class SearchPanel extends JPanel implements ActionListener, Runnable {
 	private static final long serialVersionUID = 1L;
@@ -76,8 +76,7 @@ public class SearchPanel extends JPanel implements ActionListener, Runnable {
 	}
 
 	public SearchPanel() {
-		new UtilBox();
-		setBackground(UtilBox.getRandomColor());
+		setBackground(UtilBox.getInstance().getRandomColor());
 		searchMode = METASEARCH;
 		setLayout(null);
 		setSize(554, 370);
@@ -109,8 +108,7 @@ public class SearchPanel extends JPanel implements ActionListener, Runnable {
 
 		loading = new JLabel();
 		loading.setBounds(470, 11, 50, 50);
-		loading.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader-48.gif")));
+		loading.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader-48.gif")));
 		loading.setVisible(false);
 		searchPanel.add(loading);
 

@@ -13,17 +13,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.windows.AddDownloadFrame;
+import rickelectric.img.ImageLoader;
 
 public class FurkTrayIcon {
-
-	public static void main(String[] a) {
-		new FurkTrayIcon();
-	}
 
 	private static TrayIcon trayIcon = null;
 
@@ -79,7 +76,7 @@ public class FurkTrayIcon {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					loading();
-					UtilBox.pause(2000);
+					UtilBox.getInstance().wait(2000);
 					stopLoading();
 				}
 			});
@@ -123,8 +120,7 @@ public class FurkTrayIcon {
 
 		if (SystemTray.isSupported()) {
 			SystemTray tray = SystemTray.getSystemTray();
-			Image image = Toolkit.getDefaultToolkit().getImage(
-					FurkManager.class.getResource("img/fr.png"));
+			Image image = ImageLoader.getInstance().getImage("fr.png");
 
 			ActionListener exitAction = new ActionListener() {
 				@Override
@@ -169,7 +165,7 @@ public class FurkTrayIcon {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					loading();
-					UtilBox.pause(2000);
+					UtilBox.getInstance().wait(2000);
 					stopLoading();
 				}
 			});

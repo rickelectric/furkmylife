@@ -1,5 +1,6 @@
 package rickelectric.furkmanager.views.panels;
 
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -32,7 +33,7 @@ import rickelectric.furkmanager.views.iconutil.FolderTreeRenderer;
 import rickelectric.furkmanager.views.iconutil.FolderTreeTransferHandler;
 import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.swingmods.OpacEffects;
-import java.awt.BorderLayout;
+import rickelectric.img.ImageLoader;
 
 public class File_FolderView extends JLayeredPane implements MouseListener,
 		KeyListener, Observer {
@@ -56,9 +57,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 		add(scroller, BorderLayout.CENTER);
 
 		loading = new JFadeLabel(
-				new ImageIcon(
-						File_FolderView.class
-								.getResource("/rickelectric/furkmanager/img/ajax-loader.gif")));
+				new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		loading.setAlpha(1.0f);
 		setLayer(loading, 10);
 		add(loading);
@@ -85,9 +84,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 	private DefaultTreeModel getTreeModel(boolean hardReload) {
 		if (hardReload)
 			APIFolderManager.refresh();
-		DefaultMutableTreeNode root = APIFolderManager.generateTree();
-
-		return new DefaultTreeModel(root);
+		return APIFolderManager.getModel();
 	}
 
 	protected void refreshMyFolders(final boolean hardReload) {
@@ -118,13 +115,13 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 				folder_tree.setEnabled(false);
 				try{
 					folder_tree.setModel(getTreeModel(hardReload));
-	
+
 					OpacEffects.fadeOut(loading, 30);
 					folder_tree.setEnabled(true);
 					folder_tree.requestFocus();
 				}catch(Exception e){
-					folder_tree.setEnabled(true);
 					OpacEffects.fadeOut(loading, 30);
+					folder_tree.setEnabled(true);
 				}
 				repaint();
 			}

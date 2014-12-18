@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.utils;
+package rickelectric;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -33,23 +33,26 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.commons.io.FileUtils;
-//Toolkit,Color,Component,Container
-//Clipboard
-//Listeners (Key,Mouse,Acion)
-//File/Folder Access
-
+/**
+ * Class containing a random set of functionality that I have yet to organize in a class-ful manner.
+ * 
+ * @author Rick Lewis (Ionicle)
+ *
+ */
 public class UtilBox {
 
 	public static final int MAX_COLOR_INDEX = 11;
 
-	private static boolean initd = false;
+	private static UtilBox ub = null;
+
+	private Color[] cols = null;
+	private Random r = null;
 
 	public static boolean divertUrlOpen = false;
 
 	public static void main(String[] args) {
-		new UtilBox();
-		for (Color c : cols) {
+		getInstance();
+		for (Color c : ub.cols) {
 			JFrame j = new JFrame();
 			j.getContentPane().setBackground(c);
 			j.add(new JLabel("( " + c.getRed() + ", " + c.getGreen() + ", "
@@ -60,38 +63,28 @@ public class UtilBox {
 		}
 	}
 
-	public static void init() {
-		new UtilBox();
+	public static synchronized UtilBox getInstance() {
+		if (ub == null)
+			ub = new UtilBox();
+		return ub;
 	}
 
-	public UtilBox() {
-		if (initd)
-			return;
-
-		File tc = new File("dwtemp");
-		if (!tc.exists() || !tc.isDirectory())
-			try {
-				FileUtils.copyFileToDirectory(new File("fr.ico"), new File(
-						"dwtemp"), true);
-				FileUtils.deleteQuietly(new File("dwtemp/fr.ico"));
-			} catch (IOException e) {
-			}
-
+	private UtilBox() {
+		r = new Random();
 		createColours();
-		initd = true;
 	}
 
-	public static int getRandomNumber(int range) {
+	public int getRandomNumber(int range) {
 		return r.nextInt(range);
 	}
 
-	public static void sendToClipboard(String s) {
+	public void sendToClipboard(String s) {
 		StringSelection stringSelection = new StringSelection(s);
 		Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clip.setContents(stringSelection, null);
 	}
 
-	public static String getFromClipboard() {
+	public String getFromClipboard() {
 		Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 		Transferable t = clip.getContents(null);
 		if (t == null)
@@ -103,12 +96,7 @@ public class UtilBox {
 		}
 	}
 
-	private static Color[] cols = null;
-	private static Random r = null;
-
-	private static void createColours() {
-		if (r == null)
-			r = new Random();
+	private void createColours() {
 		if (cols == null) {
 			cols = new Color[12];
 			cols[0] = new Color(238, 232, 170);
@@ -126,7 +114,7 @@ public class UtilBox {
 		}
 	}
 
-	public static Color dimColor(Color c) {
+	public Color dimColor(Color c) {
 		int r = c.getRed(), g = c.getGreen(), b = c.getBlue();
 		if (r >= 40)
 			r = r - 40;
@@ -143,7 +131,7 @@ public class UtilBox {
 		return new Color(r, g, b);
 	}
 
-	public static Color getRandomColor() {
+	public Color getRandomColor() {
 		if (r == null)
 			new UtilBox();
 		int cIndex = r.nextInt(12);
@@ -152,7 +140,7 @@ public class UtilBox {
 		return cols[cIndex];
 	}
 
-	public static Color getColor(int cid) {
+	public Color getColor(int cid) {
 		if (r == null)
 			new UtilBox();
 		if (cid > MAX_COLOR_INDEX)
@@ -162,7 +150,7 @@ public class UtilBox {
 		return cols[cid];
 	}
 
-	public static long getRandomLong() {
+	public long getRandomLong() {
 		return r.nextLong();
 	}
 
@@ -171,7 +159,7 @@ public class UtilBox {
 	 * @param url
 	 *            Internet Address To Open.
 	 */
-	public static void openUrl(String url) {
+	public void openUrl(String url) {
 		if (divertUrlOpen || url == null)
 			return;
 		try {
@@ -188,7 +176,7 @@ public class UtilBox {
 	 *            URL to ping
 	 * @return round trip time(in ms)
 	 */
-	public static long ping(String address) {
+	public long ping(String address) {
 		try {
 			if (!address.contains("http://"))
 				address = "http://" + address;
@@ -209,25 +197,14 @@ public class UtilBox {
 		return -1;
 	}
 
-	/**
-	 * 
-	 * @param millis
-	 *            Number Of Milliseconds To Pause For.
-	 */
-	public static void pause(int millis) {
-		long base = System.currentTimeMillis();
-		while (System.currentTimeMillis() - base < millis)
-			;
-	}
-
-	public static void wait(int millis) {
+	public void wait(int millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 		}
 	}
 
-	public static String alphanum(String s) {
+	public String alphanum(String s) {
 		if (s == null)
 			return "";
 		char[] str = s.toCharArray();
@@ -239,7 +216,7 @@ public class UtilBox {
 		return s;
 	}
 
-	public static String charToString(char[] c) {
+	public String charToString(char[] c) {
 		if (c == null)
 			return null;
 		String s = "";
@@ -248,13 +225,13 @@ public class UtilBox {
 		return s;
 	}
 
-	public static char[] stringToChar(String s) {
+	public char[] stringToChar(String s) {
 		if (s == null)
 			return null;
 		return s.toCharArray();
 	}
 
-	public static float compareSentence(String s1, String s2, int minLength) {
+	public float compareSentence(String s1, String s2, int minLength) {
 		int numMatches = 0;
 		s1 = s1.toLowerCase();
 		s2 = s2.toLowerCase();
@@ -290,8 +267,7 @@ public class UtilBox {
 		return per;
 	}
 
-	public static void addKeyListenerToAll(Component parent,
-			KeyListener listener) {
+	public void addKeyListenerToAll(Component parent, KeyListener listener) {
 		if (parent instanceof AbstractButton) {
 			AbstractButton a = (AbstractButton) parent;
 			// Check If The Listener is Already There (Avoid Double Reactions)
@@ -330,8 +306,7 @@ public class UtilBox {
 		}
 	}
 
-	public static void addMouseListenerToAll(Component parent,
-			MouseListener listener) {
+	public void addMouseListenerToAll(Component parent, MouseListener listener) {
 		if (parent instanceof AbstractButton) {
 			AbstractButton a = (AbstractButton) parent;
 			boolean is = false;
@@ -368,7 +343,7 @@ public class UtilBox {
 		}
 	}
 
-	public static void addMouseMotionListenerToAll(Component parent,
+	public void addMouseMotionListenerToAll(Component parent,
 			MouseMotionListener listener) {
 		if (parent instanceof AbstractButton) {
 			AbstractButton a = (AbstractButton) parent;
@@ -407,7 +382,7 @@ public class UtilBox {
 		}
 	}
 
-	public static void addMouseMotionListenerToAll(Component parent,
+	public void addMouseMotionListenerToAll(Component parent,
 			MouseMotionListener listener, Class<?>[] exclude) {
 		for (Class<?> c : exclude) {
 			if (parent.getClass() == c)
@@ -450,11 +425,11 @@ public class UtilBox {
 		}
 	}
 
-	public static String openFile(String type) {
+	public String openFile(String type) {
 		return openFile(type, null);
 	}
 
-	public static String openFile(String type, Window owner) {
+	public String openFile(String type, Window owner) {
 		JFileChooser fc = null;
 
 		if (type.equals("Torrent")) {
@@ -484,7 +459,7 @@ public class UtilBox {
 		return null;
 	}
 
-	public static void openFileLocation(File location) {
+	public void openFileLocation(File location) {
 		try {
 			if (location.exists()) {
 				String sPath = "\"" + location.getAbsolutePath() + "\"";
@@ -509,7 +484,7 @@ public class UtilBox {
 		}
 	}
 
-	public static String regex(String b4) {
+	public String regex(String b4) {
 		if (b4.contains("\\\\"))
 			return b4;
 		String after;
@@ -520,12 +495,12 @@ public class UtilBox {
 		return after;
 	}
 
-	public static void schedule(final int i, final Runnable runnable) {
+	public void schedule(final int millis, final Runnable runnable) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(i);
+					Thread.sleep(millis);
 				} catch (InterruptedException e) {
 				}
 				runnable.run();
@@ -533,7 +508,7 @@ public class UtilBox {
 		}).start();
 	}
 
-	public static int numberParse(String str, int i) {
+	public int numberParse(String str, int i) {
 		char[] chars = str.toCharArray();
 		str = "";
 		for (char c : chars) {
@@ -549,27 +524,35 @@ public class UtilBox {
 		return Integer.parseInt(str);
 	}
 
-	public static void clearActionListeners(AbstractButton cmpt) {
+	public void clearActionListeners(AbstractButton cmpt) {
 		for (ActionListener a : cmpt.getActionListeners()) {
 			cmpt.removeActionListener(a);
 		}
 	}
-	
-	public static final int LEFT=0,TOP=1,RIGHT=2,BOTTOM=3,NONEXISTANT=4;
 
-	public static int getTaskbarOrientation() {
+	/**
+	 * Windows Taskbar Orientations...
+	 */
+	public static final int LEFT = 0, TOP = 1, RIGHT = 2, BOTTOM = 3,
+			NONEXISTANT = 4;
+
+	public int getTaskbarOrientation() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Rectangle windowBounds = GraphicsEnvironment
 				.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		
-		if(windowBounds.x>0) return LEFT;
-		if(windowBounds.y>0) return TOP;
-		if(windowBounds.width<screenSize.width) return RIGHT;
-		if(windowBounds.height<screenSize.height) return BOTTOM;
+
+		if (windowBounds.x > 0)
+			return LEFT;
+		if (windowBounds.y > 0)
+			return TOP;
+		if (windowBounds.width < screenSize.width)
+			return RIGHT;
+		if (windowBounds.height < screenSize.height)
+			return BOTTOM;
 		return NONEXISTANT;
 	}
 
-	public static int getTaskbarHeight() {
+	public int getTaskbarHeight() {
 		int yDev = Toolkit.getDefaultToolkit().getScreenSize().height
 				- GraphicsEnvironment.getLocalGraphicsEnvironment()
 						.getMaximumWindowBounds().height;

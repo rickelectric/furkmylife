@@ -145,12 +145,4 @@ public class PrimaryWindowManager implements PrimaryEnv {
 				: win == null ? null : win.getWindow();
 	}
 
-	@Override
-	public void mediaNotify() {
-		if(mode == ENV_MODE && env != null) 
-			env.mediaNotify();
-		else if(mode==WIN_MODE && win != null)
-			win.mediaNotify();
-	}
-
 }

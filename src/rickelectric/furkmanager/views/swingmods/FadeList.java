@@ -5,8 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.List;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class FadeList extends List implements Opacible{
 		private static final long serialVersionUID = 1L;
@@ -66,7 +66,7 @@ public class FadeList extends List implements Opacible{
 				public void run(){
 					while(getAlpha()<0.9f){
 						setAlpha(alpha+0.02f);
-						UtilBox.pause(1000/msec);
+						UtilBox.getInstance().wait(1000/msec);
 					}
 					setAlpha(1f);
 				}

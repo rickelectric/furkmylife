@@ -26,12 +26,13 @@ import javax.swing.border.LineBorder;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.ecf.protocol.bittorrent.TorrentFile;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.network.StreamDownloader;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
-import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.img.ImageLoader;
 
 public class AddDownloadFrame extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
@@ -154,7 +155,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 		contentPane.add(btn_cancel);
 		
 		loading = new JLabel("");
-		loading.setIcon(new ImageIcon(AddDownloadFrame.class.getResource("/rickelectric/furkmanager/img/ajax-loader.gif")));
+		loading.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		loading.setHorizontalAlignment(SwingConstants.CENTER);
 		loading.setBounds(304, 124, 54, 55);
 		loading.setVisible(false);
@@ -338,7 +339,7 @@ public class AddDownloadFrame extends JFrame implements ActionListener{
 	}
 	
 	private void openFile() {
-		String metafile = UtilBox.openFile("Torrent");
+		String metafile = UtilBox.getInstance().openFile("Torrent");
 		input_link.setText(metafile);
 		info();
 	}

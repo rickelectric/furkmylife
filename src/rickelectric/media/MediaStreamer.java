@@ -1,9 +1,8 @@
-package rickelectric.furkmanager.player;
+package rickelectric.media;
 
 import javax.swing.JFrame;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.data.DefaultParams;
 
 public class MediaStreamer {
 

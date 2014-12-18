@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.SystemColor;
 import java.awt.Window;
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -20,16 +21,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIMessage;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API;
-import rickelectric.furkmanager.player.AudioPanel;
-import rickelectric.furkmanager.player.AudioPlayer;
-import rickelectric.furkmanager.player.VideoPanel;
-import rickelectric.furkmanager.player.VideoPlayer;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.menus.Main_TopMenuBar;
 import rickelectric.furkmanager.views.panels.Main_DownloadView;
 import rickelectric.furkmanager.views.panels.Main_FeedView;
@@ -40,6 +37,11 @@ import rickelectric.furkmanager.views.swingmods.OpacEffects;
 import rickelectric.furkmanager.views.swingmods.Opacible;
 import rickelectric.furkmanager.views.swingmods.Slideable;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
+import rickelectric.img.ImageLoader;
+import rickelectric.media.AudioPanel;
+import rickelectric.media.AudioPlayer;
+import rickelectric.media.VideoPanel;
+import rickelectric.media.VideoPlayer;
 
 public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	private static final long serialVersionUID = 1L;
@@ -61,7 +63,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	}
 
 	private JPanel contentPane;
-	private JFrame audioWin,videoWin;
+	private JFrame audioWin, videoWin;
 
 	public static void main(String[] args) {
 		JFrame f = new MainWindow();
@@ -194,7 +196,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 										@Override
 										public void run() {
 											FurkBridge.overrideCache(true);
-											UtilBox.pause(500);
+											UtilBox.getInstance().wait(500);
 											FurkBridge.overrideCache(false);
 										}
 									}).start();
@@ -216,8 +218,8 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 		dashArray[1][0] = new JLabel("");
 		dashArray[1][0].addMouseListener(iconEffect);
 		dashArray[1][0].setHorizontalAlignment(SwingConstants.CENTER);
-		dashArray[1][0].setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/dash/Files-64.png")));
+		dashArray[1][0].setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("dash/Files-64.png")));
 		dashArray[1][0].setBorder(new EtchedBorder(EtchedBorder.RAISED, null,
 				null));
 		dashArray[1][0].setBounds(10, 24, 78, 68);
@@ -225,8 +227,8 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 
 		dashArray[1][1] = new JLabel("");
 		dashArray[1][1].addMouseListener(iconEffect);
-		dashArray[1][1].setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/dash/Download-64.png")));
+		dashArray[1][1].setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("dash/Download-64.png")));
 		dashArray[1][1].setHorizontalAlignment(SwingConstants.CENTER);
 		dashArray[1][1].setBorder(new EtchedBorder(EtchedBorder.RAISED, null,
 				null));
@@ -235,8 +237,8 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 
 		dashArray[1][2] = new JLabel("");
 		dashArray[1][2].addMouseListener(iconEffect);
-		dashArray[1][2].setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/dash/RSS-64.png")));
+		dashArray[1][2].setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("dash/RSS-64.png")));
 		dashArray[1][2].setHorizontalAlignment(SwingConstants.CENTER);
 		dashArray[1][2].setBorder(new EtchedBorder(EtchedBorder.RAISED, null,
 				null));
@@ -245,8 +247,8 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 
 		dashArray[1][3] = new JLabel("");
 		dashArray[1][3].addMouseListener(iconEffect);
-		dashArray[1][3].setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/dash/Settings-64.png")));
+		dashArray[1][3].setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("dash/Settings-64.png")));
 		dashArray[1][3].setHorizontalAlignment(SwingConstants.CENTER);
 		dashArray[1][3].setBorder(new EtchedBorder(EtchedBorder.RAISED, null,
 				null));
@@ -255,8 +257,8 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 
 		dashArray[1][4] = new JLabel("");
 		dashArray[1][4].addMouseListener(iconEffect);
-		dashArray[1][4].setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/dash/User-64.png")));
+		dashArray[1][4].setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("dash/User-64.png")));
 		dashArray[1][4].setHorizontalAlignment(SwingConstants.CENTER);
 		dashArray[1][4].setBorder(new EtchedBorder(EtchedBorder.RAISED, null,
 				null));
@@ -331,7 +333,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 		addConsole();
 		addImgCacheViewer();
 		setResizable(false);
-		setVisible(true);
+		// setVisible(true);
 	}
 
 	@Override
@@ -409,7 +411,7 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 						}
 						OpacEffects.slide(currPanel[cpNum], 15, direction, 50,
 								Opacible.OUT);
-						UtilBox.pause(100);
+						UtilBox.getInstance().wait(100);
 						while (currPanel[cpNum].isSliding())
 							;
 
@@ -474,7 +476,14 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 
 	@Override
 	public void mediaCall(int mediaType, String mrl) {
-		if (!FurkManager.mediaEnabled())
+		boolean me = false;
+		try {
+			Class<?> c = Class.forName("rickelectric.media.AudioPlayer");
+			if (c != null)
+				me = true;
+		} catch (Exception e) {
+		}
+		if (!FurkManager.mediaEnabled() && !me)
 			return;
 		if (mediaType == AUDIO) {
 			constructAudioWindow();
@@ -490,9 +499,9 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	private void constructAudioWindow() {
 		if (audioWin == null) {
 			audioWin = new JFrame("Furk Music Player");
-			audioWin.setIconImage(new ImageIcon(getClass().getResource(
-					"/rickelectric/furkmanager/img/tree/audio-48.png"))
-					.getImage());
+			audioWin.setIconImage(ImageLoader.getInstance().getImage(
+					"tree/audio-48.png"));
+			audioWin.setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE);
 			audioWin.setContentPane(new AudioPanel());
 			audioWin.setResizable(false);
 			audioWin.addWindowListener(new WindowAdapter() {
@@ -505,21 +514,22 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 			audioWin.setLocation(this.getWidth(), this.getY());
 		}
 	}
-	
+
 	private void constructVideoWindow() {
 		if (videoWin == null) {
 			videoWin = new JFrame("Furk Music Player");
-			videoWin.setIconImage(new ImageIcon(getClass().getResource(
-					"/rickelectric/furkmanager/img/tree/video-48.png"))
-					.getImage());
+			videoWin.setIconImage(ImageLoader.getInstance().getImage(
+					"tree/video-48.png"));
+			videoWin.setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE);
 			videoWin.setContentPane(new VideoPanel());
-			//videoWin.setResizable(false);
+			// videoWin.setResizable(false);
 			videoWin.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					VideoPlayer.getInstance().stop();
 				}
 			});
-			videoWin.setMinimumSize(videoWin.getContentPane().getPreferredSize());
+			videoWin.setMinimumSize(videoWin.getContentPane()
+					.getPreferredSize());
 			videoWin.pack();
 			videoWin.setLocationRelativeTo(this);
 			videoWin.setLocation(this.getWidth(), this.getY());
@@ -535,11 +545,6 @@ public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	public void setVisible(boolean b) {
 		super.setVisible(b);
 		mediaCheck();
-	}
-
-	@Override
-	public void mediaNotify() {
-
 	}
 
 	public TranslucentPane getView(int i) {

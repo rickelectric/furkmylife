@@ -49,7 +49,7 @@ public class ImageManager {
 		return buffered;
 	}
 
-	public static BufferedImage resizeImage(BufferedImage img, int width,
+	public static BufferedImage resizeImage(Image img, int width,
 			int height) {
 		Image newImg = img.getScaledInstance(width, height,
 				Image.SCALE_AREA_AVERAGING);

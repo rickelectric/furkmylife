@@ -172,7 +172,7 @@ public class FolderTreeTransferHandler extends TransferHandler {
 		// Add data to model.
 		for (int i = 0; i < nodes.length; i++) {
 			if(nodes[i].getUserObject() instanceof MoveableItem){
-				//Move Item In FolderManager and on Furk Servers Before Move Here
+				//Move Item In FolderManager and on Furk Server Before Move Here
 				MoveableItem item=(MoveableItem)(nodes[i].getUserObject());
 				APIFolderManager.move(item, parent.getUserObject());
 				if(nodes[i] instanceof FolderTreeNode){

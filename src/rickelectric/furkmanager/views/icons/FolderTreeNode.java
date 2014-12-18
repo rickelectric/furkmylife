@@ -16,6 +16,7 @@ import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.windows.MainEnvironment;
 import rickelectric.furkmanager.views.windows.MainWindow;
+import rickelectric.img.ImageLoader;
 
 public class FolderTreeNode extends DefaultMutableTreeNode implements
 		FurkTreeNode {
@@ -69,26 +70,22 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 
 			folder_new = new JMenuItem("New Folder");
 			folder_new.addActionListener(this);
-			folder_new.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/new_black.png")));
+			folder_new.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("sm/new_black.png")));
 			add(folder_new);
 
 			folder_colorchange = new JMenuItem("Change Color");
 			folder_colorchange.addActionListener(this);
-			folder_colorchange.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/web_view.png")));
+			folder_colorchange.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("sm/web_view.png")));
 			add(folder_colorchange);
 
 			folder_rename = new JMenuItem("Rename Folder");
 			folder_rename.addActionListener(this);
-			folder_rename.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/edit_icon.png")));
+			folder_rename.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("sm/edit_icon.png")));
 			add(folder_rename);
 
 			folder_delete = new JMenuItem("Delete Folder");
 			folder_delete.addActionListener(this);
-			folder_delete.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/edit_delete.png")));
+			folder_delete.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("sm/edit_delete.png")));
 			add(folder_delete);
 
 		}
@@ -152,7 +149,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 								JOptionPane.QUESTION_MESSAGE);
 				if (resp == JOptionPane.YES_OPTION) {
 					if (APIFolderManager.delete(folder)) {
-						//parentRef(true);
+						APIFolderManager.getModel().removeNodeFromParent(FolderTreeNode.this);
 					}
 				}
 			}

@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import rickelectric.furkmanager.data.DefaultParams;
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.network.FurkBridge;
@@ -17,13 +17,10 @@ import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.network.api.API_Label;
 import rickelectric.furkmanager.network.api.API_UserData;
-import rickelectric.furkmanager.player.AudioPlayer;
-import rickelectric.furkmanager.player.VideoPlayer;
 import rickelectric.furkmanager.setup.SetupRegistry;
 import rickelectric.furkmanager.utils.MouseActivity;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.FMTrayBox;
 import rickelectric.furkmanager.views.LoginSplashWindow;
 import rickelectric.furkmanager.views.windows.APIConsole;
@@ -32,6 +29,9 @@ import rickelectric.furkmanager.views.windows.ImgCacheViewer;
 import rickelectric.furkmanager.views.windows.MainEnvironment;
 import rickelectric.furkmanager.views.windows.MainWindow;
 import rickelectric.furkmanager.views.windows.PrimaryEnv;
+import rickelectric.media.AudioPlayer;
+import rickelectric.media.DefaultParams;
+import rickelectric.media.VideoPlayer;
 
 public class FurkManager {
 
@@ -95,6 +95,10 @@ public class FurkManager {
 		} catch (Exception evt) {
 		}
 	}
+	
+	public static void LAF(Double i){
+		LAF(i.intValue());
+	}
 
 	public static boolean loadingSplash(boolean btns) {
 		if (lWin != null) {
@@ -112,27 +116,30 @@ public class FurkManager {
 		// TODO Add furk:// Protocol Argument Handler
 		System.out.println("Protocol Arguments: " + s);
 	}
+	
+	public static void init(){
+		ThreadPool.init();
+		SettingsManager.getInstance();
+		
+		UtilBox.getInstance();
+		RequestCache.init();
+		mediaEnabled = DefaultParams.init();
+	}
 
 	public static void main(String[] args) {
 		
 		SetupRegistry.checkRegistry();
-
 		LAF(0);
 		/**
 		 * Remove
 		 */
-		//FurkBridge.dummy(true);
-		//VideoPlayer.dummy = true;
-		//AudioPlayer.dummy = true;
+//		FurkBridge.dummy(true);
+//		VideoPlayer.dummy = true;
+//		AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
-		mediaEnabled = DefaultParams.init();
-		ThreadPool.init();
-		SettingsManager.getInstance();
-
-		UtilBox.init();
-		RequestCache.init();
+		init();
 
 		// Parse Arguments
 		int len = args.length;
@@ -166,22 +173,18 @@ public class FurkManager {
 			}
 		} catch (InterruptedException e) {
 			lWin.setText("Fatal Error. Exiting...");
-			UtilBox.pause(800);
+			UtilBox.getInstance().wait(800);
 			e.printStackTrace();
 			System.exit(0);
 		}
 
-		UtilBox.pause(400);
+		UtilBox.getInstance().wait(400);
 		lWin.setText("Switching To Login...");
-		UtilBox.pause(400);
+		UtilBox.getInstance().wait(400);
 		trayBox = new FMTrayBox();
 		trayBox.setMoveable(true);
 		trayRun();
-		if (tray) {
-			lWin.setVisible(false);
-		} else {
-			lWin.loginMode();
-		}
+		lWin.loginMode();
 	}
 
 	public static void appRun() {
@@ -204,6 +207,10 @@ public class FurkManager {
 			}
 			lWin.setText("Launching...");
 			mainWin();
+			if (tray) {
+				mWin.setVisible(false);
+				tray=false;
+			}
 			lWin.setVisible(false);
 
 			dwm = new DownloadManager();
@@ -362,70 +369,7 @@ public class FurkManager {
 
 	public static PrimaryEnv getMainWindow() {
 		if (mWin == null)
-			return new PrimaryEnv() {
-				@Override
-				public boolean isVisible() {
-					return true;
-				}
-
-				@Override
-				public void toFront() {
-				}
-
-				@Override
-				public void setVisible(boolean b) {
-				}
-
-				@Override
-				public void setLocationRelativeTo(Component c) {
-				}
-
-				@Override
-				public void setEnabled(boolean b) {
-				}
-
-				@Override
-				public void dispose() {
-				}
-
-				@Override
-				public void userSettings() {
-				}
-
-				@Override
-				public void settings() {
-				}
-
-				@Override
-				public void loadMessages() {
-				}
-
-				@Override
-				public void setStatus(String string) {
-				}
-
-				@Override
-				public Component getContentPane() {
-					return new JPanel();
-				}
-
-				@Override
-				public void main() {
-				}
-
-				@Override
-				public void mediaCall(int mediaType, String mrl) {
-				}
-
-				@Override
-				public Window getWindow() {
-					return null;
-				}
-
-				@Override
-				public void mediaNotify() {
-				}
-			};
+			return new PrimaryEmpty();
 		return mWin;
 	}
 
@@ -439,4 +383,65 @@ public class FurkManager {
 		return mediaEnabled;
 	}
 
+}
+
+class PrimaryEmpty implements PrimaryEnv {
+	@Override
+	public boolean isVisible() {
+		return true;
+	}
+
+	@Override
+	public void toFront() {
+	}
+
+	@Override
+	public void setVisible(boolean b) {
+	}
+
+	@Override
+	public void setLocationRelativeTo(Component c) {
+	}
+
+	@Override
+	public void setEnabled(boolean b) {
+	}
+
+	@Override
+	public void dispose() {
+	}
+
+	@Override
+	public void userSettings() {
+	}
+
+	@Override
+	public void settings() {
+	}
+
+	@Override
+	public void loadMessages() {
+	}
+
+	@Override
+	public void setStatus(String string) {
+	}
+
+	@Override
+	public Component getContentPane() {
+		return new JPanel();
+	}
+
+	@Override
+	public void main() {
+	}
+
+	@Override
+	public void mediaCall(int mediaType, String mrl) {
+	}
+
+	@Override
+	public Window getWindow() {
+		return null;
+	}
 }

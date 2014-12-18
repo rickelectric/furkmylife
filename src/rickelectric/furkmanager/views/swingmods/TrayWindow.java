@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.views;
+package rickelectric.furkmanager.views.swingmods;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -27,16 +27,11 @@ import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.border.DropShadowBorder;
 
-import rickelectric.furkmanager.utils.UtilBox;
-import rickelectric.furkmanager.views.swingmods.TranslucentPane;
+import rickelectric.UtilBox;
+import rickelectric.img.ImageLoader;
 
 public abstract class TrayWindow extends JDialog {
 	private static final long serialVersionUID = 1L;
-	
-	public static void main(String[] args){
-		final TrayWindow w = new  FMTrayBox();
-		w.setVisible(true);
-	}
 
 	protected TranslucentPane contentPane;
 
@@ -86,10 +81,10 @@ public abstract class TrayWindow extends JDialog {
 	};
 
 	public void addListeners() {
-		UtilBox.addMouseListenerToAll(this, opacInit);
+		UtilBox.getInstance().addMouseListenerToAll(this, opacInit);
 
-		UtilBox.addMouseListenerToAll(contentPane, pointInit);
-		UtilBox.addMouseMotionListenerToAll(contentPane, pointMotion);
+		UtilBox.getInstance().addMouseListenerToAll(contentPane, pointInit);
+		UtilBox.getInstance().addMouseMotionListenerToAll(contentPane, pointMotion);
 	}
 
 	public TrayWindow(String title, Font font) {
@@ -130,10 +125,8 @@ public abstract class TrayWindow extends JDialog {
 
 		btn_close = new JButton("");
 		panel_buttons.add(btn_close);
-		btn_close
-				.setIcon(new ImageIcon(
-						TrayWindow.class
-								.getResource("/rickelectric/furkmanager/img/sm/edit_delete.png")));
+		btn_close.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"sm/edit_delete.png")));
 
 		setSize(getPreferredSize());
 	}
@@ -151,7 +144,7 @@ public abstract class TrayWindow extends JDialog {
 	}
 
 	public void onMinimize(final Runnable onMinimizeAction) {
-		UtilBox.clearActionListeners(btn_minimize);
+		UtilBox.getInstance().clearActionListeners(btn_minimize);
 		btn_minimize.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -161,7 +154,7 @@ public abstract class TrayWindow extends JDialog {
 	}
 
 	public void onClose(final Runnable onCloseAction) {
-		UtilBox.clearActionListeners(btn_close);
+		UtilBox.getInstance().clearActionListeners(btn_close);
 		btn_close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

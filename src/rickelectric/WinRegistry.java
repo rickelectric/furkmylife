@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.utils;
+package rickelectric;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

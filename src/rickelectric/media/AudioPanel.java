@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.player;
+package rickelectric.media;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -112,13 +112,13 @@ public class AudioPanel extends JPanel implements AudioObserver {
 		AudioPlayer.getInstance().addAudioObserver(this);
 	}
 
-	public void detachObserver() {
-		AudioPlayer.getInstance().deleteObserver(this);
-	}
-
-	public void reattachObserver() {
-		AudioPlayer.getInstance().addAudioObserver(this);
-	}
+//	public void detachObserver() {
+//		AudioPlayer.getInstance().deleteObserver(this);
+//	}
+//
+//	public void reattachObserver() {
+//		AudioPlayer.getInstance().addAudioObserver(this);
+//	}
 
 	@Override
 	public void update(Observable o, Object param) {

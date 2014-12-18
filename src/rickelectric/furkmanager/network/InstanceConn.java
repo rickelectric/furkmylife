@@ -1,9 +1,9 @@
 package rickelectric.furkmanager.network;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.socks.ClientLink;
 import rickelectric.furkmanager.network.socks.ServerLink;
-import rickelectric.furkmanager.utils.UtilBox;
 
 /**
  * Ensures Only One Instance Of The Application Is Running At A Time Using
@@ -36,7 +36,7 @@ public class InstanceConn {
 		else if (c.response().equals("no-server")) {
 			s = new ServerLink();
 			s.run();
-			UtilBox.pause(2000);
+			UtilBox.getInstance().wait(2000);
 			if (s.error() != null && s.error().equals("Port Error")) {
 				FurkManager.trayAlert(FurkManager.TRAY_ERROR, "Error",
 						s.error(), null);

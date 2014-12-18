@@ -1,6 +1,6 @@
-package rickelectric.furkmanager.data;
+package rickelectric.media;
 
-import rickelectric.furkmanager.utils.WinRegistry;
+import rickelectric.WinRegistry;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
@@ -14,8 +14,9 @@ public class DefaultParams {
 
 	private static MediaPlayerFactory factory = null;
 
-	public static final String VLC_PATH = vlcPath() != null ? vlcReg
-			: ".\\libvlc\\"
+	public static final String VLC_PATH = 
+			//vlcPath() != null ? vlcReg: 
+				".\\libvlc\\"
 					+ ((System.getProperty("os.arch").contains("64")) ? "64"
 							: ".\\32");
 

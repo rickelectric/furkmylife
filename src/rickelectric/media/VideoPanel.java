@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.player;
+package rickelectric.media;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -21,9 +21,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.views.swingmods.JButtonLabel;
+import rickelectric.img.ImageLoader;
 
 public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 	private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 	private JLabel loading;
 	private JSlider slider_position;
 	private JPanel panel_controls;
-	private JButtonLabel btn_playpause,btn_stop,btn_max;
+	private JButtonLabel btn_playpause, btn_stop, btn_max;
 	private JSlider slider_volume;
 
 	private Thread overThread;
@@ -58,8 +58,8 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 				new ImageIcon(getClass().getResource("media_pause.png")));
 		icons.put("stop", new ImageIcon(getClass()
 				.getResource("media_stop.png")));
-		icons.put("fullscreen", new ImageIcon(getClass()
-				.getResource("media_fullscreen.png")));
+		icons.put("fullscreen",
+				new ImageIcon(getClass().getResource("media_fullscreen.png")));
 
 		videoPane = new JPanel();
 		videoPane.setBorder(new CompoundBorder(new LineBorder(Color.black, 2),
@@ -97,7 +97,7 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 		btn_stop = new JButtonLabel("");
 		panel_controls.add(btn_stop);
 		btn_stop.setIcon(icons.get("stop"));
-		
+
 		btn_max = new JButtonLabel("");
 		panel_controls.add(btn_max);
 		btn_max.setIcon(icons.get("fullscreen"));
@@ -124,8 +124,8 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 		panel_controls.add(slider_volume);
 
 		loading = new JLabel("");
-		loading.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader-48.gif")));
+		loading.setIcon(new ImageIcon(ImageLoader.class
+				.getResource("ajax-loader-48.gif")));
 		loading.setPreferredSize(new Dimension(49, 49));
 		loading.setVisible(false);
 		panel_controls.add(loading);
@@ -156,7 +156,7 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 						VideoPlayer.getInstance().getOverlay()
 								.setVisible(getTopLevelAncestor().isVisible());
 				}
-				
+
 				Thread.sleep(20);
 			} catch (Exception e) {
 			}
@@ -228,7 +228,7 @@ public class VideoPanel extends JPanel implements VideoObserver, Runnable {
 	public JButtonLabel getStopButton() {
 		return btn_stop;
 	}
-	
+
 	@Override
 	public JButtonLabel getFullscreenButton() {
 		return btn_max;

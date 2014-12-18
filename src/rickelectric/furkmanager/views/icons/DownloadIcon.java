@@ -19,11 +19,11 @@ import javax.swing.JProgressBar;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkDownload;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.api.API_Download;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.Download_MyDownloads;
 import rickelectric.furkmanager.views.windows.FurkDownloadView;
 
@@ -154,12 +154,12 @@ public class DownloadIcon extends JPanel implements
 		if (cDownload.iconColor != null)
 			bgc = cDownload.iconColor;
 		else {
-			bgc = UtilBox.getRandomColor();
+			bgc = UtilBox.getInstance().getRandomColor();
 			cDownload.iconColor = bgc;
 		}
 		setBackground(bgc);
 
-		UtilBox.addMouseListenerToAll(this, new MouseAdapter() {
+		UtilBox.getInstance().addMouseListenerToAll(this, new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1

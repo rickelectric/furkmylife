@@ -12,12 +12,13 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkDownload;
 import rickelectric.furkmanager.network.api.API_Download;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.icons.DownloadIcon;
 import rickelectric.furkmanager.views.windows.AppFrameClass;
+import rickelectric.img.ImageLoader;
 
 public class Download_MyDownloads extends JPanel implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -43,7 +44,7 @@ public class Download_MyDownloads extends JPanel implements Runnable {
 		this.mode = mode;
 		this.hardReload = false;
 		setLayout(null);
-		setBackground(UtilBox.getRandomColor());
+		setBackground(UtilBox.getInstance().getRandomColor());
 		resultScroller = new JScrollPane(
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -67,8 +68,7 @@ public class Download_MyDownloads extends JPanel implements Runnable {
 
 		label_loading = new JLabel();
 		label_loading.setHorizontalAlignment(SwingConstants.CENTER);
-		label_loading.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif")));
+		label_loading.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		label_loading.setBounds(200, 123, 107, 91);
 		resultPanel.add(label_loading);
 		repaint();
@@ -118,7 +118,7 @@ public class Download_MyDownloads extends JPanel implements Runnable {
 					+ numResults + " " + (mode == FAILED ? "Failed" : "Active")
 					+ " Downloads");
 		} catch (Exception e) {
-			label_loading.setIcon(new ImageIcon("img/remove.png"));
+			label_loading.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("remove.png")));
 			FurkManager.getMainWindow().setStatus("Could Not Load "
 					+ " " + (mode == FAILED ? "Failed" : "Active")
 					+ " Downloads");

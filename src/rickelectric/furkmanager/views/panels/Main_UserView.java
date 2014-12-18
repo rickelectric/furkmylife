@@ -24,13 +24,13 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import rickelectric.furkmanager.FurkManager;
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.swingmods.TranslucentPane;
+import rickelectric.img.ImageLoader;
 
 import com.xeiam.xchart.XChartPanel;
 
@@ -82,7 +82,7 @@ public class Main_UserView extends TranslucentPane {
 		add(tabbedPane);
 
 		JPanel pane_info = new JPanel();
-		pane_info.setBackground(UtilBox.getRandomColor());
+		pane_info.setBackground(UtilBox.getInstance().getRandomColor());
 		tabbedPane.addTab("Account Info", null, pane_info, null);
 		pane_info.setLayout(null);
 
@@ -161,8 +161,7 @@ public class Main_UserView extends TranslucentPane {
 
 		loading_box_tab1 = new JLabel("");
 		loading_box_tab1.setBounds(457, 274, 80, 80);
-		loading_box_tab1.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif")));
+		loading_box_tab1.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		loading_box_tab1.setVisible(false);
 		pane_info.add(loading_box_tab1);
 
@@ -186,20 +185,17 @@ public class Main_UserView extends TranslucentPane {
 		});
 		btn_Maximize.setFont(new Font("Dialog", Font.BOLD, 12));
 		btn_Maximize
-				.setIcon(new ImageIcon(
-						Main_UserView.class
-								.getResource("/rickelectric/furkmanager/img/sm/arrow_expand.png")));
+				.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("sm/arrow_expand.png")));
 		pane_bandwidth.add(btn_Maximize, BorderLayout.SOUTH);
 
 		panel_searchdl = new JPanel();
-		panel_searchdl.setBackground(UtilBox.getRandomColor());
+		panel_searchdl.setBackground(UtilBox.getInstance().getRandomColor());
 		tabbedPane.addTab("Search & Downloads", null, panel_searchdl, "");
 		panel_searchdl.setLayout(null);
 
 		loading_box_tab3 = new JLabel("");
 		loading_box_tab3.setBounds(457, 256, 66, 64);
-		loading_box_tab3.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif")));
+		loading_box_tab3.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		loading_box_tab3.setVisible(false);
 		panel_searchdl.add(loading_box_tab3);
 
@@ -240,8 +236,7 @@ public class Main_UserView extends TranslucentPane {
 
 		saving_box_tab_3 = new JLabel("");
 		saving_box_tab_3.setBounds(457, 256, 66, 64);
-		saving_box_tab_3.setIcon(new ImageIcon(FurkManager.class
-				.getResource("img/ajax-loader.gif")));
+		saving_box_tab_3.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
 		saving_box_tab_3.setVisible(false);
 		panel_searchdl.add(saving_box_tab_3);
 		button_save.setBounds(12, 328, 131, 26);

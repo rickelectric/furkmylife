@@ -10,15 +10,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.models.FurkTFile;
 import rickelectric.furkmanager.network.AsyncDownload;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.ImageViewer;
 import rickelectric.furkmanager.views.panels.ScreenshotViewPanel;
 import rickelectric.furkmanager.views.windows.PrimaryEnv;
+import rickelectric.img.ImageLoader;
 
 public class TFileTreeNode extends DefaultMutableTreeNode implements
 		FurkTreeNode {
@@ -47,13 +48,15 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 	public String toString() {
 		return tfile.getName();
 	}
-	
+
 	private void videoMediaCall() {
-		FurkManager.getMainWindow().mediaCall(PrimaryEnv.VIDEO,tfile.getUrlDl());
+		FurkManager.getMainWindow().mediaCall(PrimaryEnv.VIDEO,
+				tfile.getUrlDl());
 	}
 
 	private void audioMediaCall() {
-		FurkManager.getMainWindow().mediaCall(PrimaryEnv.AUDIO,tfile.getUrlDl());
+		FurkManager.getMainWindow().mediaCall(PrimaryEnv.AUDIO,
+				tfile.getUrlDl());
 	}
 
 	private class ContextMenu extends JPopupMenu implements ActionListener {
@@ -68,42 +71,42 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 			view = new JMenuItem("View Image");
 			view.addActionListener(this);
 			if (tfile.getContentType().toLowerCase().contains("image")) {
-				view.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/arrow_expand.png")));
+				view.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/arrow_expand.png")));
 				add(view);
 			}
 
-			play = new JMenuItem("Stream Audio (Experimental)");
+			play = new JMenuItem("Stream Audio");
 			play.addActionListener(this);
 			if (tfile.getContentType().toLowerCase().contains("audio")) {
-				play.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/play.png")));
+				play.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/play.png")));
 				add(play);
 			}
 
-			vplay = new JMenuItem("Stream Video (Experimental)");
+			vplay = new JMenuItem("Stream Video");
 			vplay.addActionListener(this);
 			if (tfile.getContentType().toLowerCase().contains("video")) {
-				vplay.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/play.png")));
+				vplay.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/play.png")));
 				add(vplay);
 			}
 
 			JMenu download = new JMenu("Download Using...");
-			download.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/download_gr.png")));
+			download.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+					"sm/download_gr.png")));
 			{
 				idm = new JMenuItem("Internet Download Manager");
-				idm.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/idm.png")));
+				idm.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/idm.png")));
 				idm.addActionListener(this);
 				if (SettingsManager.getInstance().idm()) {
 					download.add(idm);
 				}
 
 				internal = new JMenuItem("Internal Downloader");
-				internal.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/file_download.png")));
+				internal.setIcon(new ImageIcon(ImageLoader.getInstance()
+						.getImage("sm/file_download.png")));
 				internal.addActionListener(this);
 				if (tfile.getSize() > 104857600L) {
 					internal.setEnabled(false);
@@ -112,14 +115,14 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 				download.add(internal);
 
 				browser = new JMenuItem("Browser");
-				browser.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/internet_alt.png")));
+				browser.setIcon(new ImageIcon(ImageLoader.getInstance()
+						.getImage("sm/internet_alt.png")));
 				browser.addActionListener(this);
 				download.add(browser);
 
 				link = new JMenuItem("Link URL");
-				link.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/edit_icon.png")));
+				link.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/edit_icon.png")));
 				link.addActionListener(this);
 				download.add(link);
 			}
@@ -132,8 +135,8 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 			if (tfile.getContentType().toLowerCase().contains("video")
 					&& tfile.getThumbURL() != null
 					&& !tfile.getThumbURL().equals("")) {
-				screenshots.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/web_view.png")));
+				screenshots.setIcon(new ImageIcon(ImageLoader.getInstance()
+						.getImage("sm/web_view.png")));
 				add(screenshots);
 			}
 
@@ -167,14 +170,19 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(browser)) {
 							// Browser Download
-							UtilBox.openUrl(tfile.getUrlDl());
+							UtilBox.getInstance().openUrl(tfile.getUrlDl());
 						}
 						if (src.equals(idm)) {
-							String path = SettingsManager.getInstance().idmPath();
-							Runtime.getRuntime()
-									.exec(new String[] { path, "-d",
-											(tfile).getUrlDl(), "/p",
-											SettingsManager.getInstance().getDownloadFolder() });
+							String path = SettingsManager.getInstance()
+									.idmPath();
+							Runtime.getRuntime().exec(
+									new String[] {
+											path,
+											"-d",
+											(tfile).getUrlDl(),
+											"/p",
+											SettingsManager.getInstance()
+													.getDownloadFolder() });
 						}
 						if (src.equals(internal)) {
 							String savePath = DownloadManager
@@ -195,7 +203,7 @@ public class TFileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(link)) {
 							// Show Link
-							UtilBox.sendToClipboard(tfile.getUrlDl());
+							UtilBox.getInstance().sendToClipboard(tfile.getUrlDl());
 							FurkManager.trayAlert(FurkManager.TRAY_INFO,
 									"Link Copied",
 									"Download link to '" + tfile.getName()

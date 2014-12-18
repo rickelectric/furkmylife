@@ -5,6 +5,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIFolder;
@@ -26,13 +27,14 @@ public class APIFolderManager {
 
 	public static class FolderObservable extends Observable {
 		public void stateChanged(UpdateSource source) {
-			System.out.println("Folder Observer Updated: " + source);
-			setChanged();
-			notifyObservers(source);
+//			System.out.println("Folder Observer Updated: " + source);
+//			setChanged();
+//			notifyObservers(source);
 		}
 	}
 
 	private static FolderObservable fo = new FolderObservable();
+	private static DefaultTreeModel model;
 
 	public static void addObserver(Observer o) {
 		fo.addObserver(o);
@@ -41,10 +43,15 @@ public class APIFolderManager {
 	public static void deleteObserver(Observer o) {
 		fo.deleteObserver(o);
 	}
+	
+	public static void init(){
+		init(API_Label.root());
+	}
 
 	public static void init(FurkLabel rootLabel) {
 		if (root == null || !root.getLabel().equals(rootLabel)) {
 			register = null;
+			model = null;
 			System.gc();
 			register = new ArrayList<MoveableItem>();
 			root = new APIFolder(rootLabel);
@@ -163,14 +170,17 @@ public class APIFolderManager {
 					System.out.println("Updating Folder Label Details...");
 					FurkLabel l = ((APIFolder) obj).getLabel();
 					l.setParentID(dest.getID());
-					API_Label.update(l);
+					if(!API_Label.update(l)){
+						l.setParentID(src.getID());
+						return false;
+					}
 				} else if (obj instanceof FurkFile) {
 					String[] labels = ((FurkFile) obj).getIdLabels();
 					String id = obj.getID();
 					if (labels != null && labels.length != 0) {// Already In A
 																// Folder
-						API_Label.unlinkFromFiles(src.getID(),
-								new String[] { id });
+						if(!API_Label.unlinkFromFiles(src.getID(),
+								new String[] { id })) return false;
 					}
 					if (!dest.equals(root)) {// New Folder Is Not Root (null)
 												// Folder
@@ -197,6 +207,7 @@ public class APIFolderManager {
 		if (root == null)
 			return null;
 		FolderTreeNode head = populateTree(root);
+		model = new DefaultTreeModel(head);
 		return head;
 	}
 
@@ -216,6 +227,11 @@ public class APIFolderManager {
 			}
 		}
 		return col;
+	}
+
+	public static DefaultTreeModel getModel() {
+		return model == null ? model = new DefaultTreeModel(generateTree())
+				: model;
 	}
 
 }

@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 
 /**
  * @author Ionicle
@@ -118,7 +118,7 @@ public class JFadeLabel extends JLabel implements Opacible{
 				public void run(){
 					while(getAlpha()<0.9f){
 						setAlpha(alpha+0.02f);
-						UtilBox.pause(1000/msec);
+						UtilBox.getInstance().wait(1000/msec);
 					}
 					setAlpha(1f);
 					fading=false;

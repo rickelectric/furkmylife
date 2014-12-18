@@ -15,9 +15,9 @@ import javax.swing.JRadioButton;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.windows.MainEnvironment;
 import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
@@ -48,7 +48,7 @@ public class Settings_UIPanel extends JPanel {
 		setSize(new Dimension(242, 363));
 
 		setLayout(null);
-		setBackground(UtilBox.getRandomColor());
+		setBackground(UtilBox.getInstance().getRandomColor());
 
 		panel_mainInterface = new JPanel();
 		panel_mainInterface.setBorder(new TitledBorder(new LineBorder(

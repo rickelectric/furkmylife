@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.swing.Timer;
 
-import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.UtilBox;
 
 public class OpacEffects {
 
@@ -164,7 +164,7 @@ public class OpacEffects {
 						o.setAlpha(o.getAlpha() + alphaInc);
 					}
 					o.repaint();
-					UtilBox.pause(time);
+					UtilBox.getInstance().wait(time);
 				}
 				o.setSliding(false);
 			}
@@ -254,7 +254,7 @@ public class OpacEffects {
 						direction = -0.05f;
 					}
 					o.setAlpha(alpha);
-					UtilBox.pause(o.getOscSpeed());
+					UtilBox.getInstance().wait(o.getOscSpeed());
 				}
 				o.setAlpha(1f);
 			}

@@ -7,8 +7,8 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ThreadPool;
-import rickelectric.furkmanager.utils.UtilBox;
 
 public class TranslucentPane extends JPanel implements Opacible,Slideable {
 	private static final long serialVersionUID = 1L;
@@ -91,7 +91,7 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 			public void run() {
 				while (getAlpha() < 1f) {
 					setAlpha(alpha + 0.02f);
-					UtilBox.pause(1000 / msec);
+					UtilBox.getInstance().wait(1000 / msec);
 				}
 				setAlpha(1f);
 			}
@@ -104,7 +104,7 @@ public class TranslucentPane extends JPanel implements Opacible,Slideable {
 			public void run() {
 				while (getAlpha() > 0f) {
 					setAlpha(alpha - 0.02f);
-					UtilBox.pause(1000 / msec);
+					UtilBox.getInstance().wait(1000 / msec);
 				}
 				setAlpha(0f);
 			}

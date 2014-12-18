@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.player;
+package rickelectric.media;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -11,7 +11,6 @@ import java.util.Observer;
 import javax.swing.JSlider;
 
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.data.DefaultParams;
 import rickelectric.furkmanager.utils.SettingsManager;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;

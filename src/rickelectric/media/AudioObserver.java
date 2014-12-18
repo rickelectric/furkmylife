@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.player;
+package rickelectric.media;
 
 import java.util.Observer;
 
@@ -11,7 +11,7 @@ public interface AudioObserver extends Observer {
 	JButtonLabel getPlayButton();
 	JButtonLabel getStopButton();
 	JSlider getPositionSlider();
-	void detachObserver();
-	void reattachObserver();
+//	void detachObserver();
+//	void reattachObserver();
 
 }

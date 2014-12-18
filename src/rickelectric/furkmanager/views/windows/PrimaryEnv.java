@@ -35,6 +35,4 @@ public interface PrimaryEnv {
 
 	Window getWindow();
 
-	void mediaNotify();
-
 }

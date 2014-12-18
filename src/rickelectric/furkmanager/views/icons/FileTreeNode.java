@@ -9,14 +9,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.idownloader.DownloadManager;
 import rickelectric.furkmanager.models.FurkFile;
+import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.panels.TFileTreePanel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
+import rickelectric.img.ImageLoader;
 
 public class FileTreeNode extends DefaultMutableTreeNode implements
 		FurkTreeNode {
@@ -111,35 +113,35 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 			this.cFile = cFile;
 
 			view = new JMenuItem("View Details");
-			view.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/arrow_expand.png")));
+			view.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+					"sm/arrow_expand.png")));
 			view.addActionListener(this);
 
 			fview = new JMenuItem("Open Download Page");
-			fview.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/web_view.png")));
+			fview.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+					"sm/web_view.png")));
 			fview.addActionListener(this);
 
 			cp = new JMenuItem("Copy Download Page Link");
-			cp.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/edit_icon.png")));
+			cp.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+					"sm/edit_icon.png")));
 			cp.addActionListener(this);
 
 			JMenu download = new JMenu("Download File Using...");
-			download.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/download_gr.png")));
+			download.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+					"sm/download_gr.png")));
 			{
 				idm = new JMenuItem("Internet Download Manager");
-				idm.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/idm.png")));
+				idm.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/idm.png")));
 				idm.addActionListener(this);
 				if (SettingsManager.getInstance().idm()) {
 					download.add(idm);
 				}
 
 				internal = new JMenuItem("Internal Downloader");
-				internal.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/file_download.png")));
+				internal.setIcon(new ImageIcon(ImageLoader.getInstance()
+						.getImage("sm/file_download.png")));
 				internal.addActionListener(this);
 				if (cFile.getSize() > 104857600L) {
 					internal.setEnabled(false);
@@ -148,21 +150,21 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 				download.add(internal);
 
 				browser = new JMenuItem("Browser");
-				browser.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/internet_alt.png")));
+				browser.setIcon(new ImageIcon(ImageLoader.getInstance()
+						.getImage("sm/internet_alt.png")));
 				browser.addActionListener(this);
 				download.add(browser);
 
 				link = new JMenuItem("Link URL");
-				link.setIcon(new ImageIcon(FurkManager.class
-						.getResource("img/sm/edit_icon.png")));
+				link.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+						"sm/edit_icon.png")));
 				link.addActionListener(this);
 				download.add(link);
 			}
 
 			recycle = new JMenuItem("Send To Recycle Bin");
-			recycle.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/sm/recycler.png")));
+			recycle.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+					"sm/recycler.png")));
 			recycle.addActionListener(this);
 
 			add(view);
@@ -188,16 +190,16 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(fview)) {
 							// Furk View
-							UtilBox.openUrl("https://www.furk.net"
+							UtilBox.getInstance().openUrl("https://www.furk.net"
 									+ cFile.getUrlPage());
 						}
 						if (src.equals(cp)) {
-							UtilBox.sendToClipboard("https://www.furk.net"
+							UtilBox.getInstance().sendToClipboard("https://www.furk.net"
 									+ cFile.getUrlPage());
 						}
 						if (src.equals(browser)) {
 							// Browser Download
-							UtilBox.openUrl(cFile.getUrlDl());
+							UtilBox.getInstance().openUrl(cFile.getUrlDl());
 						}
 						if (src.equals(idm)) {
 							try {
@@ -236,7 +238,7 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						}
 						if (src.equals(link)) {
 							// Show Link
-							UtilBox.sendToClipboard(cFile.getUrlDl());
+							UtilBox.getInstance().sendToClipboard(cFile.getUrlDl());
 							FurkManager.trayAlert(FurkManager.TRAY_INFO,
 									"Link Copied",
 									"Download link to '" + cFile.getName()
@@ -245,7 +247,8 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 						if (src.equals(recycle)) {
 							// Recycle
 							String id = cFile.getID();
-							API_File.unlink(new String[] { id });
+							if(API_File.unlink(new String[] { id }))
+								APIFolderManager.getModel().removeNodeFromParent(FileTreeNode.this);
 						}
 					} catch (Exception e) {
 					}
@@ -256,11 +259,12 @@ public class FileTreeNode extends DefaultMutableTreeNode implements
 		}
 	}
 
-//	public void parentRef(boolean hard) {
-//		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE)
-//			((File_FolderView) ((Main_FileView) MainEnvironment.getInstance()
-//					.getView(1)).getTabContent(2)).refreshMyFolders(false);
-//	}
+	// public void parentRef(boolean hard) {
+	// if (SettingsManager.getInstance().getMainWinMode() ==
+	// SettingsManager.ENV_MODE)
+	// ((File_FolderView) ((Main_FileView) MainEnvironment.getInstance()
+	// .getView(1)).getTabContent(2)).refreshMyFolders(false);
+	// }
 
 	@Override
 	public boolean draggable() {

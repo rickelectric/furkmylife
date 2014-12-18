@@ -10,7 +10,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -19,9 +18,10 @@ import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
-import rickelectric.furkmanager.utils.UtilBox;
 import rickelectric.furkmanager.views.Statable;
+import rickelectric.img.ImageLoader;
 
 public abstract class AppFrameClass extends JFrame implements Statable {
 	private static final long serialVersionUID = 1L;
@@ -37,7 +37,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 
 	public AppFrameClass() {
 		super.setTitle("Furk Manager!");
-		setIconImage(new ImageIcon(FurkManager.class.getResource("img/fr.png")).getImage());
+		setIconImage(ImageLoader.getInstance().getImage("fr.png"));
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -77,7 +77,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 	};
 	
 	public void addConsole(){
-		UtilBox.addKeyListenerToAll(this,consoleAdp);
+		UtilBox.getInstance().addKeyListenerToAll(this,consoleAdp);
 	}
 	
 	public static final KeyListener cacheAdp=new KeyAdapter(){
@@ -97,7 +97,7 @@ public abstract class AppFrameClass extends JFrame implements Statable {
 	};
 	
 	public void addImgCacheViewer(){
-		UtilBox.addKeyListenerToAll(this, cacheAdp);
+		UtilBox.getInstance().addKeyListenerToAll(this, cacheAdp);
 	}
 
 	@Override
