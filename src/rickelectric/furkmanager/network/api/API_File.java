@@ -1,6 +1,8 @@
 package rickelectric.furkmanager.network.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
@@ -9,6 +11,7 @@ import java.util.Observer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import rickelectric.IndexPair;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkLabel;
@@ -22,21 +25,35 @@ import rickelectric.furkmanager.network.FurkBridge;
  */
 public class API_File extends API {
 
-	public enum GetType {
-		GET_DELETED, GET_FINISHED
+	public enum FileSection {
+		DELETED, FINISHED
 	}
 
-	public static final GetType GET_DELETED = GetType.GET_DELETED,
-			GET_FINISHED = GetType.GET_FINISHED;
+	public static final FileSection DELETED = FileSection.DELETED,
+			FINISHED = FileSection.FINISHED;
 
-	private static ArrayList<FurkFile> filesFinished;
-	private static ArrayList<FurkFile> filesDeleted;
+	private static ArrayList<IndexPair> index = new ArrayList<IndexPair>();
+	/**
+	 * Maps FurkID --> FurkFile (In MyFiles::Finished)
+	 */
+	private static HashMap<String, FurkFile> finished = new HashMap<String, FurkFile>();
+
+	private static ArrayList<IndexPair> dIndex = new ArrayList<IndexPair>();
+	/**
+	 * Maps FurkID --> FurkFile (In MyFiles::Deleted)
+	 */
+	private static HashMap<String, FurkFile> deleted = new HashMap<String, FurkFile>();
 
 	public static class FileObservable extends Observable {
-		public void stateChanged(GetType type) {
-			System.out.println("API_File Observer Update: "+type);
+		public void stateChanged(FileSection type) {
+			System.out.println("API_File Observer Update: " + type);
 			setChanged();
 			notifyObservers(type);
+		}
+
+		public void loadingState(FileSection section) {
+			setChanged();
+			notifyObservers(-1);
 		}
 	}
 
@@ -50,8 +67,115 @@ public class API_File extends API {
 		fo.deleteObserver(o);
 	}
 
-	public static ArrayList<APIObject> jsonFiles(JSONArray files) {
+	public static void update(final FileSection section){
+		update(section, true);
+	}
+	
+	/**
+	 * Updates the FurkFiles in the given Section to match new info on the
+	 * server. Adds new Files from server if they don't already exist. Removes
+	 * Files not present in section on server.
+	 * 
+	 * @param section
+	 */
+	public static void update(final FileSection section,boolean async) {
+		Thread update = new Thread(new Runnable() {
+			public void run() {
+				boolean update = false;
+				if (section == FINISHED) {
+					ArrayList<FurkFile> fin = get(FINISHED, -1, -1);
+					String[] s = finished.keySet().toArray(new String[] {});
+					ArrayList<String> keys = new ArrayList<String>();
+					for (String z : s)
+						keys.add(z);
+					for (FurkFile f : fin) {
+						update = addToSection(FINISHED, f);
+						keys.remove(f.getID());
+					}
+					if (keys.size() > 0) {
+						update = true;
+						for (String z : keys) {
+							finished.remove(z);
+						}
+						keys.removeAll(keys);
+					}
 
+				}
+				if (section == DELETED) {
+					ArrayList<FurkFile> del = get(DELETED, -1, -1);
+					String[] s = deleted.keySet().toArray(new String[] {});
+					ArrayList<String> keys = new ArrayList<String>();
+					for (String z : s)
+						keys.add(z);
+					for (FurkFile f : del) {
+						update = addToSection(DELETED, f);
+						keys.remove(f.getID());
+					}
+					if (keys.size() > 0) {
+						update = true;
+						for (String z : keys) {
+							deleted.remove(z);
+						}
+						keys.removeAll(keys);
+					}
+				}
+				if (update) {
+					fo.stateChanged(section);
+				}
+			}
+		});
+		update.setDaemon(true);
+		if(async) update.start();
+		else update.run();
+	}
+
+	public static IndexPair[] getFileIDs(FileSection section) {
+		return (section == FINISHED ? index : dIndex)
+				.toArray(new IndexPair[] {});
+	}
+
+	public static FurkFile getFile(FileSection section, String fileID) {
+		return section == FINISHED ? finished.get(fileID) : deleted.get(fileID);
+	}
+
+	private static boolean addToSection(FileSection fs, FurkFile f) {
+		boolean added = false;
+		String fid = f.getID();
+		FurkFile curr = (fs == FINISHED ? finished : deleted).get(fid);
+		if (curr == null) {
+			added = true;
+			(fs == FINISHED ? finished : deleted).put(fid, f);
+			(fs == FINISHED ? index : dIndex).add(new IndexPair(fid, f
+					.getCtime()));
+			Collections.sort(fs == FINISHED ? index : dIndex);
+		} else {
+			curr.overwrite(f);
+		}
+		return added;
+	}
+
+	private static FurkFile removeFromSection(FileSection section, String fid) {
+		FurkFile r = null;
+		if (section == FINISHED) {
+			r = finished.remove(fid);
+			if (r != null)
+				index.remove(fid);
+		} else {
+			r = deleted.remove(fid);
+			if (r != null)
+				dIndex.remove(fid);
+		}
+		return r;
+	}
+
+	/**
+	 * Parse <b>JSONArray</b> of Furk API Objects to a list of <b>APIObject</b>s
+	 * 
+	 * @param files
+	 *            JSON Array Of Furk API Objects
+	 * @return ArrayList of APIObjects matching contents of <b>files</b>.
+	 */
+	public static ArrayList<APIObject> jsonFiles(JSONArray files) {
 		ArrayList<APIObject> fl = new ArrayList<APIObject>();
 
 		for (int i = 0; i < files.length(); i++) {
@@ -139,27 +263,8 @@ public class API_File extends API {
 		return fl;
 	}
 
-	public static ArrayList<FurkFile> getFinishedCache() {
-		return filesFinished;
-	}
-
-	public static ArrayList<FurkFile> getDeletedCache() {
-		return filesDeleted;
-	}
-
-	public static ArrayList<FurkFile> getAllFinished() {
-		filesFinished = get(GET_FINISHED, -1, -1);
-		fo.stateChanged(GET_FINISHED);
-		return filesFinished;
-	}
-
-	public static ArrayList<FurkFile> getAllDeleted() {
-		filesDeleted = get(GET_DELETED, -1, -1);
-		fo.stateChanged(GET_DELETED);
-		return filesDeleted;
-	}
-
-	private static ArrayList<FurkFile> get(GetType type, int limit, int offset) {
+	private static ArrayList<FurkFile> get(FileSection type, int limit,
+			int offset) {
 		int[] limoffs = null;
 		if (limit > 0 && offset >= 0) {
 			limoffs = new int[2];
@@ -167,12 +272,12 @@ public class API_File extends API {
 			limoffs[1] = offset;
 		}
 		String json = null;
-		if (type == GET_FINISHED)
+		if (type == FINISHED)
 			json = FurkBridge.fileGet(FurkBridge.GET_ALL, null, limoffs, null,
 					true);
-		else if (type == GET_DELETED)
-			json = FurkBridge.fileGet(FurkBridge.GET_TRASH, null, limoffs, null,
-					true);
+		else if (type == DELETED)
+			json = FurkBridge.fileGet(FurkBridge.GET_TRASH, null, limoffs,
+					null, true);
 		else
 			throw new IllegalArgumentException(
 					"Invalid GET Type Passed as argument 1");
@@ -203,7 +308,8 @@ public class API_File extends API {
 		String json = FurkBridge.fileGet(FurkBridge.GET_ID, fileID, null, null,
 				true);
 		JSONObject re = new JSONObject(json);
-		if (re.get("status").equals("error"))
+		if (re.get("status").equals("error")
+				|| re.getJSONArray("files").length() == 0)
 			return null;
 		return jsonFiles(re.getJSONArray("files")).get(0);
 	}
@@ -211,12 +317,10 @@ public class API_File extends API {
 	public static APIObject info(String hash) {
 		String json = FurkBridge.fileInfo(hash);
 		JSONObject re = new JSONObject(json);
-		if (re.get("status").equals("error"))
+		if (re.get("status").equals("error")
+				|| re.getJSONArray("files").length() == 0)
 			return null;
-		ArrayList<APIObject> al = jsonFiles(re.getJSONArray("files"));
-		if (al.size() == 0)
-			return null;
-		return al.get(0);
+		return jsonFiles(re.getJSONArray("files")).get(0);
 	}
 
 	public static boolean link(String[] fileIDs) {
@@ -225,8 +329,8 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return false;
 		for (String id : fileIDs)
-			filesFinished.add((FurkFile) info(id));
-		fo.stateChanged(GET_FINISHED);
+			addToSection(FINISHED, (FurkFile) info(id));
+		fo.stateChanged(FINISHED);
 		return true;
 	}
 
@@ -236,18 +340,11 @@ public class API_File extends API {
 		if (re.get("status").equals("error"))
 			return false;
 		for (String fid : fileIDs) {
-			for (int i = 0; i < filesFinished.size(); i++) {
-				FurkFile f = filesFinished.get(i);
-				String id = f.getID();
-				if (id.equals(fid)) {
-					FurkFile rem = filesFinished.remove(i);
-					filesDeleted.add(rem);
-					break;
-				}
-			}
+			FurkFile fr = removeFromSection(FINISHED, fid);
+			addToSection(DELETED, fr);
 		}
-		fo.stateChanged(GET_FINISHED);
-		fo.stateChanged(GET_DELETED);
+		fo.stateChanged(FINISHED);
+		fo.stateChanged(DELETED);
 		return true;
 	}
 
@@ -256,17 +353,9 @@ public class API_File extends API {
 		JSONObject re = new JSONObject(json);
 		if (re.get("status").equals("error"))
 			return false;
-		for (String fid : fileIDs) {
-			for (int i = 0; i < filesDeleted.size(); i++) {
-				FurkFile f = filesDeleted.get(i);
-				String id = f.getID();
-				if (id.equals(fid)) {
-					filesDeleted.remove(i);
-					break;
-				}
-			}
-		}
-		fo.stateChanged(GET_DELETED);
+		for (String fid : fileIDs)
+			removeFromSection(DELETED, fid);
+		fo.stateChanged(DELETED);
 		return true;
 	}
 
@@ -290,19 +379,18 @@ public class API_File extends API {
 		if (fsync.getName().equals("0-FurkManagerRoot"))
 			id = "0";
 		ArrayList<FurkFile> files = new ArrayList<FurkFile>();
-		for (APIObject f : filesFinished) {
-			if (f instanceof FurkFile) {
-				String[] labels = ((FurkFile) f).getIdLabels();
-				if (labels == null || labels.length == 0) {
-					if (id.equals("0")) {
-						files.add((FurkFile) f);
-					}
-				} else {
-					for (String s : labels) {
-						if (id.equals(s)) {
-							files.add((FurkFile) f);
-							break;
-						}
+		for (String key : finished.keySet()) {
+			FurkFile ff = getFile(FINISHED, key);
+			String[] labels = ff.getIdLabels();
+			if (labels == null || labels.length == 0) {
+				if (id.equals("0")) {
+					files.add(ff);
+				}
+			} else {
+				for (String s : labels) {
+					if (id.equals(s)) {
+						files.add(ff);
+						break;
 					}
 				}
 			}
@@ -312,13 +400,23 @@ public class API_File extends API {
 
 	public static void flush() {
 		try {
-			filesFinished.removeAll(filesFinished);
-			filesDeleted.removeAll(filesDeleted);
+			finished.clear();
+			deleted.clear();
 			fo.deleteObservers();
 		} catch (Exception e) {
 		}
-		filesFinished = null;
-		filesDeleted = null;
+	}
+
+	public static int size(FileSection section) {
+		return section == FINISHED ? finished.size() : deleted.size();
+	}
+
+	public static FurkFile getByNumber(FileSection section, int inc) {
+		return section(section).get(index.get(inc).getKey());
+	}
+
+	private static HashMap<String, FurkFile> section(FileSection section) {
+		return section == FINISHED ? finished : deleted;
 	}
 
 }

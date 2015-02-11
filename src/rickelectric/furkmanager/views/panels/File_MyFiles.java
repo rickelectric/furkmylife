@@ -18,8 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import rickelectric.IndexPair;
 import rickelectric.UtilBox;
-import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.views.icons.FileIcon;
@@ -29,17 +29,14 @@ import rickelectric.img.ImageLoader;
 public class File_MyFiles extends JPanel implements Runnable, Observer {
 	private static final long serialVersionUID = 1L;
 
-	private enum Mode {
-		MYFILES, RECYCLER
-	}
-
-	public static final Mode MYFILES = Mode.MYFILES, RECYCLER = Mode.RECYCLER;
+	public static final API_File.FileSection MYFILES = API_File.FINISHED,
+			RECYCLER = API_File.DELETED;
 
 	protected JScrollPane resultScroller;
 	private JPanel resultPanel;
 	private boolean hardReload;
 
-	private Mode mode = MYFILES;
+	private API_File.FileSection mode = MYFILES;
 
 	private JLabel label_loading;
 
@@ -50,13 +47,13 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public File_MyFiles(Mode mode, boolean hardReload) {
+	public File_MyFiles(API_File.FileSection mode, boolean hardReload) {
 		this(mode);
 
 		refreshMyFiles(hardReload);
 	}
 
-	private File_MyFiles(Mode mode) {
+	private File_MyFiles(API_File.FileSection mode) {
 		super();
 		if (mode == null) {
 			return;
@@ -93,7 +90,8 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 
 		label_loading = new JLabel();
 		label_loading.setHorizontalAlignment(SwingConstants.CENTER);
-		label_loading.setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
+		label_loading.setIcon(new ImageIcon(ImageLoader.class
+				.getResource("ajax-loader.gif")));
 		label_loading.setBounds(200, 123, 107, 91);
 		resultPanel.add(label_loading);
 
@@ -130,21 +128,22 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 			if (hardReload)
 				position = resultScroller.getHorizontalScrollBar().getMinimum();
 
-			ArrayList<FurkFile> ffarray = hardReload ? (mode == MYFILES ? API_File
-					.getAllFinished() : API_File.getAllDeleted())
-					: (mode == RECYCLER ? API_File.getDeletedCache() : API_File
-							.getFinishedCache());
+			if (hardReload) {
+				API_File.update(mode);
+			}
+			hardReload = false;
+			IndexPair[] fs = API_File.getFileIDs(mode);
 
 			resultPanel.removeAll();
 			resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
 			resultPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-			if (ffarray == null)
-				return;
 
 			numResults = 0;
 			FurkFile[] oArr = new FurkFile[3];
 			int i = 0;
-			for (FurkFile o : ffarray) {
+			for (IndexPair ip : fs) {
+				String fid = ip.getKey();
+				FurkFile o = API_File.getFile(mode, fid);
 				oArr[i] = o;
 				i++;
 				if (i == 3) {
@@ -170,8 +169,8 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			label_loading.setIcon(new ImageIcon(FurkManager.class
-					.getResource("img/remove.png")));
+			label_loading.setIcon(new ImageIcon(ImageLoader.getInstance()
+					.getImage("remove.png")));
 		}
 		try {
 			if (getTopLevelAncestor() instanceof AppFrameClass) {
@@ -248,9 +247,8 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		if (arg1 == API_File.GET_FINISHED && mode == MYFILES)
+		if(arg1.equals(mode)){
 			refreshMyFiles(false);
-		if (arg1 == API_File.GET_DELETED && mode == RECYCLER)
-			refreshMyFiles(false);
+		}
 	}
 }

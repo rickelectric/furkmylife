@@ -35,4 +35,8 @@ public interface PrimaryEnv {
 
 	Window getWindow();
 
+	boolean isAlwaysOnTop();
+
+	void setAlwaysOnTop(boolean b);
+
 }

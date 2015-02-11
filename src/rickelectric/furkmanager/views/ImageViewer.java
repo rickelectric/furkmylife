@@ -26,9 +26,9 @@ import javax.swing.border.EmptyBorder;
 
 import rickelectric.furkmanager.network.AsyncDownload;
 import rickelectric.furkmanager.utils.ImageManager;
-import rickelectric.furkmanager.views.swingmods.JFadeLabel;
-import rickelectric.furkmanager.views.swingmods.OpacEffects;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.JFadeLabel;
+import rickelectric.swingmods.OpacEffects;
 
 public class ImageViewer extends JDialog {
 	private static final long serialVersionUID = 1L;

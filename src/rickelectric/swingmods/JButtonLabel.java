@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.views.swingmods;
+package rickelectric.swingmods;
 
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -46,6 +46,11 @@ public class JButtonLabel extends JLabel {
 
 	public void setAction(Runnable action) {
 		this.action=action;
+	}
+
+	public void invoke() {
+		if(JButtonLabel.this.action!=null)
+			JButtonLabel.this.action.run();
 	}
 
 }

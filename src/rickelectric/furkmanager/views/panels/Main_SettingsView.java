@@ -23,9 +23,9 @@ import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.swingmods.TranslucentPane;
-import rickelectric.furkmanager.views.windows.MainEnvironment;
+import rickelectric.furkmanager.views.windows.MainEnv;
 import rickelectric.furkmanager.views.windows.MainWindow;
+import rickelectric.swingmods.TranslucentPane;
 
 public class Main_SettingsView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;
@@ -218,8 +218,8 @@ public class Main_SettingsView extends TranslucentPane {
 			public void actionPerformed(ActionEvent e) {
 				String f = UtilBox.getInstance().openFile(
 						"IDMExecutable",
-						((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
-								.getMainWindow() : (MainWindow) FurkManager
+						((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? ((MainEnv) FurkManager
+								.getMainWindow()).getWindow() : (MainWindow) FurkManager
 								.getMainWindow())));
 				if (f != null && !f.equals(""))
 					input_idmexe.setText(f);

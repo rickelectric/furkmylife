@@ -18,7 +18,7 @@ public class ClientLink implements Runnable{
 		ADD_TORRENT=104;
 	
 	private String text;
-	private String response=null;
+	private String response="";
 	
 	public String response(){return response;}
 	

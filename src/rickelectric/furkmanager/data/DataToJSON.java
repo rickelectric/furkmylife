@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import rickelectric.IndexPair;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API;
@@ -18,22 +19,21 @@ public class DataToJSON {
 			root.put("status", "error");
 			root.put("error", "Limit is Zero");
 		}
-		ArrayList<FurkFile> files = API_File.getFinishedCache();
-		if(files==null) files = API_File.getAllFinished();
+		IndexPair[] files = API_File.getFileIDs(API_File.FINISHED);
 		if (files == null){
 			root.put("status", "error");
 			root.put("error", "Error Obtaining Files.");
 			return root.toString();
 		}
-		if (offset>=files.size()){
+		if (offset>=files.length){
 			root.put("status", "error");
 			root.put("error", "Incrrect Offset");
 			return root.toString();
 		}
 		JSONArray file=new JSONArray();
 		for(int i=offset;i<offset+limit;i++){
-			if(i>=files.size()) break;
-			FurkFile ffile=files.get(i);
+			if(i>=files.length) break;
+			FurkFile ffile=API_File.getFile(API_File.FINISHED, files[i].getKey());
 			JSONObject o=new JSONObject();
 			String urlPage=ffile.getUrlPage();
 			if(!urlPage.contains("furk.net")) urlPage="https://www.furk.net"+urlPage;
@@ -46,7 +46,7 @@ public class DataToJSON {
 		}
 		root.put("status",JSONObject.NULL);
 		root.put("status", "ok");
-		root.put("num_files", files.size());
+		root.put("num_files", files.length);
 		root.put("files", file);
 		return root.toString();
 	}
@@ -77,9 +77,9 @@ public class DataToJSON {
 			o.put("infoHash",ffile.getInfoHash());
 			file.put(o);
 		}
-		root.put("status",JSONObject.NULL);
 		root.put("status", "ok");
-		root.put("files", file);
+		root.put("num_results", file.length());
+		root.put("results", file);
 		return root.toString();
 	}
 

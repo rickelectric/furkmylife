@@ -21,7 +21,7 @@ public class APIObject extends Observable{
 	
 	public void stateChanged(){
 		setChanged();
-		notifyObservers(0);
+		notifyObservers(this);
 	}
 	
 	public String getName(){return name;}

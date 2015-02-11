@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import rickelectric.WinRegistry;
 
 public class SetupRegistry {
-	
+
 	private static void runSetup(int s) {
 
 	}
@@ -37,9 +37,11 @@ public class SetupRegistry {
 		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
 				"SOFTWARE\\Classes\\furk\\DefaultIcon");
 		WinRegistry
-				.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-						"SOFTWARE\\Classes\\furk\\DefaultIcon", "",
-						"C:\\Users\\Ionicle\\Desktop\\ \\FurkManager\\FurkManager.exe,0");
+				.writeStringValue(
+						WinRegistry.HKEY_CURRENT_USER,
+						"SOFTWARE\\Classes\\furk\\DefaultIcon",
+						"",
+						"C:\\Users\\Ionicle\\Applications\\RickelectricApps\\FurkManager\\FurkManager.exe,0");
 
 		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
 				"SOFTWARE\\Classes\\furk\\shell");
@@ -55,17 +57,25 @@ public class SetupRegistry {
 		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
 				"SOFTWARE\\Classes\\furk\\shell\\open\\command");
 		WinRegistry
-				.writeStringValue(WinRegistry.HKEY_CURRENT_USER,
-						"SOFTWARE\\Classes\\furk\\shell\\open\\command", "",
-						"C:\\Users\\Ionicle\\Desktop\\ \\FurkManager\\FurkManager.exe %1");
-
+				.writeStringValue(
+						WinRegistry.HKEY_CURRENT_USER,
+						"SOFTWARE\\Classes\\furk\\shell\\open\\command",
+						"",
+						"C:\\Users\\Ionicle\\Applications\\RickelectricApps\\FurkManager\\FurkManager.exe %1");
 	}
-	
-	public static void installChromeExt(String installDir) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+
+	public static void installChromeExt(String installDir)
+			throws IllegalArgumentException, IllegalAccessException,
+			InvocationTargetException {
+		WinRegistry
+				.createKey(WinRegistry.HKEY_CURRENT_USER,
+						"SOFTWARE\\Google\\Chrome\\Extensions\\eecjgaddalinecocgjigcjbihajfjfah");
+		WinRegistry
+				.createKey(
+						WinRegistry.HKEY_CURRENT_USER,
+						"SOFTWARE\\Wow6432Node\\Google\\Chrome\\Extensions\\eecjgaddalinecocgjigcjbihajfjfah");
 		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
-				"SOFTWARE\\Google\\Chrome\\Extensions\\eecjgaddalinecocgjigcjbihajfjfah");
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,"SOFTWARE\\Wow6432Node\\Google\\Chrome\\Extensions\\eecjgaddalinecocgjigcjbihajfjfah");
-		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER, "SOFTWARE\\Classes\\.torrent");
+				"SOFTWARE\\Classes\\.torrent");
 	}
 
 	public static void checkRegistry() {

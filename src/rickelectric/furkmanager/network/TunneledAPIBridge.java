@@ -268,8 +268,8 @@ public class TunneledAPIBridge extends FurkBridge {
 	public static boolean userLogout() {
 		if (api_key == null)
 			return true;
-		String url = API_BASE + "/?object=login&function=logout&" + key();
-		jsonPost(url, false, false);
+//		String url = API_BASE + "/?object=login&function=logout&" + key();
+//		jsonPost(url, false, false);
 		api_key = null;
 		return true;
 	}

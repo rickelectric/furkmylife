@@ -363,8 +363,8 @@ class APIBridge extends FurkBridge {
 	public static boolean userLogout() {
 		if (api_key == null)
 			return true;
-		String url = API_BASE + "/login/logout?" + key();
-		jsonGet(url, false, false);
+//		String url = API_BASE + "/login/logout?" + key();
+//		jsonGet(url, false, false);
 		api_key = null;
 		return true;
 	}

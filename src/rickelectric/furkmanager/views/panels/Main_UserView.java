@@ -29,8 +29,8 @@ import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.URI_Enums;
 import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.TranslucentPane;
 
 import com.xeiam.xchart.XChartPanel;
 

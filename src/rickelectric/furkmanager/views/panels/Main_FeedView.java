@@ -8,7 +8,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.swingmods.TranslucentPane;
+import rickelectric.swingmods.TranslucentPane;
 
 public class Main_FeedView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;

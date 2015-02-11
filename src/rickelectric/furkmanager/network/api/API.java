@@ -35,7 +35,7 @@ public class API {
 		return msgCache.iterator();
 	}
 
-	protected static void setMessages(JSONArray j) {
+	protected static void setMessages(JSONArray j) {  
 		if (j == null)
 			return;
 		msgCache.removeAll(msgCache);

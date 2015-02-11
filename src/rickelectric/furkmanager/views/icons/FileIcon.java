@@ -29,9 +29,9 @@ import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API_Download;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.swingmods.JFadeLabel;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.JFadeLabel;
 
 public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 

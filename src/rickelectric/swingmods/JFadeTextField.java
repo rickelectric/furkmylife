@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.views.swingmods;
+package rickelectric.swingmods;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;

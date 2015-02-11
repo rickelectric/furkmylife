@@ -2,7 +2,6 @@ package rickelectric.furkmanager.network.socks;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.List;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -10,7 +9,6 @@ import org.java_websocket.server.WebSocketServer;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.data.DataToJSON;
-import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_File;
@@ -71,16 +69,10 @@ public class ChromeWebSocketLink extends WebSocketServer {
 				String ret=DataToJSON.search(term);
 				sendMessage(ret);
 			}
-			else if(type.equals("view")){
-				int num=o.getInt("num");
-				List<FurkFile> files=API_File.getFinishedCache();
-				if(files!=null){
-					APIObject a=files.get(num-1);
-					if(a instanceof FurkFile)
-						new FurkFileView((FurkFile)a);
-					
-				}
-			}
+		}else if(cl.equals("view")){
+			int num=o.getInt("num");
+			FurkFile ff=API_File.getByNumber(API_File.FINISHED,num-1);
+			new FurkFileView(ff);
 		}else if(cl.equals("link")){
 			String link=o.getString("link");
 			new AddDownloadFrame(link);

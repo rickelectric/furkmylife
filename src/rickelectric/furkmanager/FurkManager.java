@@ -26,7 +26,7 @@ import rickelectric.furkmanager.views.LoginSplashWindow;
 import rickelectric.furkmanager.views.windows.APIConsole;
 import rickelectric.furkmanager.views.windows.AddDownloadFrame;
 import rickelectric.furkmanager.views.windows.ImgCacheViewer;
-import rickelectric.furkmanager.views.windows.MainEnvironment;
+import rickelectric.furkmanager.views.windows.MainEnv;
 import rickelectric.furkmanager.views.windows.MainWindow;
 import rickelectric.furkmanager.views.windows.PrimaryEnv;
 import rickelectric.media.AudioPlayer;
@@ -35,8 +35,8 @@ import rickelectric.media.VideoPlayer;
 
 public class FurkManager {
 
-	private static boolean tray = false;
-	private static String addString = null;
+	private static boolean runTray = false, runLogin = false;
+	private static String addString = null, loginString = null;
 
 	private static FurkTrayIcon trayIcon = null;
 	private static FMTrayBox trayBox = null;
@@ -95,8 +95,8 @@ public class FurkManager {
 		} catch (Exception evt) {
 		}
 	}
-	
-	public static void LAF(Double i){
+
+	public static void LAF(Double i) {
 		LAF(i.intValue());
 	}
 
@@ -115,27 +115,34 @@ public class FurkManager {
 	private static void processProtocolHandler(String s) {
 		// TODO Add furk:// Protocol Argument Handler
 		System.out.println("Protocol Arguments: " + s);
+		String[] split = s.split("\\/");
+		for (String sp : split) {
+			if (!runLogin && sp.startsWith("key=")) {
+				runLogin = true;
+				loginString = sp.split("=")[1];
+			}
+		}
 	}
-	
-	public static void init(){
+
+	public static void init() {
 		ThreadPool.init();
 		SettingsManager.getInstance();
-		
+
 		UtilBox.getInstance();
 		RequestCache.init();
 		mediaEnabled = DefaultParams.init();
 	}
 
 	public static void main(String[] args) {
-		
+
 		SetupRegistry.checkRegistry();
 		LAF(0);
 		/**
 		 * Remove
 		 */
-//		FurkBridge.dummy(true);
-//		VideoPlayer.dummy = true;
-//		AudioPlayer.dummy = true;
+		// FurkBridge.dummy(true);
+		// VideoPlayer.dummy = true;
+		// AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
@@ -149,7 +156,7 @@ public class FurkManager {
 				processProtocolHandler(args[iter]);
 			}
 			if (args[iter].equals("-tray")) {
-				tray = true;
+				runTray = true;
 			}
 			if (args[iter].contains(".torrent")) {
 				addString = args[iter];
@@ -184,20 +191,24 @@ public class FurkManager {
 		trayBox = new FMTrayBox();
 		trayBox.setMoveable(true);
 		trayRun();
-		lWin.loginMode();
+		appRun();
 	}
 
 	public static void appRun() {
-		if (FurkBridge.key() == null)
-			lWin.loginMode();
-		else {
+		if (FurkBridge.key() == null) {
+			if (runLogin) {
+				lWin.keyLogin(loginString);
+				runLogin = false;
+			}
+			else lWin.loginMode();
+		} else {
 			if (!API_UserData.isLoaded()) {
 				lWin.setText("Loading User Data...");
 				API_UserData.loadUserData();
 			}
-			if (API_File.getFinishedCache() == null) {
+			if (API_File.size(API_File.FINISHED) == 0) {
 				lWin.setText("Loading Files...");
-				API_File.getAllFinished();
+				API_File.update(API_File.FINISHED,false);
 			}
 			if (API_Label.getAllCached() == null) {
 				lWin.setText("Loading Folders...");
@@ -207,9 +218,9 @@ public class FurkManager {
 			}
 			lWin.setText("Launching...");
 			mainWin();
-			if (tray) {
+			if (runTray) {
 				mWin.setVisible(false);
-				tray=false;
+				runTray = false;
 			}
 			lWin.setVisible(false);
 
@@ -232,7 +243,7 @@ public class FurkManager {
 			return;
 		}
 		if (SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE)
-			mWin = MainEnvironment.getInstance();
+			mWin = MainEnv.getInstance();
 		else
 			mWin = MainWindow.getInstance();
 		mWin.main();
@@ -319,13 +330,9 @@ public class FurkManager {
 					mWin.setEnabled(false);
 					mWin.dispose();
 					API.flushAll();
-
-					if (mWin instanceof MainEnvironment) {
-						MainEnvironment.destroyInstance();
-					} else {
-						MainWindow.destroyInstance();
-					}
-					mWin = null;
+					
+					MainEnv.destroyInstance();
+					MainWindow.destroyInstance();
 
 					System.gc();
 					lWin.loginMode();
@@ -337,6 +344,7 @@ public class FurkManager {
 				}
 			}
 		};
+		t.setDaemon(true);
 		t.start();
 	}
 
@@ -443,5 +451,15 @@ class PrimaryEmpty implements PrimaryEnv {
 	@Override
 	public Window getWindow() {
 		return null;
+	}
+
+	@Override
+	public boolean isAlwaysOnTop() {
+		return false;
+	}
+
+	@Override
+	public void setAlwaysOnTop(boolean b) {
+
 	}
 }

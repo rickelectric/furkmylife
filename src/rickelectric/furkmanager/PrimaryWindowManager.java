@@ -4,7 +4,7 @@ import java.awt.Component;
 import java.awt.Window;
 
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.windows.MainEnvironment;
+import rickelectric.furkmanager.views.windows.MainEnv;
 import rickelectric.furkmanager.views.windows.MainWindow;
 import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
@@ -15,7 +15,7 @@ public class PrimaryWindowManager implements PrimaryEnv {
 	private static PrimaryWindowManager thisInstance;
 
 	private int mode;
-	private MainEnvironment env;
+	private MainEnv env;
 	private MainWindow win;
 	
 	//private TranslucentPane[] panels;
@@ -35,7 +35,7 @@ public class PrimaryWindowManager implements PrimaryEnv {
 
 	private void initWithMode() {
 		if(mode==ENV_MODE){
-			if(env==null) env = MainEnvironment.getInstance();
+			if(env==null) env = MainEnv.getInstance();
 		}
 	}
 
@@ -143,6 +143,18 @@ public class PrimaryWindowManager implements PrimaryEnv {
 	public Window getWindow() {
 		return mode == ENV_MODE ? env == null ? null : env.getWindow()
 				: win == null ? null : win.getWindow();
+	}
+
+	@Override
+	public boolean isAlwaysOnTop() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setAlwaysOnTop(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

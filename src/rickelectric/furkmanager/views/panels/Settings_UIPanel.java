@@ -16,13 +16,14 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import rickelectric.UtilBox;
+import rickelectric.desktop.views.windows.MainEnvironment;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.windows.MainEnvironment;
-import rickelectric.furkmanager.views.windows.PrimaryEnv;
 
 public class Settings_UIPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+
+	private static boolean extensionMode = false;
 
 	private JPanel panel_mainInterface;
 	private JRadioButton radio_windowed;
@@ -71,25 +72,33 @@ public class Settings_UIPanel extends JPanel {
 						check_slide.isSelected());
 
 				if (getTopLevelAncestor() instanceof MainEnvironment) {
-					((MainEnvironment) getTopLevelAncestor()).refreshBgc();
+					
+					MainEnvironment.getInstance().refreshBgc();
 				}
 				int newMode = radio_env.isSelected() ? SettingsManager.ENV_MODE
 						: SettingsManager.WIN_MODE;
 				if (newMode != SettingsManager.getInstance().getMainWinMode()) {
 					int opt;
+					boolean aat = FurkManager.getMainWindow().isAlwaysOnTop();
 					try {
-						opt = JOptionPane.showConfirmDialog(
-								((PrimaryEnv) getTopLevelAncestor())
-										.getContentPane(),
-								"Main Window Mode Is About To Be Changed. Are You Sure You Want To Continue?",
-								"Confirm Change", JOptionPane.YES_NO_OPTION);
+						FurkManager.getMainWindow().setAlwaysOnTop(false);
+						opt = JOptionPane
+								.showConfirmDialog(
+										null,
+										"Main Window Mode Is About To Be Changed. Are You Sure You Want To Continue?",
+										"Confirm Change",
+										JOptionPane.YES_NO_OPTION);
 						if (opt == JOptionPane.YES_OPTION) {
 							SettingsManager.getInstance().setMainWinMode(
 									newMode);
 							FurkManager.mWinModeChanged();
+						} else {
+							FurkManager.getMainWindow().setAlwaysOnTop(aat);
 						}
 					} catch (ClassCastException ex) {
+						ex.printStackTrace();
 						SettingsManager.getInstance().setMainWinMode(newMode);
+						FurkManager.getMainWindow().setAlwaysOnTop(aat);
 					}
 				}
 				SettingsManager.save();
@@ -180,6 +189,17 @@ public class Settings_UIPanel extends JPanel {
 		check_uieffects.setOpaque(false);
 		check_uieffects.setBounds(16, 123, 145, 23);
 		panel_env.add(check_uieffects);
+		
+		if(extensionMode){
+			radio_env.setEnabled(false);
+			radio_windowed.setEnabled(false);
+			check_autohide.setEnabled(false);
+			check_dim.setEnabled(false);
+			check_onTop.setEnabled(false);
+			check_slide.setEnabled(false);
+			check_uieffects.setEnabled(false);
+			panel_mainInterface.setToolTipText("Can't Change Interface When In Use As An R-Desktop Extension.");
+		}
 
 		panel_theme = new JPanel();
 		panel_theme.setLayout(null);
@@ -239,5 +259,9 @@ public class Settings_UIPanel extends JPanel {
 				sf.dispose();
 			}
 		});
+	}
+
+	public static void lockWinMode(boolean lock) {
+		extensionMode=lock;
 	}
 }

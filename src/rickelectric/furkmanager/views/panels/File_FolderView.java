@@ -31,9 +31,9 @@ import rickelectric.furkmanager.views.icons.FileTreeNode;
 import rickelectric.furkmanager.views.icons.FurkTreeNode;
 import rickelectric.furkmanager.views.iconutil.FolderTreeRenderer;
 import rickelectric.furkmanager.views.iconutil.FolderTreeTransferHandler;
-import rickelectric.furkmanager.views.swingmods.JFadeLabel;
-import rickelectric.furkmanager.views.swingmods.OpacEffects;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.JFadeLabel;
+import rickelectric.swingmods.OpacEffects;
 
 public class File_FolderView extends JLayeredPane implements MouseListener,
 		KeyListener, Observer {
@@ -255,7 +255,7 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 	@Override
 	public void update(Observable o, Object arg1) {
 		if(o instanceof API_File.FileObservable){
-			if(arg1 == API_File.GET_FINISHED) 
+			if(arg1 == API_File.FINISHED) 
 				refreshMyFolders(false);
 		}
 		else {

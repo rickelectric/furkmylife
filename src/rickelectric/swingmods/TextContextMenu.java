@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.views.swingmods;
+package rickelectric.swingmods;
 
 
 import java.awt.event.ActionEvent;
@@ -11,7 +11,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
-import rickelectric.furkmanager.utils.UtilBox;
+import rickelectric.UtilBox;
 
 public class TextContextMenu extends JPopupMenu implements ActionListener{
 	private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class TextContextMenu extends JPopupMenu implements ActionListener{
 		if(src.equals(copy) || src.equals(cut)){
 			String sel=txt.getSelectedText();
 			if(sel==null || sel.equals("")) return;
-			UtilBox.sendToClipboard(sel);
+			UtilBox.getInstance().sendToClipboard(sel);
 		}
 		if(src.equals(cut) || src.equals(delete) || src.equals(paste)){
 			int start=txt.getSelectionStart();
@@ -71,7 +71,7 @@ public class TextContextMenu extends JPopupMenu implements ActionListener{
 			}
 		}
 		if(src.equals(paste)){
-			String s=UtilBox.getFromClipboard();
+			String s=UtilBox.getInstance().getFromClipboard();
 			if(s==null) s="";
 			Document doc = txt.getDocument();
 			int pos=txt.getCaretPosition();

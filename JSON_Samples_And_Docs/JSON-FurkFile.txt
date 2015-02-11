@@ -1,5 +1,11 @@
 {
-   "messages" : [],
+    "messages" : [
+      {
+         "txt" : "Your free bandwidth limit is over. You or someone else from your IP subnet (a small part of your ISP network) have downloaded too much. It&#x27;s time to upgrade to premium!",
+         "type" : "error",
+         "key" : "free_bw_limit_over"
+      }
+   ],
    "status" : "ok",
    "files" : [
       {

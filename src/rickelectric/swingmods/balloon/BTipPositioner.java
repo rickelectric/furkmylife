@@ -1,4 +1,4 @@
-package rickelectric.furkmanager.views.swingmods.balloon;
+package rickelectric.swingmods.balloon;
 
 import java.awt.Point;
 import java.awt.Rectangle;

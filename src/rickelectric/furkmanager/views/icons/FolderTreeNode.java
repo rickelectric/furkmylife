@@ -14,7 +14,7 @@ import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.models.APIFolder;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.windows.MainEnvironment;
+import rickelectric.furkmanager.views.windows.MainEnv;
 import rickelectric.furkmanager.views.windows.MainWindow;
 import rickelectric.img.ImageLoader;
 
@@ -98,8 +98,8 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 				f.setColumns(40);
 				int resp = JOptionPane
 						.showConfirmDialog(
-								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
-										.getMainWindow()
+								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? ((MainEnv) FurkManager
+										.getMainWindow()).getWindow()
 										: (MainWindow) FurkManager
 												.getMainWindow())), f,
 								"Folder Name", JOptionPane.OK_CANCEL_OPTION,
@@ -123,8 +123,8 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 				f.setSelectionEnd(folder.getName().length());
 				int resp = JOptionPane
 						.showConfirmDialog(
-								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
-										.getMainWindow()
+								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? ((MainEnv) FurkManager
+										.getMainWindow()).getWindow()
 										: (MainWindow) FurkManager
 												.getMainWindow())), f,
 								"Rename", JOptionPane.OK_CANCEL_OPTION,
@@ -139,8 +139,8 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 			} else if (src == folder_delete) {
 				int resp = JOptionPane
 						.showConfirmDialog(
-								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? (MainEnvironment) FurkManager
-										.getMainWindow()
+								((SettingsManager.getInstance().getMainWinMode() == SettingsManager.ENV_MODE ? ((MainEnv) FurkManager
+										.getMainWindow()).getWindow()
 										: (MainWindow) FurkManager
 												.getMainWindow())),
 								"Are You Sure You Want To Delete This Folder?\n"

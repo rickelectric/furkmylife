@@ -10,9 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
+import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.utils.SettingsManager;
-import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.TranslucentPane;
 
 public class Main_FileView extends TranslucentPane {
 	private static final long serialVersionUID = 1L;
@@ -76,18 +77,19 @@ public class Main_FileView extends TranslucentPane {
 	}
 
 	public void refreshMyFiles(boolean hardReload) {
-		pane_myfiles.refreshMyFiles(hardReload);
-		pane_recycler.refreshMyFiles(hardReload);
+		refreshActive(hardReload);
 	}
 
 	public void refreshActive(boolean hardReload) {
 		int selectedTab = tabbedPane.getSelectedIndex();
 		if (selectedTab == 0) {
-			pane_myfiles.refreshMyFiles(hardReload);
+			if(!hardReload) pane_myfiles.refreshMyFiles(false);
+			else API_File.update(API_File.FINISHED);
 		} else if (selectedTab == 1) {
 			pane_folders.refreshMyFolders(hardReload);
 		} else if (selectedTab == tabbedPane.getTabCount() - 1) {
-			pane_recycler.refreshMyFiles(hardReload);
+			if(!hardReload) pane_recycler.refreshMyFiles(false);
+			else API_File.update(API_File.DELETED);
 		}
 	}
 

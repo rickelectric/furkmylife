@@ -6,21 +6,68 @@
 			"className":"rickelectric.furkmanager.network.api.API",
 			"method":"init",
 			"param":"5323228d687ed9f7f1bdf9ce87050a1fa672e485"
+		},
+		{
+			"className":"rickelectric.furkmanager.network.InstanceConn"
+		},
+		{
+			"className":"rickelectric.extensions.furkmanager.FurkPopup"
 		}
 	],
+	"onButtonAdd":[
+		{
+			"className":"rickelectric.extensions.furkmanager.FurkPopup",
+			"method":"generateRefreshButtons"
+		}
+	],
+	"popupMenu":"rickelectric.furkmanager.views.menus.Main_PopupMenu",
 	"buttons":[
 		{
-			"name":"Furk Manager",
-			"icon":"fr.png",
+			"name":"My Files",
+			"icon":"/rickelectric/img/dash/Files-64.png",
 			"dropTargetEnabled":false,
 			"location":{
 				"x":100,
-				"y":630
+				"y":30
 			},
 			"balloon":{
-				"contents":"rickelectric.extensions.furkmanager.FurkPopup",
-				"background":"#ffab03",
-				"outline":"#0000ff"
+				"contents":"rickelectric.furkmanager.views.panels.Main_FileView"
+			}
+		},
+		{
+			"name":"My Downloads",
+			"icon":"/rickelectric/img/dash/Download-64.png",
+			"dropTargetEnabled":false,
+			"location":{
+				"x":200,
+				"y":30
+			},
+			"balloon":{
+				"contents":"rickelectric.furkmanager.views.panels.Main_DownloadView"
+			}
+		},
+		{
+			"name":"Furk App Settings",
+			"icon":"/rickelectric/img/dash/Settings-64.png",
+			"dropTargetEnabled":false,
+			"location":{
+				"x":300,
+				"y":30
+			},
+			"balloon":{
+				"contents":"rickelectric.furkmanager.views.panels.Main_SettingsView"
+			}
+		},
+		{
+			"name":"Furk User Options",
+			"icon":"/rickelectric/img/dash/User-64.png",
+			"dropTargetEnabled":false,
+			"location":{
+				"x":400,
+				"y":30
+			},
+			"balloon":{
+				"contents":"rickelectric.furkmanager.views.panels.Main_UserView"
 			}
 		}
 	]

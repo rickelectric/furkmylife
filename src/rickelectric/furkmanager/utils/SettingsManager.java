@@ -83,7 +83,8 @@ public class SettingsManager implements Serializable {
 	}
 
 	private static void init() {
-		sFile = new File("settings.db");
+		dirSetup();
+		sFile = new File("settings/app.furkmanager.settings.db");
 		if (!sFile.exists()) {
 			try {
 				sFile.createNewFile();
@@ -93,6 +94,19 @@ public class SettingsManager implements Serializable {
 			}
 		} else {
 			sMan = load();
+		}
+	}
+
+	private static void dirSetup(){
+		try{
+			File[] folders = new File[]{
+					new File("./settings/"),
+					new File("./db/")
+			};
+			for(File f:folders)
+				f.mkdir();
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 

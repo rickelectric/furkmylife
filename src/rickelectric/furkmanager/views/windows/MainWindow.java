@@ -33,15 +33,15 @@ import rickelectric.furkmanager.views.panels.Main_FeedView;
 import rickelectric.furkmanager.views.panels.Main_FileView;
 import rickelectric.furkmanager.views.panels.Main_SettingsView;
 import rickelectric.furkmanager.views.panels.Main_UserView;
-import rickelectric.furkmanager.views.swingmods.OpacEffects;
-import rickelectric.furkmanager.views.swingmods.Opacible;
-import rickelectric.furkmanager.views.swingmods.Slideable;
-import rickelectric.furkmanager.views.swingmods.TranslucentPane;
 import rickelectric.img.ImageLoader;
 import rickelectric.media.AudioPanel;
 import rickelectric.media.AudioPlayer;
 import rickelectric.media.VideoPanel;
 import rickelectric.media.VideoPlayer;
+import rickelectric.swingmods.OpacEffects;
+import rickelectric.swingmods.Opacible;
+import rickelectric.swingmods.Slideable;
+import rickelectric.swingmods.TranslucentPane;
 
 public class MainWindow extends AppFrameClass implements PrimaryEnv {
 	private static final long serialVersionUID = 1L;

@@ -16,9 +16,9 @@ import javax.swing.border.BevelBorder;
 import rickelectric.furkmanager.FurkManager;
 import rickelectric.furkmanager.utils.ImageManager;
 import rickelectric.furkmanager.views.panels.APIMessagePanel;
-import rickelectric.furkmanager.views.swingmods.JButtonLabel;
-import rickelectric.furkmanager.views.swingmods.TrayWindow;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.JButtonLabel;
+import rickelectric.swingmods.TrayWindow;
 
 public class FMTrayBox extends TrayWindow {
 	private static final long serialVersionUID = 1L;

@@ -1,44 +1,25 @@
 package rickelectric.furkmanager.models;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import rickelectric.furkmanager.network.api.API_File;
+public class FurkFile extends APIObject implements MoveableItem {
 
-public class FurkFile extends APIObject implements MoveableItem{
-	
-	//Private 1-fixed thread pool so update and refresh cannot run at the same time.
-	private ExecutorService exec=Executors.newFixedThreadPool(1);
-	
-	private String[] 
-		screenshotThumbs,
-		screenshots,
-		idLabels;
-	
-	private String
-		id,ctime,type,status,
-		avResult,avInfo,avTime,
-		urlDl,urlPls,
-		urlPage,
-		numAudioFiles,numVideoFiles,numImageFiles,
-		numAudioPlayerFiles,numVideoPlayerFiles,
-		deletedReason,
-		notes;
-		
-	private int 
-		isLinked,
-		isReady,
-		isProtected;
-	
+	private String[] screenshotThumbs, screenshots, idLabels;
+
+	private String id, ctime, type, status, avResult, avInfo, avTime, urlDl,
+			urlPls, urlPage, numAudioFiles, numVideoFiles, numImageFiles,
+			numAudioPlayerFiles, numVideoPlayerFiles, deletedReason, notes;
+
+	private int isLinked, isReady, isProtected;
+
 	public FurkFile(String name, String infoHash, long size, String id,
 			String urlDl, String urlPls, String type, String status,
 			String urlPage, int isLinked, int isReady) {
 		super(name, infoHash, size);
-		this.id=id;
-		this.urlDl=urlDl;
-		this.urlPls=urlPls;
-		this.type=type;
+		this.id = id;
+		this.urlDl = urlDl;
+		this.urlPls = urlPls;
+		this.type = type;
 		this.status = status;
 		this.urlPage = urlPage;
 		this.isLinked = isLinked;
@@ -46,56 +27,108 @@ public class FurkFile extends APIObject implements MoveableItem{
 	}
 
 	@Override
-	public String getID() {return id;}
-
-	public String getType(){return type;}
-
-	public String[] getIdLabels(){return idLabels;}
-	public void setIdLabels(String[] idLabels){this.idLabels=idLabels;}
-
-	public String getCtime(){return ctime;}
-	public void setCtime(String ctime){this.ctime=ctime;}
-	
-	public String getStatus(){return status;}
-	public void setStatus(String status){this.status=status;}
-
-	public String getUrlPage(){return urlPage;}
-	public void setUrlPage(String url_page){this.urlPage=url_page;}
-
-	public String getDeletedReason(){return deletedReason;}
-	public void setDeletedReason(String deletedReason){this.deletedReason=deletedReason;}
-
-	public String getNotes(){return notes;}
-
-	public void setNotes(String notes){
-		String noteTemp=this.notes;
-		try{
-			this.notes=notes;
-		}catch(Exception e){this.notes=noteTemp;}
+	public String getID() {
+		return id;
 	}
 
-	public boolean isLinked(){return isLinked==1;}
-	public void setLinked(boolean isLinked){
-		this.isLinked=isLinked?1:0;
+	public String getType() {
+		return type;
 	}
 
-	public boolean isReady(){return isReady==1;}
-	public void setReady(boolean ready){this.isReady=ready?1:0;}
-	
-	public boolean isProtected(){return isProtected==1;}
-	public void setProtected(int isProtected){
-		this.isProtected=isProtected;
-	}
-	
-	public void setAntivirus(String result,String info,String time){
-		this.avResult=result;
-		this.avInfo=info;
-		this.avTime=time;
+	public String[] getIdLabels() {
+		return idLabels;
 	}
 
-	public String getAvResult(){return avResult;}
-	public String getAvInfo(){return avInfo;}
-	public String getAvTime(){return avTime;}
+	public void setIdLabels(String[] idLabels) {
+		this.idLabels = idLabels;
+	}
+
+	public String getCtime() {
+		return ctime;
+	}
+
+	public void setCtime(String ctime) {
+		this.ctime = ctime;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getUrlPage() {
+		return urlPage;
+	}
+
+	public void setUrlPage(String url_page) {
+		this.urlPage = url_page;
+	}
+
+	public String getDeletedReason() {
+		return deletedReason;
+	}
+
+	public void setDeletedReason(String deletedReason) {
+		this.deletedReason = deletedReason;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		String noteTemp = this.notes;
+		try {
+			this.notes = notes;
+		} catch (Exception e) {
+			this.notes = noteTemp;
+		}
+	}
+
+	public boolean isLinked() {
+		return isLinked == 1;
+	}
+
+	public void setLinked(boolean isLinked) {
+		this.isLinked = isLinked ? 1 : 0;
+	}
+
+	public boolean isReady() {
+		return isReady == 1;
+	}
+
+	public void setReady(boolean ready) {
+		this.isReady = ready ? 1 : 0;
+	}
+
+	public boolean isProtected() {
+		return isProtected == 1;
+	}
+
+	public void setProtected(int isProtected) {
+		this.isProtected = isProtected;
+	}
+
+	public void setAntivirus(String result, String info, String time) {
+		this.avResult = result;
+		this.avInfo = info;
+		this.avTime = time;
+	}
+
+	public String getAvResult() {
+		return avResult;
+	}
+
+	public String getAvInfo() {
+		return avInfo;
+	}
+
+	public String getAvTime() {
+		return avTime;
+	}
 
 	public String getNumAudioFiles() {
 		return numAudioFiles;
@@ -117,22 +150,22 @@ public class FurkFile extends APIObject implements MoveableItem{
 		return numVideoPlayerFiles;
 	}
 
-	public String[] getThumbs(){
+	public String[] getThumbs() {
 		return screenshotThumbs;
 	}
 
 	public void setThumbs(String[] ss_urls_tn) {
 		this.screenshotThumbs = ss_urls_tn;
 	}
-	
+
 	public String[] getScreenshots() {
 		return screenshots;
 	}
-	
+
 	public void setScreenshots(String[] ss_urls) {
 		this.screenshots = ss_urls;
 	}
-	
+
 	public String getUrlDl() {
 		return urlDl;
 	}
@@ -148,42 +181,34 @@ public class FurkFile extends APIObject implements MoveableItem{
 	public void setUrlPls(String urlPls) {
 		this.urlPls = urlPls;
 	}
-	
-	private void overwrite(FurkFile f){
-		screenshotThumbs=f.screenshotThumbs;
-		screenshots=f.screenshots;
-		idLabels=f.idLabels;
-			
-		ctime=f.ctime;
-		type=f.type;
-		status=f.status;
-		avResult=f.avResult;
-		avInfo=f.avInfo;
-		avTime=f.avTime;
-		urlPage=f.urlPage;
-		numAudioFiles=f.numAudioFiles;
-		numVideoFiles=f.numVideoFiles;
-		numImageFiles=f.numImageFiles;
-		numAudioPlayerFiles=f.numAudioPlayerFiles;
-		numVideoPlayerFiles=f.numVideoPlayerFiles;
-		deletedReason=f.deletedReason;
-		notes=f.notes;
+
+	public void overwrite(FurkFile f) {
+		screenshotThumbs = f.screenshotThumbs;
+		screenshots = f.screenshots;
+		idLabels = f.idLabels;
+
+		id = f.id;
+		ctime = f.ctime;
+		type = f.type;
+		status = f.status;
+		avResult = f.avResult;
+		avInfo = f.avInfo;
+		avTime = f.avTime;
+		urlDl = f.urlDl;
+		urlPls = f.urlPls;
+		urlPage = f.urlPage;
+		numVideoFiles = f.numVideoFiles;
+		numImageFiles = f.numImageFiles;
+		numAudioPlayerFiles = f.numAudioPlayerFiles;
+		numVideoPlayerFiles = f.numVideoPlayerFiles;
+		deletedReason = f.deletedReason;
+		notes = f.notes;
+
+		isLinked = f.isLinked;
+		isReady = f.isReady;
+		isProtected = f.isProtected;
 		
-		isLinked=f.isLinked;
-		isReady=f.isReady;
-		isProtected=f.isProtected;
-	}
-	
-	public boolean serverRefresh(){
-		exec.execute(new Runnable(){
-			@Override
-			public void run(){
-				APIObject f=API_File.get(getID());
-				if(f!=null&&f instanceof FurkFile)
-					overwrite((FurkFile)f);
-			}
-		});
-		return false;
+		stateChanged();
 	}
 
 	@Override
@@ -191,20 +216,31 @@ public class FurkFile extends APIObject implements MoveableItem{
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((avInfo == null) ? 0 : avInfo.hashCode());
-		result = prime * result	+ ((avResult == null) ? 0 : avResult.hashCode());
+		result = prime * result
+				+ ((avResult == null) ? 0 : avResult.hashCode());
 		result = prime * result + ((avTime == null) ? 0 : avTime.hashCode());
 		result = prime * result + ((ctime == null) ? 0 : ctime.hashCode());
-		result = prime * result	+ ((deletedReason == null) ? 0 : deletedReason.hashCode());
+		result = prime * result
+				+ ((deletedReason == null) ? 0 : deletedReason.hashCode());
 		result = prime * result + Arrays.hashCode(idLabels);
 		result = prime * result + isLinked;
 		result = prime * result + isProtected;
 		result = prime * result + isReady;
 		result = prime * result + ((notes == null) ? 0 : notes.hashCode());
-		result = prime * result	+ ((numAudioFiles == null) ? 0 : numAudioFiles.hashCode());
-		result = prime * result	+ ((numAudioPlayerFiles == null) ? 0 : numAudioPlayerFiles.hashCode());
-		result = prime * result	+ ((numImageFiles == null) ? 0 : numImageFiles.hashCode());
-		result = prime * result	+ ((numVideoFiles == null) ? 0 : numVideoFiles.hashCode());
-		result = prime * result	+ ((numVideoPlayerFiles == null) ? 0 : numVideoPlayerFiles.hashCode());
+		result = prime * result
+				+ ((numAudioFiles == null) ? 0 : numAudioFiles.hashCode());
+		result = prime
+				* result
+				+ ((numAudioPlayerFiles == null) ? 0 : numAudioPlayerFiles
+						.hashCode());
+		result = prime * result
+				+ ((numImageFiles == null) ? 0 : numImageFiles.hashCode());
+		result = prime * result
+				+ ((numVideoFiles == null) ? 0 : numVideoFiles.hashCode());
+		result = prime
+				* result
+				+ ((numVideoPlayerFiles == null) ? 0 : numVideoPlayerFiles
+						.hashCode());
 		result = prime * result + Arrays.hashCode(screenshotThumbs);
 		result = prime * result + Arrays.hashCode(screenshots);
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
@@ -215,8 +251,8 @@ public class FurkFile extends APIObject implements MoveableItem{
 
 	@Override
 	public String toString() {
-		return super.toString()+" ==> FurkFile ["
-				+ (exec != null ? "exec=" + exec + ", " : "")
+		return super.toString()
+				+ " ==> FurkFile ["
 				+ (screenshotThumbs != null ? "screenshotThumbs="
 						+ Arrays.toString(screenshotThumbs) + ", " : "")
 				+ (screenshots != null ? "screenshots="
@@ -249,13 +285,13 @@ public class FurkFile extends APIObject implements MoveableItem{
 
 	@Override
 	public int compareTo(Object o) {
-		if(o instanceof MoveableItem){
+		if (o instanceof MoveableItem) {
 			return getName().compareTo(((MoveableItem) o).getName());
 		}
-		if(o instanceof String){
+		if (o instanceof String) {
 			return getName().compareTo(o.toString());
 		}
 		throw new IllegalArgumentException("Expected MoveableItem or String");
 	}
-	
+
 }

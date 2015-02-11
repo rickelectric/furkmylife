@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,10 +51,10 @@ import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.views.panels.Settings_ProxyPorts;
 import rickelectric.furkmanager.views.panels.Settings_UIPanel;
-import rickelectric.furkmanager.views.swingmods.JButtonLabel;
 import rickelectric.img.ImageLoader;
+import rickelectric.swingmods.JButtonLabel;
 
-public class LoginSplashWindow extends JFrame {
+public class LoginSplashWindow extends JFrame implements Runnable{
 	private static final long serialVersionUID = 1L;
 	private Image splashImage;
 	private Image loadingImage;
@@ -332,6 +333,20 @@ public class LoginSplashWindow extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		addListeners();
+		
+		Thread t = new Thread(this);
+		t.setDaemon(true);
+		t.start();
+	}
+	
+	public void run(){
+		while(true){
+			if(isShowing()){
+				repaint();
+			}
+			try {Thread.sleep(500);}
+			catch (InterruptedException e) {}
+		}
 	}
 
 	private ImageObserver loadingImageObserver = new ImageObserver() {
@@ -413,6 +428,10 @@ public class LoginSplashWindow extends JFrame {
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g.create();
+		g2d.setRenderingHint(
+		        RenderingHints.KEY_TEXT_ANTIALIASING,
+		        RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+		
 		g2d.drawImage(splashImage, 0, 0, this.frameImageObserver);
 		if (panel_login.isVisible()) {
 
@@ -464,6 +483,11 @@ public class LoginSplashWindow extends JFrame {
 			furkAnimate(0);
 			return;
 		}
+	}
+	
+	public void keyLogin(String apiKey){
+		input_apikey.setText(apiKey);
+		button_apilogin.invoke();
 	}
 
 	private void apiLogin() {
