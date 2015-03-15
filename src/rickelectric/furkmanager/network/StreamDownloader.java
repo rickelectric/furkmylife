@@ -14,24 +14,44 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.cert.X509Certificate;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
 
+import rickelectric.UtilBox;
 import rickelectric.furkmanager.utils.ProxySettings;
 import rickelectric.furkmanager.utils.SettingsManager;
 
 public class StreamDownloader {
 
 	private static StreamDownloader thisInstance;
+	private DefaultHttpClient client;
 
 	public static synchronized StreamDownloader getInstance() {
 		if (thisInstance == null) {
@@ -39,9 +59,41 @@ public class StreamDownloader {
 		}
 		return thisInstance;
 	}
+
+	private StreamDownloader() {
+		HttpParams params = new BasicHttpParams();
+		HttpConnectionParams.setSoTimeout(params, 18000);
+		HttpConnectionParams.setConnectionTimeout(params, 10000);
+		HttpConnectionParams.setTcpNoDelay(params, true);
+		params.setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
+				HttpVersion.HTTP_1_1);
+		try{
+			final SSLContext sslCtx;
+			sslCtx = SSLContext.getInstance("SSL");
+			CustomTrustManagerHostnameVerifier mgr = new CustomTrustManagerHostnameVerifier();
+			sslCtx.init(null, new TrustManager[] { mgr }, null);
 	
-	private StreamDownloader(){
+			X509HostnameVerifier verifier = mgr;
+			final SSLSocketFactory socketFactory = new SSLSocketFactory(sslCtx,
+					verifier);
+			final SchemeRegistry registry = new SchemeRegistry();
+			registry.register(new Scheme("https", 443, socketFactory));
+	
+			final PoolingClientConnectionManager cm = new PoolingClientConnectionManager(
+					registry);
+			cm.setMaxTotal(100);
+			cm.setDefaultMaxPerRoute(50);
+			client = new DefaultHttpClient(cm,params);
+		}catch(Exception e){
+			client = new DefaultHttpClient(params);
+		}
 		
+		client.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
+			@Override
+			public long getKeepAliveDuration(HttpResponse hr, HttpContext hc) {
+				return 0;
+			}
+		});
 	}
 
 	public String fileToString(String filepath) throws IOException {
@@ -57,7 +109,7 @@ public class StreamDownloader {
 	}
 
 	public String getStringStream(String url) throws Exception {
-		return getStringStream(url, 1024);
+		return getStringStream(url, 32*1024);
 	}
 
 	public String getStringStream(String url, int batchWriteSize)
@@ -66,17 +118,13 @@ public class StreamDownloader {
 				.getInstance().timeout());
 	}
 
-	public String getStringStream(String url, int batchWriteSize,
-			int timeout) throws Exception {
+	public String getStringStream(String url, int batchWriteSize, int timeout)
+			throws Exception {
 		URL urli = new URL(url);
-		DefaultHttpClient client = new DefaultHttpClient();
-
+		
 		ProxySettings settings = SettingsManager.getInstance()
 				.getProxySettings();
 		settings.applyProxyTo(client);
-
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,
-				timeout);
 
 		HttpGet get = new HttpGet(urli.toURI());
 		HttpResponse resp = client.execute(get);
@@ -103,62 +151,114 @@ public class StreamDownloader {
 		return s;
 	}
 
+	class CustomTrustManagerHostnameVerifier implements X509TrustManager, X509HostnameVerifier {
+		@Override
+		public void checkClientTrusted(X509Certificate[] cert, String authType) {
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] cert, String authType) {
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return null;
+		}
+		
+		@Override
+		public void verify(String string, SSLSocket ssls)
+				throws IOException {
+		}
+
+		@Override
+		public void verify(String string, X509Certificate xc)
+				throws SSLException {
+		}
+
+		@Override
+		public void verify(String string, String[] strings,
+				String[] strings1) throws SSLException {
+		}
+
+		@Override
+		public boolean verify(String string, SSLSession ssls) {
+			return true;
+		}
+	}
+
 	public String postMultipartStream(String url, MultipartEntity entity)
 			throws Exception {
 		URL urli = new URL(url);
 
-		DefaultHttpClient client = new DefaultHttpClient();
-
 		ProxySettings settings = SettingsManager.getInstance()
 				.getProxySettings();
 		settings.applyProxyTo(client);
-
-		client.getParams().setParameter(
-				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
-
+		
 		HttpPost post = new HttpPost(urli.toURI());
-		// post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+		post.getParams().setBooleanParameter(
+				CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
 		post.setEntity(entity);
 
+		System.err.println("Uploading '"
+				+ url
+				+ "' : Size="
+				+ UtilBox.getInstance().byteSizeToString(
+						entity.getContentLength()));
 		HttpResponse resp = client.execute(post);
 		int response = resp.getStatusLine().getStatusCode();
 
-		if (response < 200 || response > 299)
+		if (response >= 200 && response <= 299) {
+			
+		} else if(response>=300 && response<=399){
+			Header[] loc = resp.getHeaders("Location");
+			if (loc.length > 0)
+				System.out.println("New Location = "+loc[0].getValue());
+		}else {
 			throw new IOException("HTTP Response " + response);
+		}
+
+		System.err.println("Downloading '"
+				+ url
+				+ "' : Size="
+				+ UtilBox.getInstance().byteSizeToString(
+						resp.getEntity().getContentLength()));
+		long i = System.currentTimeMillis();
+		// String r = EntityUtils.toString(resp.getEntity());
 
 		BufferedInputStream bis = new BufferedInputStream(resp.getEntity()
 				.getContent());
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] b = new byte[512];
-		int bytesRead = bis.read(b, 0, 512);
+		ByteArrayOutputStream os = new ByteArrayOutputStream((int) resp
+				.getEntity().getContentLength());
+		int batchWriteSize = 128 * 1024;
+		byte[] b = new byte[batchWriteSize];
+		int bytesRead = bis.read(b, 0, batchWriteSize);
 		while (bytesRead != -1) {
+			System.err.println("Read "+bytesRead+" bytes");
 			os.write(b, 0, bytesRead);
-			bytesRead = bis.read(b, 0, 512);
+			bytesRead = bis.read(b, 0, batchWriteSize);
 		}
 		bis.close();
-		String re = os.toString();
+		String r = os.toString();
 		os.close();
-		return re;
+
+		long t = System.currentTimeMillis();
+		System.err.println("Download Complete (time=" + ((t - i) / 1000f)
+				+ "s)\n");
+		return r;
 	}
 
 	public String postStringStream(String urlx, int batchWriteSize)
 			throws Exception {
 		String[] urli = urlx.split("[?]");
 		URL url = new URL(urli[0]);
-		DefaultHttpClient client = new DefaultHttpClient();
 
 		ProxySettings settings = SettingsManager.getInstance()
 				.getProxySettings();
 		settings.applyProxyTo(client);
 
-		client.getParams().setParameter(
-				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
-
 		HttpPost post = new HttpPost(url.toURI());
-		
-		if(urli.length>1){
+
+		if (urli.length > 1) {
 			post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 			post.setEntity(new StringEntity(urli[1]));
 		}
@@ -166,7 +266,7 @@ public class StreamDownloader {
 		int response = resp.getStatusLine().getStatusCode();
 
 		if (response < 200 || response > 299)
-			throw new IOException("HTTP Response {"+urlx+"} = " + response);
+			throw new IOException("HTTP Response {" + urlx + "} = " + response);
 
 		BufferedInputStream bis = new BufferedInputStream(resp.getEntity()
 				.getContent());
@@ -183,18 +283,13 @@ public class StreamDownloader {
 		return re;
 	}
 
-	public String getFileStreamWithName(String url, File f,
-			int batchWriteSize) throws Exception {
+	public String getFileStreamWithName(String url, File f, int batchWriteSize)
+			throws Exception {
 		String nextCookie = null, titleRet = null;
-		DefaultHttpClient client = new DefaultHttpClient();
-
+		
 		ProxySettings settings = SettingsManager.getInstance()
 				.getProxySettings();
 		settings.applyProxyTo(client);
-
-		client.getParams().setParameter(
-				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
 
 		HttpResponse resp;
 		do {
@@ -229,11 +324,8 @@ public class StreamDownloader {
 			}
 			/* do it until you get some code that is not a redirection */
 
-		} while ((resp.getStatusLine().getStatusCode() / 100) == 3);/*
-																	 * codes 3XX
-																	 * are
-																	 * redirections
-																	 */
+		} while ((resp.getStatusLine().getStatusCode() / 100) == 3);
+		/* 3xx codes are redirections */
 
 		if (resp.getStatusLine().getStatusCode() < 200
 				|| resp.getStatusLine().getStatusCode() > 299)
@@ -261,15 +353,10 @@ public class StreamDownloader {
 		// return img.getImage();
 
 		URL urli = new URL(url);
-		DefaultHttpClient client = new DefaultHttpClient();
 
 		ProxySettings settings = SettingsManager.getInstance()
 				.getProxySettings();
 		settings.applyProxyTo(client);
-
-		client.getParams().setParameter(
-				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
 
 		HttpGet get = new HttpGet(urli.toURI());
 		HttpResponse resp = client.execute(get);
@@ -307,15 +394,10 @@ public class StreamDownloader {
 	public void getFileStream(String fileURL, File f, int batchWriteSize)
 			throws Exception {
 		URL urli = new URL(fileURL);
-		DefaultHttpClient client = new DefaultHttpClient();
-
+		
 		ProxySettings settings = SettingsManager.getInstance()
 				.getProxySettings();
 		settings.applyProxyTo(client);
-
-		client.getParams().setParameter(
-				CoreConnectionPNames.CONNECTION_TIMEOUT, 8000);
-		client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 12000);
 
 		HttpGet get = new HttpGet(urli.toURI());
 		HttpResponse resp = client.execute(get);
