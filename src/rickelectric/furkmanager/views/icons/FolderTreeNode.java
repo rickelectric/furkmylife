@@ -45,7 +45,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 
 	@Override
 	public JPopupMenu popupMenu() {
-		return new ContextMenu(folder);
+		return new ContextMenu(folder,this);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 
 	}
 
-	public class ContextMenu extends JPopupMenu implements ActionListener {
+	public static class ContextMenu extends JPopupMenu implements ActionListener {
 		private static final long serialVersionUID = 1L;
 
 		private APIFolder folder = null;
@@ -62,11 +62,14 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 		private JMenuItem folder_rename;
 		private JMenuItem folder_colorchange;
 
+		private FolderTreeNode thisNode;
+
 		// End FolderType Menu
 
-		public ContextMenu(APIFolder folder) {
+		public ContextMenu(APIFolder folder,FolderTreeNode thisNode) {
 			super();
 			this.folder = folder;
+			this.thisNode = thisNode;
 
 			folder_new = new JMenuItem("New Folder");
 			folder_new.addActionListener(this);
@@ -149,25 +152,12 @@ public class FolderTreeNode extends DefaultMutableTreeNode implements
 								JOptionPane.QUESTION_MESSAGE);
 				if (resp == JOptionPane.YES_OPTION) {
 					if (APIFolderManager.delete(folder)) {
-						APIFolderManager.getModel().removeNodeFromParent(FolderTreeNode.this);
+						APIFolderManager.getModel().removeNodeFromParent(thisNode);
 					}
 				}
 			}
 		}
 	}
-
-//	private void parentRef(boolean hard) {
-//		try {
-//			Container parent = parentTree.getParent();
-//			do {
-//				parent = parent.getParent();
-//			} while (!(parent instanceof File_FolderView));
-//			((File_FolderView) parent).refreshMyFolders(hard);
-//		} catch (Exception ex) {
-//			System.err.println("Could Not Find Proper Parent");
-//			ex.printStackTrace();
-//		}
-//	}
 
 	@Override
 	public boolean draggable() {

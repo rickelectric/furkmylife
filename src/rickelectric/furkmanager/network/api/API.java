@@ -21,6 +21,7 @@ public class API {
 
 	public static void init(String key) {
 		FurkBridge.initialize(key);
+		FileUpdater.getInstance().start();
 		msgCache = new ArrayList<APIMessage>();
 		msgPanel = new APIMessagePanel();
 	}

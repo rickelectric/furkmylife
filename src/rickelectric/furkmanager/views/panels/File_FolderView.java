@@ -38,9 +38,9 @@ import rickelectric.swingmods.OpacEffects;
 public class File_FolderView extends JLayeredPane implements MouseListener,
 		KeyListener, Observer {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Thread thisRun;
-	
+
 	private JTree folder_tree;
 	private JScrollPane scroller;
 	private TransferHandler transferer;
@@ -56,8 +56,8 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 
 		add(scroller, BorderLayout.CENTER);
 
-		loading = new JFadeLabel(
-				new ImageIcon(ImageLoader.class.getResource("ajax-loader.gif")));
+		loading = new JFadeLabel(new ImageIcon(
+				ImageLoader.class.getResource("ajax-loader.gif")));
 		loading.setAlpha(1.0f);
 		setLayer(loading, 10);
 		add(loading);
@@ -93,33 +93,33 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 			public void run() {
 				loading.setVisible(true);
 				loading.setAlpha(1.0f);
-				if(folder_tree==null){
+				if (folder_tree == null) {
 					folder_tree = new JTree();
 
 					folder_tree.addMouseListener(File_FolderView.this);
 					folder_tree.addKeyListener(File_FolderView.this);
-	
+
 					folder_tree.setDragEnabled(true);
 					folder_tree.setDropMode(DropMode.ON_OR_INSERT);
-	
+
 					folder_tree.setTransferHandler(transferer);
 					folder_tree.setCellRenderer(renderer);
-	
+
 					folder_tree.putClientProperty("JTree.lineStyle", "Angled");
 					folder_tree.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 					folder_tree.getSelectionModel().setSelectionMode(
 							TreeSelectionModel.SINGLE_TREE_SELECTION);
-					
+
 					scroller.setViewportView(folder_tree);
 				}
 				folder_tree.setEnabled(false);
-				try{
+				try {
 					folder_tree.setModel(getTreeModel(hardReload));
 
 					OpacEffects.fadeOut(loading, 30);
 					folder_tree.setEnabled(true);
 					folder_tree.requestFocus();
-				}catch(Exception e){
+				} catch (Exception e) {
 					OpacEffects.fadeOut(loading, 30);
 					folder_tree.setEnabled(true);
 				}
@@ -254,12 +254,13 @@ public class File_FolderView extends JLayeredPane implements MouseListener,
 
 	@Override
 	public void update(Observable o, Object arg1) {
-		if(o instanceof API_File.FileObservable){
-			if(arg1 == API_File.FINISHED) 
+		if (o instanceof API_File.FileObservable) {
+			if (arg1 == API_File.FINISHED)
 				refreshMyFolders(false);
-		}
-		else {
-			if(arg1!=APIFolderManager.UpdateSource.INIT)
+		} else {
+			if (arg1 == APIFolderManager.UpdateSource.INIT)
+				refreshMyFolders(false);
+			else if (arg1 instanceof APIFolderManager.UpdateSource)
 				refreshMyFolders(true);
 		}
 	}

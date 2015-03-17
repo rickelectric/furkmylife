@@ -444,7 +444,7 @@ public class FileIcon extends JLayeredPane implements Comparable<FileIcon> {
 		icon_type = new JLabel();
 		setLayer(icon_type, 10);
 		icon_type.setHorizontalAlignment(SwingConstants.CENTER);
-		String ty = f.getType();
+		String ty = f.getType().toString();
 		ImageIcon icon = null;
 		if (ty == null)
 			ty = "";

@@ -27,9 +27,9 @@ public class APIFolderManager {
 
 	public static class FolderObservable extends Observable {
 		public void stateChanged(UpdateSource source) {
-//			System.out.println("Folder Observer Updated: " + source);
-//			setChanged();
-//			notifyObservers(source);
+			System.out.println("Folder Observer Updated: " + source);
+			setChanged();
+			notifyObservers(source);
 		}
 	}
 
@@ -50,10 +50,14 @@ public class APIFolderManager {
 
 	public static void init(FurkLabel rootLabel) {
 		if (root == null || !root.getLabel().equals(rootLabel)) {
-			register = null;
+			if(register!=null){
+				register.removeAll(register);
+			}else{
+				register = new ArrayList<MoveableItem>();
+			}
 			model = null;
 			System.gc();
-			register = new ArrayList<MoveableItem>();
+			
 			root = new APIFolder(rootLabel);
 			register(root);
 			root.populate();
@@ -65,7 +69,7 @@ public class APIFolderManager {
 	public static void refresh() {
 		if (API_Label.getAll() != null) {
 			root = null;
-			init(API_Label.root());
+//			init(API_Label.root());
 		}
 	}
 
@@ -230,6 +234,7 @@ public class APIFolderManager {
 	}
 
 	public static DefaultTreeModel getModel() {
+		init(API_Label.root());
 		return model == null ? model = new DefaultTreeModel(generateTree())
 				: model;
 	}

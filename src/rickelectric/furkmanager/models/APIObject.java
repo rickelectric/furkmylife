@@ -3,6 +3,8 @@ package rickelectric.furkmanager.models;
 import java.awt.Color;
 import java.util.Observable;
 
+import rickelectric.UtilBox;
+
 public class APIObject extends Observable{
 	
 	private String 
@@ -29,16 +31,7 @@ public class APIObject extends Observable{
 	
 	public long getSize(){return size;}
 	public String getSizeString(){
-		float sz=size;
-		String[] reps=new String[]{"bytes","kB","MB","GB","TB"};
-		int i=0;
-		while(sz>1024&&i<=4){
-			sz=sz/1024f;
-			i++;
-		}
-		String[] szs=(""+sz).split("\\.");
-		if(szs[1].length()>2) szs[1]=szs[1].substring(0, 2);
-		return szs[0]+"."+szs[1]+" "+reps[i];
+		return UtilBox.getInstance().byteSizeToString(size);
 	}
 
 	@Override

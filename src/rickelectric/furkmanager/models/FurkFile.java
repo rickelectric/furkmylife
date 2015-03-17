@@ -2,23 +2,31 @@ package rickelectric.furkmanager.models;
 
 import java.util.Arrays;
 
+import rickelectric.furkmanager.models.enums.FileType;
+
 public class FurkFile extends APIObject implements MoveableItem {
 
 	private String[] screenshotThumbs, screenshots, idLabels;
+	private String idFeeds;
 
-	private String id, ctime, type, status, avResult, avInfo, avTime, urlDl,
-			urlPls, urlPage, numAudioFiles, numVideoFiles, numImageFiles,
-			numAudioPlayerFiles, numVideoPlayerFiles, deletedReason, notes;
+	private String id, ctime, status;
+	private String avResult, avInfo, avTime;
+	private int numAudioFiles, numVideoFiles, numImageFiles;
+	private String videoInfo;
+
+	private String urlDl, urlPls, urlPage;
+	private String deletedReason;
+
+	private FileType type;
 
 	private int isLinked, isReady, isProtected;
 
 	public FurkFile(String name, String infoHash, long size, String id,
-			String urlDl, String urlPls, String type, String status,
-			String urlPage, int isLinked, int isReady) {
+			String urlDl, FileType type, String status, String urlPage,
+			int isLinked, int isReady) {
 		super(name, infoHash, size);
 		this.id = id;
 		this.urlDl = urlDl;
-		this.urlPls = urlPls;
 		this.type = type;
 		this.status = status;
 		this.urlPage = urlPage;
@@ -31,16 +39,34 @@ public class FurkFile extends APIObject implements MoveableItem {
 		return id;
 	}
 
-	public String getType() {
-		return type;
+	public FileType getType() {
+		return type == null ? FileType.DEFAULT : type;
 	}
 
 	public String[] getIdLabels() {
 		return idLabels;
 	}
 
+	public String getParentID() {
+		if (idLabels == null || idLabels.length == 0)
+			return "0";
+		return idLabels[0];
+	}
+
+	public void setParentID(String labelID) {
+		idLabels = new String[] { labelID };
+	}
+
 	public void setIdLabels(String[] idLabels) {
 		this.idLabels = idLabels;
+	}
+
+	public String getIdFeeds() {
+		return idFeeds;
+	}
+
+	public void setIdFeeds(String idFeeds) {
+		this.idFeeds = idFeeds;
 	}
 
 	public String getCtime() {
@@ -73,19 +99,6 @@ public class FurkFile extends APIObject implements MoveableItem {
 
 	public void setDeletedReason(String deletedReason) {
 		this.deletedReason = deletedReason;
-	}
-
-	public String getNotes() {
-		return notes;
-	}
-
-	public void setNotes(String notes) {
-		String noteTemp = this.notes;
-		try {
-			this.notes = notes;
-		} catch (Exception e) {
-			this.notes = noteTemp;
-		}
 	}
 
 	public boolean isLinked() {
@@ -130,24 +143,22 @@ public class FurkFile extends APIObject implements MoveableItem {
 		return avTime;
 	}
 
-	public String getNumAudioFiles() {
+	public void fileCount(int audioFiles, int videoFiles, int imageFiles) {
+		numAudioFiles = audioFiles;
+		numVideoFiles = videoFiles;
+		numImageFiles = imageFiles;
+	}
+
+	public int getNumAudioFiles() {
 		return numAudioFiles;
 	}
 
-	public String getNumVideoFiles() {
+	public int getNumVideoFiles() {
 		return numVideoFiles;
 	}
 
-	public String getNumImageFiles() {
+	public int getNumImageFiles() {
 		return numImageFiles;
-	}
-
-	public String getNumAudioPlayerFiles() {
-		return numAudioPlayerFiles;
-	}
-
-	public String getNumVideoPlayerFiles() {
-		return numVideoPlayerFiles;
 	}
 
 	public String[] getThumbs() {
@@ -182,6 +193,14 @@ public class FurkFile extends APIObject implements MoveableItem {
 		this.urlPls = urlPls;
 	}
 
+	public void setVideoInfo(String videoInfo) {
+		this.videoInfo = videoInfo;
+	}
+
+	public String getVideoInfo() {
+		return videoInfo;
+	}
+
 	public void overwrite(FurkFile f) {
 		screenshotThumbs = f.screenshotThumbs;
 		screenshots = f.screenshots;
@@ -198,16 +217,14 @@ public class FurkFile extends APIObject implements MoveableItem {
 		urlPls = f.urlPls;
 		urlPage = f.urlPage;
 		numVideoFiles = f.numVideoFiles;
+		numAudioFiles = f.numAudioFiles;
 		numImageFiles = f.numImageFiles;
-		numAudioPlayerFiles = f.numAudioPlayerFiles;
-		numVideoPlayerFiles = f.numVideoPlayerFiles;
 		deletedReason = f.deletedReason;
-		notes = f.notes;
 
 		isLinked = f.isLinked;
 		isReady = f.isReady;
 		isProtected = f.isProtected;
-		
+
 		stateChanged();
 	}
 
@@ -226,21 +243,10 @@ public class FurkFile extends APIObject implements MoveableItem {
 		result = prime * result + isLinked;
 		result = prime * result + isProtected;
 		result = prime * result + isReady;
-		result = prime * result + ((notes == null) ? 0 : notes.hashCode());
-		result = prime * result
-				+ ((numAudioFiles == null) ? 0 : numAudioFiles.hashCode());
-		result = prime
-				* result
-				+ ((numAudioPlayerFiles == null) ? 0 : numAudioPlayerFiles
-						.hashCode());
-		result = prime * result
-				+ ((numImageFiles == null) ? 0 : numImageFiles.hashCode());
-		result = prime * result
-				+ ((numVideoFiles == null) ? 0 : numVideoFiles.hashCode());
-		result = prime
-				* result
-				+ ((numVideoPlayerFiles == null) ? 0 : numVideoPlayerFiles
-						.hashCode());
+		result = prime * result + numAudioFiles;
+		result = prime * result + numImageFiles;
+		result = prime * result + numVideoFiles;
+
 		result = prime * result + Arrays.hashCode(screenshotThumbs);
 		result = prime * result + Arrays.hashCode(screenshots);
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
@@ -266,21 +272,18 @@ public class FurkFile extends APIObject implements MoveableItem {
 				+ (avInfo != null ? "avInfo=" + avInfo + ", " : "")
 				+ (avTime != null ? "avTime=" + avTime + ", " : "")
 				+ (urlPage != null ? "urlPage=" + urlPage + ", " : "")
-				+ (numAudioFiles != null ? "numAudioFiles=" + numAudioFiles
-						+ ", " : "")
-				+ (numVideoFiles != null ? "numVideoFiles=" + numVideoFiles
-						+ ", " : "")
-				+ (numImageFiles != null ? "numImageFiles=" + numImageFiles
-						+ ", " : "")
-				+ (numAudioPlayerFiles != null ? "numAudioPlayerFiles="
-						+ numAudioPlayerFiles + ", " : "")
-				+ (numVideoPlayerFiles != null ? "numVideoPlayerFiles="
-						+ numVideoPlayerFiles + ", " : "")
+				+ "numAudioFiles="
+				+ numAudioFiles
+				+ ", "
+				+ "numVideoFiles="
+				+ numVideoFiles
+				+ ", "
+				+ "numImageFiles="
+				+ numImageFiles
+				+ ", "
 				+ (deletedReason != null ? "deletedReason=" + deletedReason
-						+ ", " : "")
-				+ (notes != null ? "notes=" + notes + ", " : "") + "isLinked="
-				+ isLinked + ", isReady=" + isReady + ", isProtected="
-				+ isProtected + "]";
+						+ ", " : "") + "isLinked=" + isLinked + ", isReady="
+				+ isReady + ", isProtected=" + isProtected + "]";
 	}
 
 	@Override

@@ -248,6 +248,7 @@ public class File_MyFiles extends JPanel implements Runnable, Observer {
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if(arg1.equals(mode)){
+			System.out.println("Update Requested :: mode="+mode);
 			refreshMyFiles(false);
 		}
 	}

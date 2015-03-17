@@ -584,7 +584,7 @@ public class MainEnvironment extends JDialog implements Runnable,
 		new Thread(new Runnable() {
 			public void run() {
 				scaler = 1.0;
-				double dec = 0.005;
+				double dec = (0.01/buttonMap.size());
 				while (scaler > 0.05) {
 					scaler -= dec;
 					dec += 0.001;
@@ -598,6 +598,7 @@ public class MainEnvironment extends JDialog implements Runnable,
 					} catch (InterruptedException e) {
 					}
 				}
+				System.out.println("Final Dec = "+dec);
 				MainEnvironment.super.setVisible(false);
 				animating = false;
 			}
@@ -613,10 +614,19 @@ public class MainEnvironment extends JDialog implements Runnable,
 		new Thread(new Runnable() {
 			public void run() {
 				scaler = 0.05;
-				double inc = 0.005;
+				double inc = 0.05;
+				int incDir=-1;
 				while (scaler < 1.0) {
 					scaler += inc;
-					inc += 0.001;
+					inc += (incDir)*0.002;
+					if(inc<0.002){
+						inc=0.002;
+						incDir=-incDir;
+					}
+					if(inc>0.05){
+						inc=0.05;
+						incDir=-incDir;
+					}
 					if (scaler > 1.0)
 						scaler = 1.0;
 					SwingUtilities.invokeLater(new Runnable() {
@@ -773,5 +783,18 @@ public class MainEnvironment extends JDialog implements Runnable,
 	public JComponent getBalloonContents(String key){
 		PopupBalloonTip b = balloonMap.get(key);
 		return b==null?null:b.getContents();
+	}
+
+	public void invokeButton(String key) {
+		if(key==null) return;
+		PopupBalloonTip b = balloonMap.get(key);
+		Runnable run = runMap.get(key);
+		if(b!=null)
+			b.setVisible(true);
+		if(run!=null){
+			Thread t = new Thread(run);
+			t.setDaemon(true);
+			t.start();
+		}
 	}
 }

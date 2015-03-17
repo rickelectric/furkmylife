@@ -1,5 +1,6 @@
 package rickelectric.furkmanager.views;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
@@ -16,6 +17,7 @@ public class LoadingCircle extends JLabel {
 
 	public LoadingCircle() {
 		setFont(new Font("Dialog", Font.BOLD, 12));
+		setBackground(new Color(0,0,0,0));
 		setIcon(new ImageIcon(ImageLoader.class.getResource("ajax-loader-128.gif")));
 		setHorizontalAlignment(SwingConstants.CENTER);
 		setVerticalAlignment(SwingConstants.CENTER);

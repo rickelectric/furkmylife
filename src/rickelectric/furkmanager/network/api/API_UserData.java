@@ -6,8 +6,8 @@ import org.json.JSONObject;
 import rickelectric.UtilBox;
 import rickelectric.furkmanager.models.FurkUserData;
 import rickelectric.furkmanager.models.LoginModel;
-import rickelectric.furkmanager.models.URI_Enums;
-import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
+import rickelectric.furkmanager.models.enums.URI_Enums;
+import rickelectric.furkmanager.models.enums.URI_Enums.Prefs_Flags;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.utils.SettingsManager;
 
@@ -91,13 +91,13 @@ public class API_UserData extends API {
 	public static boolean login(LoginModel login) {
 		boolean isValid = false;
 		switch (login.mode()) {
-		case LoginModel.APIKEY:
+		case APIKEY:
 			isValid = FurkBridge.ping(login.apiKey());
 			if (isValid) {
 				API.init(login.apiKey());
 			}
 			break;
-		case LoginModel.CREDENTIALS:
+		case CREDENTIALS:
 			String key = FurkBridge.userLogin(login.username(),
 					UtilBox.getInstance().charToString(login.password()));
 			isValid = (key!=null);
@@ -106,7 +106,7 @@ public class API_UserData extends API {
 				login.setApiKey(key);
 			}
 			break;
-		case LoginModel.BLANK:
+		case BLANK:
 			return false;
 		default:
 			return false;

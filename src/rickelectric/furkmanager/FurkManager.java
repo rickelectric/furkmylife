@@ -134,15 +134,23 @@ public class FurkManager {
 	}
 
 	public static void main(String[] args) {
-
-		SetupRegistry.checkRegistry();
+//		String disp = "";
+//		for(String arg:args){
+//			disp+="Argument:: "+arg+"\n";
+//		}
+//		alerts(disp);
+		if(args.length==0){
+			alerts("Please Run Using FurkManager.exe executable");
+			return;
+		}
+		SetupRegistry.checkRegistry(args[0]);
 		LAF(0);
 		/**
 		 * Remove
 		 */
-		// FurkBridge.dummy(true);
-		// VideoPlayer.dummy = true;
-		// AudioPlayer.dummy = true;
+//		 FurkBridge.dummy(true);
+//		 VideoPlayer.dummy = true;
+//		 AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
@@ -152,7 +160,7 @@ public class FurkManager {
 		int len = args.length;
 		int iter = 0;
 		while (iter < len) {
-			if (iter == 0 && args[iter].startsWith("furk:")) {
+			if (iter == 1 && args[iter].startsWith("furk:")) {
 				processProtocolHandler(args[iter]);
 			}
 			if (args[iter].equals("-tray")) {
@@ -202,34 +210,38 @@ public class FurkManager {
 			}
 			else lWin.loginMode();
 		} else {
-			if (!API_UserData.isLoaded()) {
-				lWin.setText("Loading User Data...");
-				API_UserData.loadUserData();
-			}
-			if (API_File.size(API_File.FINISHED) == 0) {
-				lWin.setText("Loading Files...");
-				API_File.update(API_File.FINISHED,false);
-			}
-			if (API_Label.getAllCached() == null) {
-				lWin.setText("Loading Folders...");
-				API_Label.getAll();
-				lWin.setText("Folder Manager Initializing...");
-				APIFolderManager.init(API_Label.root());
-			}
-			lWin.setText("Launching...");
-			mainWin();
-			if (runTray) {
-				mWin.setVisible(false);
-				runTray = false;
-			}
-			lWin.setVisible(false);
-
-			dwm = new DownloadManager();
-			dwm.setVisible(false);
-
-			if (addString != null) {
-				new AddDownloadFrame(addString);
-				addString = null;
+			try{
+				if (!API_UserData.isLoaded()) {
+					lWin.setText("Loading User Data...");
+					API_UserData.loadUserData();
+				}
+				if (API_File.size(API_File.FINISHED) == 0) {
+					lWin.setText("Loading Files...");
+					API_File.update(API_File.FINISHED,false);
+				}
+				if (API_Label.getAllCached() == null) {
+					lWin.setText("Loading Folders...");
+					API_Label.getAll();
+					lWin.setText("Folder Manager Initializing...");
+					APIFolderManager.init(API_Label.root());
+				}
+				lWin.setText("Launching...");
+				mainWin();
+				if (runTray) {
+					mWin.setVisible(false);
+					runTray = false;
+				}
+				lWin.setVisible(false);
+	
+				dwm = new DownloadManager();
+				dwm.setVisible(false);
+	
+				if (addString != null) {
+					new AddDownloadFrame(addString);
+					addString = null;
+				}
+			}catch(Exception ex){
+				ex.printStackTrace();
 			}
 		}
 	}

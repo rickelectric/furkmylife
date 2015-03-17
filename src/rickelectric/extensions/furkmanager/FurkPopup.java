@@ -40,6 +40,9 @@ public class FurkPopup extends JPanel {
 		add(MainWindow.getInstance().getContentPane(), BorderLayout.CENTER);
 	}
 
+	/**
+	 * Post-Loader Function
+	 */
 	public static void generateRefreshButtons() {
 		final CircleButton[] buttons = new CircleButton[2], refreshButtons = new CircleButton[2];
 		final JComponent[] sections = new JComponent[2];

@@ -158,7 +158,7 @@ public class MainEnv implements PrimaryEnv {
 //		buttons[2].setLocation(xLoc, bHeight);
 //		xLoc += inc;
 
-		buttons[3] = new CircleButton("Application Settings", ImageLoader
+		buttons[3] = new CircleButton("Furk App Settings", ImageLoader
 				.getInstance().getImage("dash/Settings-64.png"));
 		buttons[3].setLocation(xLoc, bHeight);
 		xLoc += inc;
@@ -281,31 +281,18 @@ public class MainEnv implements PrimaryEnv {
 
 	@Override
 	public void main() {
-		//changeViewSection(0);
+		MainEnvironment.getInstance().invokeButton("extensions.furkmanager.My Files");
 	}
 
 	@Override
 	public void settings() {
-		//changeViewSection(3);
+		MainEnvironment.getInstance().invokeButton("extensions.furkmanager.Furk App Settings");
 	}
 
 	@Override
 	public void userSettings() {
-		//changeViewSection(4);
+		MainEnvironment.getInstance().invokeButton("extensions.furkmanager.Furk User Options");
 	}
-
-//	private void changeViewSection(int i) {
-//		for (int x = 0; x < balloons.length; x++) {
-//			balloons[x].setVisible(false);
-//		}
-//		balloons[i].setVisible(true);
-//		bgc = new Color(Color.darkGray.getRed(), Color.darkGray.getBlue(),
-//				Color.darkGray.getGreen(), SettingsManager.getInstance()
-//						.dimEnvironment() ? darkness : 0);
-//		setBackground(bgc);
-//		slideButtons(true);
-//		MainEnvironment.getInstance().repaint();
-//	}
 
 	@Override
 	public void setStatus(String string) {

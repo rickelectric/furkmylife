@@ -18,6 +18,7 @@ import javax.swing.border.TitledBorder;
 import rickelectric.UtilBox;
 import rickelectric.desktop.views.windows.MainEnvironment;
 import rickelectric.furkmanager.FurkManager;
+import rickelectric.furkmanager.network.api.API_UserData;
 import rickelectric.furkmanager.utils.SettingsManager;
 
 public class Settings_UIPanel extends JPanel {
@@ -77,7 +78,7 @@ public class Settings_UIPanel extends JPanel {
 				}
 				int newMode = radio_env.isSelected() ? SettingsManager.ENV_MODE
 						: SettingsManager.WIN_MODE;
-				if (newMode != SettingsManager.getInstance().getMainWinMode()) {
+				if (newMode != SettingsManager.getInstance().getMainWinMode() && API_UserData.currentLoginModel()!=null) {
 					int opt;
 					boolean aat = FurkManager.getMainWindow().isAlwaysOnTop();
 					try {

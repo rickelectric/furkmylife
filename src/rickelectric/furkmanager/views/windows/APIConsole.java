@@ -38,6 +38,10 @@ public class APIConsole extends JFrame {
 	private JScrollPane scrollPane;
 	private JPanel panel_top;
 	private JComboBox<String> method;
+	
+	public static void main(String...strings){
+		new APIConsole().setVisible(true);
+	}
 
 	public APIConsole() {
 		setMinimumSize(new Dimension(450, 400));

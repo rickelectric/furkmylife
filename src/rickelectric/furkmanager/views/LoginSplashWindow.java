@@ -54,7 +54,7 @@ import rickelectric.furkmanager.views.panels.Settings_UIPanel;
 import rickelectric.img.ImageLoader;
 import rickelectric.swingmods.JButtonLabel;
 
-public class LoginSplashWindow extends JFrame implements Runnable{
+public class LoginSplashWindow extends JFrame implements Runnable {
 	private static final long serialVersionUID = 1L;
 	private Image splashImage;
 	private Image loadingImage;
@@ -71,6 +71,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 	private JButtonLabel button_apilogin;
 	private JLabel label_key;
 	private boolean loggingIn;
+	
+	private Thread loginProcessThread=null;
 
 	private Point startPoint = null;
 	private boolean moveable = true;
@@ -79,9 +81,9 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 
 	private JPanel panel_login;
 	private Rectangle label_loading;
-	private JCheckBox check_savecreds,check_auto;
+	private JCheckBox check_savecreds, check_auto;
 	private JDialog sf = null, uf = null;
-	private JButtonLabel btn_apihelp,btn_env;
+	private JButtonLabel btn_apihelp, btn_env;
 
 	public LoginSplashWindow() {
 		setUndecorated(true);
@@ -102,8 +104,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 				FurkManager.exit();
 			}
 		});
-		btn_X.setIcon(new ImageIcon(
-				ImageLoader.getInstance().getImage("sm/edit_delete.png")));
+		btn_X.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"sm/edit_delete.png")));
 		btn_X.setBounds(639, 11, 39, 23);
 		contentPane.add(btn_X);
 
@@ -117,14 +119,26 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 				LoginSplashWindow.class
 						.getResource("/javax/swing/plaf/metal/icons/ocean/minimize.gif")));
 		btn_min.setBounds(590, 11, 39, 23);
+		btn_min.setToolTipText("Back (Cancel Login)");
 		contentPane.add(btn_min);
+		
+		btn_back = new JButtonLabel("", new Runnable(){
+			public void run(){
+				cancelLogin();
+			}
+		});
+		btn_back.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"arrow_double_left.png")));
+		btn_back.setBounds(541, 11, 39, 23);
+		btn_back.setVisible(false);
+		contentPane.add(btn_back);
 
 		panel_login = new JPanel();
 		panel_login.setOpaque(false);
 		panel_login.setBounds(218, 171, 424, 208);
 		contentPane.add(panel_login);
 		panel_login.setLayout(null);
-		
+
 		label_loading = new Rectangle(420, 207, 298, 208);
 		loadingImage = Toolkit.getDefaultToolkit().getImage(
 				ImageLoader.class.getResource("ajax-loader-128.gif"));
@@ -186,12 +200,14 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		button_userlogin = new JButtonLabel("User Login", new Runnable() {
 			@Override
 			public void run() {
-				ThreadPool.run(new Runnable() {
+				loginProcessThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						login();
 					}
 				});
+				loginProcessThread.setDaemon(true);
+				loginProcessThread.start();
 			}
 		});
 		button_userlogin.setBounds(284, 101, 128, 20);
@@ -219,12 +235,14 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		button_apilogin = new JButtonLabel("API Login", new Runnable() {
 			@Override
 			public void run() {
-				ThreadPool.run(new Runnable() {
+				loginProcessThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						apiLogin();
 					}
 				});
+				loginProcessThread.setDaemon(true);
+				loginProcessThread.start();
 
 			}
 		});
@@ -235,7 +253,7 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		check_savecreds.setOpaque(false);
 		check_savecreds.setBounds(10, 170, 123, 23);
 		panel_login.add(check_savecreds);
-		
+
 		check_auto = new JCheckBox("Auto-Login");
 		check_auto.setOpaque(false);
 		check_auto.setBounds(143, 169, 101, 23);
@@ -253,7 +271,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 					@Override
 					public void hyperlinkUpdate(HyperlinkEvent e) {
 						if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-							UtilBox.getInstance().openUrl(e.getURL().toExternalForm());
+							UtilBox.getInstance().openUrl(
+									e.getURL().toExternalForm());
 						}
 					}
 				});
@@ -263,7 +282,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 			}
 		});
 		btn_apihelp.setHorizontalAlignment(SwingConstants.LEFT);
-		btn_apihelp.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("dash/User-16.png")));
+		btn_apihelp.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"dash/User-16.png")));
 		btn_apihelp.setForeground(Color.BLUE);
 		btn_apihelp.setBounds(10, 139, 123, 25);
 		panel_login.add(btn_apihelp);
@@ -293,7 +313,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 					}
 				});
 		btn_settings.setHorizontalAlignment(SwingConstants.LEFT);
-		btn_settings.setIcon(new ImageIcon(ImageLoader.getInstance().getImage("dash/Settings-16.png")));
+		btn_settings.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"dash/Settings-16.png")));
 		btn_settings.setBounds(10, 67, 123, 25);
 		panel_login.add(btn_settings);
 
@@ -320,9 +341,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		});
 		btn_env.setHorizontalAlignment(SwingConstants.LEFT);
 		btn_apihelp.setForeground(Color.RED);
-		btn_env
-				.setIcon(new ImageIcon(
-						ImageLoader.getInstance().getImage("sm/menu_expand.png")));
+		btn_env.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"sm/menu_expand.png")));
 		btn_env.setBounds(10, 25, 123, 25);
 		panel_login.add(btn_env);
 
@@ -333,19 +353,27 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		addListeners();
-		
+
 		Thread t = new Thread(this);
 		t.setDaemon(true);
 		t.start();
 	}
-	
-	public void run(){
-		while(true){
-			if(isShowing()){
+
+	protected void cancelLogin() {
+		if(loginProcessThread!=null && loginProcessThread.isAlive()){
+			loginProcessThread.interrupt();
+		}
+	}
+
+	public void run() {
+		while (true) {
+			if (isShowing()) {
 				repaint();
 			}
-			try {Thread.sleep(500);}
-			catch (InterruptedException e) {}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
@@ -395,14 +423,17 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 			startPoint = null;
 		}
 	};
+	private JButtonLabel btn_back;
 
 	public void addListeners() {
 		UtilBox.getInstance().addMouseListenerToAll(contentPane, pointInit);
-		UtilBox.getInstance().addMouseMotionListenerToAll(contentPane, pointMotion,
+		UtilBox.getInstance().addMouseMotionListenerToAll(
+				contentPane,
+				pointMotion,
 				new Class<?>[] { JButton.class, JTextField.class,
 						JPasswordField.class, JButtonLabel.class });
 	}
-	
+
 	public void splashMode() {
 		panel_login.setVisible(false);
 	}
@@ -428,10 +459,9 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g.create();
-		g2d.setRenderingHint(
-		        RenderingHints.KEY_TEXT_ANTIALIASING,
-		        RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
-		
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+
 		g2d.drawImage(splashImage, 0, 0, this.frameImageObserver);
 		if (panel_login.isVisible()) {
 
@@ -450,13 +480,13 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		furkAnimate(4);
 		String username = input_username.getText();
 		char[] password = input_password.getPassword();
-		
-		if(username==null||username.equals("")){
+
+		if (username == null || username.equals("")) {
 			setText("Error: Username Is Blank");
 			furkAnimate(0);
 			return;
 		}
-		if(password==null||password.length==0){
+		if (password == null || password.length == 0) {
 			setText("Error: No Password Entered");
 			furkAnimate(0);
 			return;
@@ -476,7 +506,7 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 			}
 		} catch (Exception e) {
 			furkAnimate(2);
-			FurkManager.trayAlert(FurkManager.TRAY_ERROR, "Login Failed",
+			FurkManager.trayAlert(FurkManager.TRAY_ERROR, "Login Failed / Cancelled",
 					e.getMessage(), null);
 			setText("Login Failed: " + e.getMessage());
 			loggingIn = false;
@@ -484,8 +514,8 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 			return;
 		}
 	}
-	
-	public void keyLogin(String apiKey){
+
+	public void keyLogin(String apiKey) {
 		input_apikey.setText(apiKey);
 		button_apilogin.invoke();
 	}
@@ -496,7 +526,7 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 		loggingIn = true;
 		furkAnimate(4);
 		String apiKey = input_apikey.getText();
-		if(apiKey==null || apiKey.equals("")){
+		if (apiKey == null || apiKey.equals("")) {
 			setText("Error: Blank API Key");
 			furkAnimate(0);
 			return;
@@ -528,12 +558,14 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 
 	public void loadLoginData() {
 		LoginModel savedLogin = SettingsManager.getInstance().loginModel();
-		if(savedLogin==null) savedLogin = new LoginModel(LoginModel.BLANK);
-		
+		if (savedLogin == null)
+			savedLogin = new LoginModel(LoginModel.BLANK);
+
 		input_username.setText(savedLogin.username());
-		input_password.setText(UtilBox.getInstance().charToString(savedLogin.password()));
+		input_password.setText(UtilBox.getInstance().charToString(
+				savedLogin.password()));
 		input_apikey.setText(savedLogin.apiKey());
-		
+
 		check_savecreds.setSelected(savedLogin.save());
 		check_auto.setSelected(savedLogin.autoLogin());
 		loggingIn = false;
@@ -541,6 +573,7 @@ public class LoginSplashWindow extends JFrame implements Runnable{
 
 	private void furkAnimate(int speed) {
 		panel_login.setVisible(speed == 0);
+		btn_back.setVisible(speed!=0);
 		repaint();
 	}
 

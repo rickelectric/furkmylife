@@ -77,6 +77,19 @@ public class UtilBox {
 	public int getRandomNumber(int range) {
 		return r.nextInt(range);
 	}
+	
+	public String byteSizeToString(long size){
+		double sz=size;
+		String[] reps=new String[]{"bytes","kB","MB","GB","TB"};
+		int i=0;
+		while(sz>1024&&i<=4){
+			sz=sz/1024f;
+			i++;
+		}
+		String[] szs=(""+sz).split("\\.");
+		if(szs[1].length()>2) szs[1]=szs[1].substring(0, 2);
+		return szs[0]+"."+szs[1]+" "+reps[i];
+	}
 
 	public void sendToClipboard(String s) {
 		StringSelection stringSelection = new StringSelection(s);

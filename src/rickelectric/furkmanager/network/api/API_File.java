@@ -15,6 +15,7 @@ import rickelectric.IndexPair;
 import rickelectric.furkmanager.models.APIObject;
 import rickelectric.furkmanager.models.FurkFile;
 import rickelectric.furkmanager.models.FurkLabel;
+import rickelectric.furkmanager.models.enums.FileType;
 import rickelectric.furkmanager.network.FurkBridge;
 
 /**
@@ -67,10 +68,10 @@ public class API_File extends API {
 		fo.deleteObserver(o);
 	}
 
-	public static void update(final FileSection section){
+	public static void update(final FileSection section) {
 		update(section, true);
 	}
-	
+
 	/**
 	 * Updates the FurkFiles in the given Section to match new info on the
 	 * server. Adds new Files from server if they don't already exist. Removes
@@ -78,10 +79,10 @@ public class API_File extends API {
 	 * 
 	 * @param section
 	 */
-	public static void update(final FileSection section,boolean async) {
+	public static void update(final FileSection section, boolean async) {
 		Thread update = new Thread(new Runnable() {
 			public void run() {
-				boolean update = false;
+				boolean updated = false;
 				if (section == FINISHED) {
 					ArrayList<FurkFile> fin = get(FINISHED, -1, -1);
 					String[] s = finished.keySet().toArray(new String[] {});
@@ -89,11 +90,11 @@ public class API_File extends API {
 					for (String z : s)
 						keys.add(z);
 					for (FurkFile f : fin) {
-						update = addToSection(FINISHED, f);
+						updated = addToSection(FINISHED, f);
 						keys.remove(f.getID());
 					}
 					if (keys.size() > 0) {
-						update = true;
+						updated = true;
 						for (String z : keys) {
 							finished.remove(z);
 						}
@@ -108,25 +109,27 @@ public class API_File extends API {
 					for (String z : s)
 						keys.add(z);
 					for (FurkFile f : del) {
-						update = addToSection(DELETED, f);
+						updated = addToSection(DELETED, f);
 						keys.remove(f.getID());
 					}
 					if (keys.size() > 0) {
-						update = true;
+						updated = true;
 						for (String z : keys) {
 							deleted.remove(z);
 						}
 						keys.removeAll(keys);
 					}
 				}
-				if (update) {
+				if (updated) {
 					fo.stateChanged(section);
 				}
 			}
 		});
 		update.setDaemon(true);
-		if(async) update.start();
-		else update.run();
+		if (async)
+			update.start();
+		else
+			update.run();
 	}
 
 	public static IndexPair[] getFileIDs(FileSection section) {
@@ -243,8 +246,9 @@ public class API_File extends API {
 						}
 					}
 					FurkFile fi = new FurkFile(name, info_hash, size, id,
-							url_dl, url_pls, type, fstatus, url_page,
+							url_dl, FileType.fromString(type), fstatus, url_page,
 							is_linked, is_ready);
+					fi.setUrlPls(url_pls);
 					fi.setDeletedReason(del_reason);
 					fi.setThumbs(thumbs);
 					fi.setScreenshots(ss);
@@ -400,6 +404,7 @@ public class API_File extends API {
 
 	public static void flush() {
 		try {
+			FileUpdater.destroyInstance();
 			finished.clear();
 			deleted.clear();
 			fo.deleteObservers();
@@ -417,6 +422,49 @@ public class API_File extends API {
 
 	private static HashMap<String, FurkFile> section(FileSection section) {
 		return section == FINISHED ? finished : deleted;
+	}
+
+}
+
+class FileUpdater extends Thread {
+
+	private static FileUpdater thisInst = null;
+
+	public static synchronized FileUpdater getInstance() {
+		if (thisInst == null)
+			thisInst = new FileUpdater();
+		return thisInst;
+	}
+
+	public static synchronized void destroyInstance() {
+		thisInst.running = false;
+		thisInst.interrupt();
+		thisInst = null;
+	}
+
+	private boolean running;
+
+	public FileUpdater() {
+		setDaemon(true);
+		running = true;
+	}
+
+	public void run() {
+		try {
+			API_File.update(API_File.FINISHED);
+			API_File.update(API_File.DELETED);
+			sleep(10000);
+			while (running) {
+				try {
+					API_File.update(API_File.FINISHED);
+					sleep(20000);
+				} catch (InterruptedException e) {
+					System.err.println("Updating & Restarting File Thread...");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

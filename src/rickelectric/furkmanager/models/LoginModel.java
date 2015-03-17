@@ -5,12 +5,17 @@ import java.io.Serializable;
 public class LoginModel implements Serializable {
 	private static final long serialVersionUID = 10314L;
 
-	public static final int APIKEY = 0, CREDENTIALS = 1, BLANK = -1;
+	public enum LoginMode {
+		APIKEY, CREDENTIALS, BLANK
+	}
+
+	public static final LoginMode APIKEY = LoginMode.APIKEY,
+			CREDENTIALS = LoginMode.CREDENTIALS, BLANK = LoginMode.BLANK;
 
 	private String apiKey, username;
 	private char[] password;
 
-	private int mode;
+	private LoginMode mode;
 	private boolean save, autoLogin, valid;
 
 	public LoginModel(String apiKey) {
@@ -23,16 +28,16 @@ public class LoginModel implements Serializable {
 		setLogin(username, password);
 	}
 
-	public LoginModel(int mode) {
-		if (mode != APIKEY && mode!=CREDENTIALS && mode!=BLANK)
+	public LoginModel(LoginMode mode) {
+		if (mode != APIKEY && mode != CREDENTIALS && mode != BLANK)
 			return;
 		this.setMode(mode);
 		apiKey = null;
 		username = null;
 		password = null;
-		valid=false;
-		autoLogin=false;
-		save=false;
+		valid = false;
+		autoLogin = false;
+		save = false;
 	}
 
 	public boolean isValid() {
@@ -71,11 +76,11 @@ public class LoginModel implements Serializable {
 		return true;
 	}
 
-	public int mode() {
+	public LoginMode mode() {
 		return mode;
 	}
 
-	public void setMode(int mode) {
+	public void setMode(LoginMode mode) {
 		this.mode = mode;
 	}
 

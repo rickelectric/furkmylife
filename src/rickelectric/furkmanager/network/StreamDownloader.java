@@ -25,6 +25,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpGet;
@@ -52,6 +53,7 @@ public class StreamDownloader {
 
 	private static StreamDownloader thisInstance;
 	private DefaultHttpClient client;
+	private int batchMult;
 
 	public static synchronized StreamDownloader getInstance() {
 		if (thisInstance == null) {
@@ -94,6 +96,7 @@ public class StreamDownloader {
 				return 0;
 			}
 		});
+		this.batchMult=4;
 	}
 
 	public String fileToString(String filepath) throws IOException {
@@ -225,14 +228,29 @@ public class StreamDownloader {
 		long i = System.currentTimeMillis();
 		// String r = EntityUtils.toString(resp.getEntity());
 
-		BufferedInputStream bis = new BufferedInputStream(resp.getEntity()
+		String r=readEntityStream(resp.getEntity());
+		long t = System.currentTimeMillis();
+		System.err.println("Download Complete (time=" + ((t - i) / 1000f)
+				+ "s)\n");
+		return r;
+	}
+
+	private String readEntityStream(HttpEntity entity) throws IllegalStateException, IOException { 
+		BufferedInputStream bis = new BufferedInputStream(entity
 				.getContent());
-		ByteArrayOutputStream os = new ByteArrayOutputStream((int) resp
-				.getEntity().getContentLength());
-		int batchWriteSize = 128 * 1024;
-		byte[] b = new byte[batchWriteSize];
+		ByteArrayOutputStream os = new ByteArrayOutputStream((int)entity.getContentLength());
+		int batchWriteSize = batchMult * 1024;
+		byte[] b = new byte[256*1024];
 		int bytesRead = bis.read(b, 0, batchWriteSize);
 		while (bytesRead != -1) {
+			if(batchMult>1&& bytesRead<(batchWriteSize/2)){
+				batchMult = batchMult/2;
+				batchWriteSize = batchMult * 1024;
+			}
+			if(batchMult<256&&bytesRead==batchWriteSize){
+				batchMult = batchMult*2;
+				batchWriteSize = batchMult * 1024;
+			}
 			System.err.println("Read "+bytesRead+" bytes");
 			os.write(b, 0, bytesRead);
 			bytesRead = bis.read(b, 0, batchWriteSize);
@@ -240,11 +258,8 @@ public class StreamDownloader {
 		bis.close();
 		String r = os.toString();
 		os.close();
-
-		long t = System.currentTimeMillis();
-		System.err.println("Download Complete (time=" + ((t - i) / 1000f)
-				+ "s)\n");
 		return r;
+		
 	}
 
 	public String postStringStream(String urlx, int batchWriteSize)

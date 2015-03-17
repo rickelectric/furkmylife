@@ -64,7 +64,7 @@ public class FolderTreeRenderer extends DefaultTreeCellRenderer {
 				loading.setImageObserver(new NodeImageObserver(tree, val));
 			} else {
 				FurkFile curr = val.getUserObject();
-				String type = curr.getType();
+				String type = curr.getType().toString();
 				if (type.equals("audio"))
 					setIcon(audio);
 				else if (type.equals("video"))

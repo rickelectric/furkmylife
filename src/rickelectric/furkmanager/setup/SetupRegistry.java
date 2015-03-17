@@ -10,7 +10,7 @@ public class SetupRegistry {
 
 	}
 
-	private static void registerProtocol() throws IllegalArgumentException,
+	private static void registerProtocol(String executable) throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
 		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
 				"SOFTWARE\\Classes\\furk");
@@ -41,7 +41,7 @@ public class SetupRegistry {
 						WinRegistry.HKEY_CURRENT_USER,
 						"SOFTWARE\\Classes\\furk\\DefaultIcon",
 						"",
-						"C:\\Users\\Ionicle\\Applications\\RickelectricApps\\FurkManager\\FurkManager.exe,0");
+						executable+",0");
 
 		WinRegistry.createKey(WinRegistry.HKEY_CURRENT_USER,
 				"SOFTWARE\\Classes\\furk\\shell");
@@ -61,7 +61,7 @@ public class SetupRegistry {
 						WinRegistry.HKEY_CURRENT_USER,
 						"SOFTWARE\\Classes\\furk\\shell\\open\\command",
 						"",
-						"C:\\Users\\Ionicle\\Applications\\RickelectricApps\\FurkManager\\FurkManager.exe %1");
+						executable+" %1");
 	}
 
 	public static void installChromeExt(String installDir)
@@ -78,7 +78,7 @@ public class SetupRegistry {
 				"SOFTWARE\\Classes\\.torrent");
 	}
 
-	public static void checkRegistry() {
+	public static void checkRegistry(String executable) {
 		// If Furk Registry Keys Exist, Return.
 		// Else : Run First TimeSetup
 
@@ -103,7 +103,7 @@ public class SetupRegistry {
 				runSetup(s);
 			}
 
-			registerProtocol();
+			registerProtocol(executable);
 
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block

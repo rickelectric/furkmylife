@@ -147,7 +147,7 @@ public class FurkFileView extends JDialog implements Statable {
 		input_type.setBackground(Color.WHITE);
 		input_type.setEditable(false);
 		input_type.setBounds(310, 75, 122, 20);
-		input_type.setText(ff.getType());
+		input_type.setText(ff.getType().toString());
 		if (ff.getType() == null)
 			input_type.setEnabled(false);
 		centerPane.add(input_type);
@@ -335,7 +335,7 @@ public class FurkFileView extends JDialog implements Statable {
 		btn_changeview.setBounds(189, 427, 243, 20);
 		if (showScreenshots)
 			centerPane.add(btn_changeview);
-		new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				tfile_scroll = new TFileTreePanel(ff);
@@ -347,7 +347,9 @@ public class FurkFileView extends JDialog implements Statable {
 					tfile_scroll.setVisible(true);
 				}
 			}
-		}).start();
+		});
+		t.setDaemon(true);
+		t.start();
 
 		repaint();
 		setVisible(true);

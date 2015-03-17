@@ -8,7 +8,8 @@ import java.util.Collections;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import rickelectric.furkmanager.models.URI_Enums.Prefs_Flags;
+import rickelectric.furkmanager.models.enums.URI_Enums;
+import rickelectric.furkmanager.models.enums.URI_Enums.Prefs_Flags;
 import rickelectric.furkmanager.network.api.API_UserData;
 
 import com.xeiam.xchart.Chart;

@@ -16,6 +16,8 @@ public class FurkLabel implements Comparable<FurkLabel>{
 		this.name=name;
 		parentID="0";
 		sortOrder=0;
+		color="";
+		background="";
 	}
 	
 	public FurkLabel(String ID,String name,String parentID){
