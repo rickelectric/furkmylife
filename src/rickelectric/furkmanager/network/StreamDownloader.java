@@ -137,21 +137,7 @@ public class StreamDownloader {
 					+ resp.getStatusLine().getStatusCode());
 		}
 
-		BufferedInputStream bis = new BufferedInputStream(resp.getEntity()
-				.getContent());
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-		byte[] b = new byte[batchWriteSize];
-		int bytesRead = bis.read(b, 0, batchWriteSize);
-		while (bytesRead != -1) {
-			out.write(b, 0, bytesRead);
-			bytesRead = bis.read(b, 0, batchWriteSize);
-		}
-		bis.close();
-		String s = out.toString();
-		out.flush();
-		out.close();
-		return s;
+		return readEntityStream(resp.getEntity());
 	}
 
 	class CustomTrustManagerHostnameVerifier implements X509TrustManager, X509HostnameVerifier {
@@ -283,19 +269,7 @@ public class StreamDownloader {
 		if (response < 200 || response > 299)
 			throw new IOException("HTTP Response {" + urlx + "} = " + response);
 
-		BufferedInputStream bis = new BufferedInputStream(resp.getEntity()
-				.getContent());
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		byte[] b = new byte[512];
-		int bytesRead = bis.read(b, 0, 512);
-		while (bytesRead != -1) {
-			os.write(b, 0, bytesRead);
-			bytesRead = bis.read(b, 0, 512);
-		}
-		bis.close();
-		String re = os.toString();
-		os.close();
-		return re;
+		return readEntityStream(resp.getEntity());
 	}
 
 	public String getFileStreamWithName(String url, File f, int batchWriteSize)

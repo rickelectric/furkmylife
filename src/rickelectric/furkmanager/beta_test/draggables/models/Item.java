@@ -18,16 +18,21 @@ public abstract class Item extends Rectangle implements Comparable<Item> {
 
 	private boolean selected;
 
+	private boolean hovered;
+
 	public Item(int id, String name) {
 		this.ID = id;
 		this.name = name;
 		selected=false;
+		hovered=false;
 		//defIcon();
 	}
 
 	public Item(String name) {
 		this.ID = idg++;
 		this.name = name;
+		selected=false;
+		hovered=false;
 		//defIcon();
 	}
 
@@ -69,9 +74,13 @@ public abstract class Item extends Rectangle implements Comparable<Item> {
 
 	@Override
 	public int compareTo(Item o) {
-		int oid=o.getID();
-		int mid=getID();
-		return mid - oid;
+		if(o==null) return 100000; 
+		int numeral,oNumeral = numeral = 1;
+		if(this instanceof FolderItem) numeral = 10000;
+		if(o instanceof FolderItem) oNumeral = 10000;
+		int oid=oNumeral*o.getID();
+		int mid=numeral*getID();
+		return oid - mid;
 	}
 
 	public Color online() {
@@ -86,6 +95,22 @@ public abstract class Item extends Rectangle implements Comparable<Item> {
 	
 	public boolean isSelected(){
 		return selected;
+	}
+
+	public boolean isHovered() {
+		return hovered;
+	}
+
+	public void setHovered(boolean hovered) {
+		this.hovered = hovered;
+	}
+	
+	public int randCode() {
+		final int prime = 31;
+		int result = prime * ID;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((toolTip == null) ? 0 : toolTip.hashCode());
+		return result;
 	}
 
 }

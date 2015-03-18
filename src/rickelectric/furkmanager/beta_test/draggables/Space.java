@@ -1,12 +1,12 @@
 package rickelectric.furkmanager.beta_test.draggables;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -17,14 +17,19 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.RepaintManager;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 
 import rickelectric.UtilBox;
 import rickelectric.furkmanager.FurkManager;
@@ -35,15 +40,14 @@ import rickelectric.furkmanager.beta_test.draggables.models.FolderDescriptor;
 import rickelectric.furkmanager.beta_test.draggables.models.FolderItem;
 import rickelectric.furkmanager.beta_test.draggables.models.Item;
 import rickelectric.furkmanager.models.LoginModel;
+import rickelectric.furkmanager.network.api_new.FileAPI;
 import rickelectric.furkmanager.network.api_new.FurkAPI;
+import rickelectric.furkmanager.network.api_new.LabelAPI;
+import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.views.LoadingCircle;
 import rickelectric.furkmanager.views.windows.FurkFileView;
 import rickelectric.img.ImageLoader;
 import rickelectric.swingmods.JButtonLabel;
-import javax.swing.border.BevelBorder;
-import javax.swing.JProgressBar;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 public class Space extends JFrame implements KeyListener, MouseListener,
 		MouseMotionListener, Runnable {
@@ -58,7 +62,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	private ArrayList<Item> allItems;
 
 	private JScrollPane scroller;
-	private JPanel contentPane;
+	private DraggableItemPane contentPane;
 	private LoadingCircle circ;
 
 	private Point screenPoint, vPoint;
@@ -67,16 +71,18 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 
 	private JPanel navBar;
 
-	private JButtonLabel nav_back;
+	private JButtonLabel nav_back, nav_reload, nav_align;
 
 	private Point zero;
-	private JButtonLabel btnlblReload;
 	private JPanel statusPanel;
 	private JProgressBar actionProgress;
 	private JLabel lblReady;
 
 	public static void main(String... strings) {
+		FurkManager.LAF(0);
 		FurkManager.init();
+		FileAPI.dummy = true;
+		LabelAPI.dummy = true;
 		LoginModel lm = new LoginModel(
 				"5323228d687ed9f7f1bdf9ce87050a1fa672e485");
 		try {
@@ -126,8 +132,6 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 			}
 		}
 		contentPane.setPreferredSize(sz);
-		setSize(getSize().width,getSize().height+1);
-		setSize(getSize().width,getSize().height-1);
 		position(zero);
 		validate();
 		return newSz;
@@ -166,43 +170,62 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		nav_back.setPreferredSize(new Dimension(80, 34));
 		nav_back.setEnabled(false);
 		nav_back.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
-				"folder/prev-32.png")));
+				"spaces/prev-32.png")));
 		navBar.add(nav_back);
-		
-		btnlblReload = new JButtonLabel("Reload",new Runnable(){
-			public void run(){
+
+		nav_reload = new JButtonLabel("Reload", new Runnable() {
+			public void run() {
 				reload();
 			}
 		});
-		btnlblReload.setIcon(new ImageIcon(Space.class.getResource("/rickelectric/img/dash/Reload-32.png")));
-		btnlblReload.setPreferredSize(new Dimension(80, 34));
-		navBar.add(btnlblReload);
+		nav_reload.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"dash/Reload-32.png")));
+		nav_reload.setPreferredSize(new Dimension(80, 34));
+		navBar.add(nav_reload);
+
+		nav_align = new JButtonLabel("Align", new Runnable() {
+			public void run() {
+				JPopupMenu menu = new JPopupMenu();
+				Point sc = nav_align.getLocation(Space.this.getContentPane()
+						.getLocation());
+				// menu.setLocation(sc.x,sc.y+nav_align.getHeight());
+
+				final JMenuItem grid = new JMenuItem("To Grid");
+				menu.add(grid);
+
+				final JMenuItem radial = new JMenuItem("To Square");
+				menu.add(radial);
+
+				final JMenuItem triangle = new JMenuItem("To Triangle");
+				menu.add(triangle);
+
+				ActionListener listener = new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						Object src = e.getSource();
+						if (src.equals(grid)) {
+							alignGrid();
+						} else if (src.equals(radial)) {
+							alignRadial();
+						} else if (src.equals(triangle)) {
+							alignRadialTriangle();
+						}
+					}
+				};
+				grid.addActionListener(listener);
+				radial.addActionListener(listener);
+				triangle.addActionListener(listener);
+				menu.show(Space.this.getContentPane(), sc.x,
+						sc.y + nav_align.getHeight());
+			}
+		});
+		nav_align.setIcon(new ImageIcon(ImageLoader.getInstance().getImage(
+				"sm/menu_expand.png")));
+		nav_align.setPreferredSize(new Dimension(80, 34));
+		navBar.add(nav_align);
 
 		scroller = new JScrollPane();
 
-		contentPane = new JPanel() {
-			private static final long serialVersionUID = 1L;
-
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				g.setColor(Color.white);
-				g.fillRect(0, 0, getWidth(), getHeight());
-				g.setColor(Color.black);
-				@SuppressWarnings("unchecked")
-				ArrayList<Item> cloned = (ArrayList<Item>) allItems.clone();
-				Collections.reverse(cloned);
-
-				ModelPainter.paint(g, cloned);
-
-				cloned.removeAll(cloned);
-				cloned = null;
-			}
-
-			@Override
-			public void paintAll(Graphics g) {
-				paintComponent(g);
-			}
-		};
+		contentPane = new DraggableItemPane(allItems);
 		contentPane.setLayout(null);
 		circ = new LoadingCircle();
 		enableDoubleBuffering(contentPane);
@@ -216,18 +239,21 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		contentPane.addKeyListener(this);
 
 		rootPane.add(scroller, BorderLayout.CENTER);
-		
+
 		statusPanel = new JPanel();
 		statusPanel.setPreferredSize(new Dimension(10, 23));
-		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null,
+				null, null));
 		rootPane.add(statusPanel, BorderLayout.SOUTH);
 		statusPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		actionProgress = new JProgressBar();
+		actionProgress.setPreferredSize(new Dimension(200, 14));
 		actionProgress.setIndeterminate(true);
-		actionProgress.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		actionProgress.setBorder(new BevelBorder(BevelBorder.RAISED, null,
+				null, null, null));
 		statusPanel.add(actionProgress, BorderLayout.WEST);
-		
+
 		lblReady = new JLabel("Ready");
 		lblReady.setHorizontalAlignment(SwingConstants.CENTER);
 		statusPanel.add(lblReady, BorderLayout.CENTER);
@@ -275,6 +301,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		Item str = null;
 		boolean scanComplete = false;
 		for (Item s : allItems()) {
+			if(s==null) continue;
 			if (s.contains(p)) {
 				str = s;
 				scanComplete = true;
@@ -289,7 +316,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	private ArrayList<Item> getItemsBelow(Point p) {
 		ArrayList<Item> str = new ArrayList<Item>();
 		for (Item s : allItems()) {
-			if (s.contains(p)) {
+			if (s!=null && s.contains(p)) {
 				str.add(s);
 			}
 		}
@@ -302,6 +329,8 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 			return;
 		spawnPoint = new Point(e.getX(), e.getY());
 		str = getSelectedItem(spawnPoint);
+		allItems.remove(str);
+		allItems.add(0, str);
 		if (str == null) {
 			screenPoint = e.getLocationOnScreen();
 			vPoint = position();
@@ -327,17 +356,22 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		}
 		if (e.getPoint().equals(spawnPoint))
 			return;
-		if(e.getPoint().getX()<0 || e.getPoint().getY()<0){
+		if (e.getPoint().getX() < 0 || e.getPoint().getY() < 0) {
 			str.setLocation(prevPoint);
-		}else{
+		} else {
 			mgr.updateItemLocation(str);
 			sizeContentPane();
-			position(prevPoint);
+			if (str.getX() < this.vpSize().width
+					&& str.getY() < vpSize().height) {
+				position(zero);
+			} else {
+				position(str.getLocation());
+			}
 		}
 		prevPoint = null;
 		startPoint = null;
 		str = null;
-		
+
 		repaint();
 	}
 
@@ -378,6 +412,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		deselectAll();
 		if (all == null || all.size() == 0) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
+				// Context Menu For Blank Space
 				spawnPoint = new Point(e.getX(), e.getY());
 				SpaceContextMenu mnSpace = new SpaceContextMenu(this);
 				mnSpace.show(e.getComponent(), e.getX(), e.getY());
@@ -386,10 +421,12 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 			final Item spr = all.get(0);
 			selectItem(spr);
 			if (e.getButton() == MouseEvent.BUTTON3) {
+				// Context Menu For Item
 				ItemContextMenu m = new ItemContextMenu(this, spr);
 				m.show(e.getComponent(), e.getX(), e.getY());
 			} else if (e.getButton() == MouseEvent.BUTTON1) {
 				if (e.getClickCount() == 2) {
+					// Open Action For Item
 					if (spr instanceof FolderItem) {
 						mgr.setCurrentFolder(((FolderItem) spr).getDescriptor());
 						loadItemsInCurrentFolder();
@@ -399,6 +436,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 								.getFileObject());
 					}
 				} else if (e.getClickCount() == 1) {
+					// Select Item
 					selectItem(spr);
 				}
 			}
@@ -412,17 +450,29 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 
 	private void deselectAll() {
 		for (Item i : allItems) {
+			if(i==null) continue;
 			i.setSelected(false);
+			i.setHovered(false);
 		}
 		repaint();
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		Item i = getSelectedItem(e.getPoint());
-		if (i != null) {
-			contentPane.setToolTipText(i.getToolTip());
-		} else
-			contentPane.setToolTipText(null);
+		if (str == null) {
+			for (Item i : allItems) {
+				if(i==null) continue;
+				i.setHovered(false);
+			}
+			Item i = getSelectedItem(e.getPoint());
+			if (i != null) {
+				contentPane.setToolTipText(i.getToolTip());
+				i.setHovered(true);
+			} else {
+				contentPane.setToolTipText(null);
+			}
+			validate();
+			repaint();
+		}
 	}
 
 	public Item getSelectedItem() {
@@ -469,11 +519,11 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 			back();
 		}
 	}
-	
+
 	protected void reload() {
-		new Thread(new Runnable(){
-			public void run(){
-				
+		new Thread(new Runnable() {
+			public void run() {
+
 				FolderDescriptor currentFolder = mgr.getCurrentFolder();
 				loadItems();
 				mgr.setCurrentFolder(currentFolder);
@@ -482,11 +532,50 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		}).start();
 	}
 
+	protected void alignGrid() {
+		new Thread(new Runnable() {
+			public void run() {
+				contentPane.alignToGrid();
+				for (Item item : allItems) {
+					mgr.updateItemLocation(item);
+				}
+			}
+		}).start();
+	}
+
+	protected void alignRadial() {
+		new Thread(new Runnable() {
+			public void run() {
+				contentPane.alignRadial();
+				for (Item item : allItems) {
+					mgr.updateItemLocation(item);
+				}
+			}
+		}).start();
+	}
+
+	protected void alignRadialTriangle() {
+		new Thread(new Runnable() {
+			public void run() {
+				contentPane.alignRadialTriangle();
+				for (Item item : allItems) {
+					mgr.updateItemLocation(item);
+				}
+			}
+		}).start();
+	}
+
 	private void back() {
-		if (mgr.getCurrentFolder().getParent() != null) {
-			mgr.setCurrentFolder(mgr.getCurrentFolder().getParent());
-			loadItemsInCurrentFolder();
-		}
+		Thread t = ThreadPool.getThread(new Runnable() {
+			public void run() {
+				if (mgr.getCurrentFolder().getParent() != null) {
+					mgr.setCurrentFolder(mgr.getCurrentFolder().getParent());
+					loadItemsInCurrentFolder();
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
 	}
 
 	public void mouseEntered(MouseEvent e) {

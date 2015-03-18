@@ -4,6 +4,7 @@ import rickelectric.furkmanager.exception.APIException;
 import rickelectric.furkmanager.exception.LoginException;
 import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.network.api.API;
+import rickelectric.furkmanager.network.api.FileUpdater;
 
 public class FurkAPI {
 
@@ -35,6 +36,7 @@ public class FurkAPI {
 			//TODO Undo when complete;
 			if(/*login.login(loginModel)*/true){
 				API.init(loginModel.apiKey());
+				FileUpdater.destroyInstance();
 				account = new UserAccountAPI(loginModel.apiKey());
 				file=new FileAPI(loginModel.apiKey());
 				dl=new DownloadAPI(loginModel.apiKey());

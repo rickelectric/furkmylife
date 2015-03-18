@@ -23,15 +23,15 @@ public class FileItem extends Item {
 		switch (desc.getFileObject().getType()) {
 		case AUDIO:
 			this.icon = ImageLoader.getInstance().getImage(
-					"folder/audio-48.png");
+					"spaces/audio-48.png");
 			break;
 		case VIDEO:
 			this.icon = ImageLoader.getInstance().getImage(
-					"folder/video-48.png");
+					"spaces/video-48.png");
 			break;
 		default:
 			this.icon = ImageLoader.getInstance().getImage(
-					"folder/default-file-64.png");
+					"spaces/default-file-64.png");
 			break;
 		}
 		if (icon != null) {

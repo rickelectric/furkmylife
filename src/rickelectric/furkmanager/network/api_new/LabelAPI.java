@@ -10,9 +10,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rickelectric.furkmanager.models.FurkLabel;
+import rickelectric.furkmanager.network.StreamDownloader;
 
 public class LabelAPI implements APIModule {
 
+	public static boolean dummy = false;
+	
 	private String apiKey;
 	private ArrayList<FurkLabel> labels;
 	private long lastUpdated;
@@ -31,7 +34,8 @@ public class LabelAPI implements APIModule {
 		try {
 			parts.addPart("api_key", new StringBody(apiKey));
 			String url = "/label/get";
-			String json = APIConnector.getInstance().jsonPost(url, parts);
+			String json = dummy?StreamDownloader.getInstance().fileToString("./dummy/label.json")://TODO Remove
+				APIConnector.getInstance().jsonPost(url, parts);
 			JSONObject obj = new JSONObject(json);
 			if (obj.getString("status").equals("error"))
 				return false;

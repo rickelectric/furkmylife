@@ -19,12 +19,15 @@ import rickelectric.furkmanager.models.enums.FileSource;
 import rickelectric.furkmanager.models.enums.FileType;
 import rickelectric.furkmanager.models.enums.SortType;
 import rickelectric.furkmanager.models.enums.UnlinkParam;
+import rickelectric.furkmanager.network.StreamDownloader;
 
 public class FileAPI implements APIModule {
 
 	private String apiKey;
 	private long lastUpdatedFin, lastUpdatedDel;
 	private ArrayList<FurkFile> filesFinished, filesDeleted;
+	
+	public static boolean dummy = false;
 
 	public FileAPI(String apiKey) throws APIException {
 		if (apiKey == null)
@@ -258,7 +261,8 @@ public class FileAPI implements APIModule {
 					parts.addPart("unlinked", new StringBody("" + unlinked));
 			}
 			String url = "/file/get";
-			String json = APIConnector.getInstance().jsonPost(url, parts);
+			String json = dummy?StreamDownloader.getInstance().fileToString("./dummy/file.json")://TODO Remove
+				APIConnector.getInstance().jsonPost(url, parts);
 			if (json == null)
 				return null;
 			JSONObject obj = new JSONObject(json);

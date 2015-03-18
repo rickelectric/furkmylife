@@ -20,7 +20,7 @@ public class FolderItem extends Item {
 	}
 
 	public void defIcon() {
-		this.icon = ImageLoader.getInstance().getImage("folder/folder-64.png");
+		this.icon = ImageLoader.getInstance().getImage("spaces/folder-64.png");
 		if (icon != null) {
 			this.width = icon.getWidth(null);
 			this.height = icon.getHeight(null);
