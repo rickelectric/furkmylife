@@ -2,13 +2,17 @@ package rickelectric.furkmanager;
 
 import java.awt.Component;
 import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import rickelectric.UtilBox;
+import rickelectric.furkmanager.beta_test.draggables.Space;
 import rickelectric.furkmanager.idownloader.DownloadManager;
+import rickelectric.furkmanager.models.LoginModel;
 import rickelectric.furkmanager.network.APIFolderManager;
 import rickelectric.furkmanager.network.FurkBridge;
 import rickelectric.furkmanager.network.InstanceConn;
@@ -17,6 +21,7 @@ import rickelectric.furkmanager.network.api.API;
 import rickelectric.furkmanager.network.api.API_File;
 import rickelectric.furkmanager.network.api.API_Label;
 import rickelectric.furkmanager.network.api.API_UserData;
+import rickelectric.furkmanager.network.api_new.FurkAPI;
 import rickelectric.furkmanager.setup.SetupRegistry;
 import rickelectric.furkmanager.utils.MouseActivity;
 import rickelectric.furkmanager.utils.SettingsManager;
@@ -36,6 +41,7 @@ import rickelectric.media.VideoPlayer;
 public class FurkManager {
 
 	private static boolean runTray = false, runLogin = false;
+	private static boolean spacesStart = false;
 	private static String addString = null, loginString = null;
 
 	private static FurkTrayIcon trayIcon = null;
@@ -57,6 +63,7 @@ public class FurkManager {
 	public static final AlertType TRAY_MESSAGE = AlertType.MESSAGE,
 			TRAY_WARNING = AlertType.WARNING, TRAY_ERROR = AlertType.ERROR,
 			TRAY_INFO = AlertType.INFO;
+	private static Space space;
 
 	public static void trayAlert(AlertType type, String title, String msg,
 			Runnable action) {
@@ -115,11 +122,16 @@ public class FurkManager {
 	private static void processProtocolHandler(String s) {
 		// TODO Add furk:// Protocol Argument Handler
 		System.out.println("Protocol Arguments: " + s);
-		String[] split = s.split("\\/");
+		String[] split = s.split("/");
 		for (String sp : split) {
+			System.out.println("@Param '" + sp + "'");
 			if (!runLogin && sp.startsWith("key=")) {
 				runLogin = true;
 				loginString = sp.split("=")[1];
+				System.out.println("@loginString = '" + loginString + "'");
+			}
+			if (!spacesStart && sp.equals("spaces")) {
+				spacesStart = true;
 			}
 		}
 	}
@@ -134,12 +146,7 @@ public class FurkManager {
 	}
 
 	public static void main(String[] args) {
-//		String disp = "";
-//		for(String arg:args){
-//			disp+="Argument:: "+arg+"\n";
-//		}
-//		alerts(disp);
-		if(args.length==0){
+		if (args.length == 0) {
 			alerts("Please Run Using FurkManager.exe executable");
 			return;
 		}
@@ -148,9 +155,9 @@ public class FurkManager {
 		/**
 		 * Remove
 		 */
-//		 FurkBridge.dummy(true);
-//		 VideoPlayer.dummy = true;
-//		 AudioPlayer.dummy = true;
+		// FurkBridge.dummy(true);
+		// VideoPlayer.dummy = true;
+		// AudioPlayer.dummy = true;
 
 		loadingSplash(true);
 
@@ -170,6 +177,29 @@ public class FurkManager {
 				addString = args[iter];
 			}
 			iter++;
+		}
+
+		if (spacesStart) {
+			if (runLogin) {
+				LoginModel lm = new LoginModel(loginString);
+				lWin.setText("Launching Spaces... API Login In Progress...");
+
+				API_UserData.login(lm);
+				lWin.whiteBackground();
+				lWin.setText("Loading Spaces...");
+				lWin.setAlwaysOnTop(true);
+				launchSpaces();
+				lWin.setText("Spaces Running");
+				space.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent e) {
+						System.exit(0);
+					}
+				});
+				//lWin.setAlwaysOnTop(false);
+				lWin.setVisible(false);
+				space.setVisible(true);
+				return;
+			}
 		}
 
 		try {
@@ -207,17 +237,17 @@ public class FurkManager {
 			if (runLogin) {
 				lWin.keyLogin(loginString);
 				runLogin = false;
-			}
-			else lWin.loginMode();
+			} else
+				lWin.loginMode();
 		} else {
-			try{
+			try {
 				if (!API_UserData.isLoaded()) {
 					lWin.setText("Loading User Data...");
 					API_UserData.loadUserData();
 				}
 				if (API_File.size(API_File.FINISHED) == 0) {
 					lWin.setText("Loading Files...");
-					API_File.update(API_File.FINISHED,false);
+					API_File.update(API_File.FINISHED, false);
 				}
 				if (API_Label.getAllCached() == null) {
 					lWin.setText("Loading Folders...");
@@ -232,15 +262,15 @@ public class FurkManager {
 					runTray = false;
 				}
 				lWin.setVisible(false);
-	
+
 				dwm = new DownloadManager();
 				dwm.setVisible(false);
-	
+
 				if (addString != null) {
 					new AddDownloadFrame(addString);
 					addString = null;
 				}
-			}catch(Exception ex){
+			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
@@ -339,10 +369,14 @@ public class FurkManager {
 					AudioPlayer.destroyInstance();
 					VideoPlayer.destroyInstance();
 
-					mWin.setEnabled(false);
+					if (space != null) {
+						space.dispose();
+						space = null;
+					}
+
 					mWin.dispose();
 					API.flushAll();
-					
+
 					MainEnv.destroyInstance();
 					MainWindow.destroyInstance();
 
@@ -401,6 +435,26 @@ public class FurkManager {
 
 	public static boolean mediaEnabled() {
 		return mediaEnabled;
+	}
+
+	public static void launchSpaces() {
+		LoginModel lm = API_UserData.currentLoginModel();
+		try {
+			boolean logged = FurkAPI.getInstance().login(lm);
+			System.out.println("Logged In: " + logged);
+			if (logged) {
+				if (space == null) {
+					space = new Space();
+					space.setSize(1024, 700);
+				}
+				space.setVisible(true);
+				space.setLocationRelativeTo(null);
+				space.loadItems();
+				space.loadItemsInCurrentFolder();
+			}
+		} catch (Exception ez) {
+			ez.printStackTrace();
+		}
 	}
 
 }

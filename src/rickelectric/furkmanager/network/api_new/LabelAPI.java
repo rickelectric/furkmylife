@@ -39,6 +39,12 @@ public class LabelAPI implements APIModule {
 			JSONObject obj = new JSONObject(json);
 			if (obj.getString("status").equals("error"))
 				return false;
+//			if (!dummy) {
+//				FileWriter r = new FileWriter("./dummy/label.json");
+//				r.write(json);
+//				r.flush();
+//				r.close();
+//			}
 			JSONArray labels = obj.getJSONArray("labels");
 			this.labels = APIParser.parseLabelList(labels);
 			lastUpdated = System.currentTimeMillis();
@@ -136,6 +142,7 @@ public class LabelAPI implements APIModule {
 			}
 			String url = "/label/link";
 			String json = APIConnector.getInstance().jsonPost(url, parts);
+			System.out.println(json);
 			JSONObject obj = new JSONObject(json);
 			if (obj.getString("status").equals("ok"))
 				return true;

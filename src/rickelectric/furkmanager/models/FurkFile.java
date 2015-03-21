@@ -50,7 +50,7 @@ public class FurkFile extends APIObject implements MoveableItem {
 	public String getParentID() {
 		if (idLabels == null || idLabels.length == 0)
 			return "0";
-		return idLabels[0];
+		return idLabels[idLabels.length-1];
 	}
 
 	public void setParentID(String labelID) {

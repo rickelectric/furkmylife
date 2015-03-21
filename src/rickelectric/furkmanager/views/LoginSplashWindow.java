@@ -602,4 +602,12 @@ public class LoginSplashWindow extends JFrame implements Runnable {
 		});
 		fader.start();
 	}
+
+	public void whiteBackground() {
+		splashImage = ImageLoader.getInstance().getImage("Splash_Big_White_Trans.png");
+	}
+	
+	public void regularBackground(){
+		splashImage = ImageLoader.getInstance().getImage("Splash_Big.png");
+	}
 }

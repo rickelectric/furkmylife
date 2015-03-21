@@ -82,21 +82,29 @@ public class FolderTreeManager {
 	}
 
 	public boolean move(AbstractDescriptor item, FolderDescriptor dest) {
+		boolean moved = false;
 		if (item instanceof FileDescriptor) {
-			boolean moved = FurkAPI
+			FurkAPI.getInstance()
+					.label()
+					.unlink(item.getParent().getId(),
+							((FileDescriptor) item).getFileObject()
+									.getIdLabels());
+			moved = FurkAPI
 					.getInstance()
 					.label()
 					.link(dest.getId(),
 							new String[] { ((FileDescriptor) item).getId() });
 			if (moved) {
-				dest.getChildren().add(item);
+				dest.addChild(item);
 				item.getParent().removeChild(item);
+				item.setParent(dest);
 				((FileDescriptor) item).getFileObject().setParentID(
 						dest.getId());
+				return moved;
 			}
 		} else if (item instanceof FolderDescriptor) {
 			FurkLabel l = ((FolderDescriptor) item).getLabel();
-			boolean moved = FurkAPI
+			moved = FurkAPI
 					.getInstance()
 					.label()
 					.update(l.getID(), l.getName(), dest.getId(),
@@ -104,10 +112,12 @@ public class FolderTreeManager {
 			if (moved) {
 				dest.getChildren().add(item);
 				item.getParent().removeChild(item);
+				item.setParent(dest);
 				l.setParentID(dest.getId());
 			}
+			return moved;
 		}
-		return false;
+		return moved;
 	}
 
 	public String toString() {
@@ -175,14 +185,21 @@ public class FolderTreeManager {
 					if (f.isOrphaned())
 						fi.remove();
 				}
-				for(FolderDescriptor f:fd){
+				for (FolderDescriptor f : fd) {
 					f.setOrphaned(true);
 					root.addChild(f);
 				}
 			}
-			fd=null;
+			fd = null;
 		}
 		populateFiles(root, files);
+		if(!files.isEmpty()){
+			for(FurkFile f:files){
+				f.setParentID(root.getId());
+				FileDescriptor fd = new FileDescriptor(root,f);
+				root.addChild(fd);
+			}
+		}
 	}
 
 	private void populateFolders(FolderDescriptor folder,

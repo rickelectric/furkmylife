@@ -14,7 +14,7 @@ import rickelectric.furkmanager.beta_test.draggables.models.Item;
 public class DraggableItemPane extends JPanel {
 	private static final long serialVersionUID = 1L;
 
-	private static final int ITEM_SPACING = 50;
+	private static final int ITEM_SPACING =80;
 
 	private ArrayList<Item> allItems;
 
@@ -34,12 +34,15 @@ public class DraggableItemPane extends JPanel {
 		for (Item i : allItems)
 			items.add(i);
 		Collections.sort(items);
+		ArrayList<Thread> workers = new ArrayList<Thread>();
 		int i = 0, j = 0;
 		while (!items.isEmpty()) {
 			Item item = items.remove(0);
 			if (item != null) {
-				item.setLocation(start + j * (64 + ITEM_SPACING), start + i
-						* (64 + ITEM_SPACING));
+				Point dest = new Point(start + j * (64 + ITEM_SPACING), start
+						+ i * (64 + ITEM_SPACING));
+				Thread wk = moveToLocation(item, dest);
+				if(wk!=null) workers.add(wk);
 
 				j++;
 				if (j >= numUnitsW) {
@@ -50,6 +53,16 @@ public class DraggableItemPane extends JPanel {
 			repaint();
 			UtilBox.getInstance().wait(80);
 		}
+		
+		for (Thread t : workers)
+			if (t.isAlive())
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
 		getTopLevelAncestor().validate();
 		getTopLevelAncestor().repaint();
 	}
@@ -159,7 +172,7 @@ public class DraggableItemPane extends JPanel {
 				if (dest.x == src.x) {
 					int inc = 5 * (int) Math.ceil(Math.signum(dest.y - src.y));
 					int pt = src.y;
-					while (Math.abs(pt - dest.y) > 2) {
+					while (Math.abs(pt - dest.y) > 6) {
 						pt = pt + inc;
 						item.setLocation(src.x, pt);
 						repaint();
@@ -168,7 +181,7 @@ public class DraggableItemPane extends JPanel {
 				} else if (dest.y == src.y) {
 					int inc = 5 * (int) Math.ceil(Math.signum(dest.x - src.x));
 					int pt = src.x;
-					while (Math.abs(pt - dest.x) > 2) {
+					while (Math.abs(pt - dest.x) > 6) {
 						pt = pt + inc;
 						item.setLocation(pt, src.y);
 						repaint();
@@ -180,9 +193,9 @@ public class DraggableItemPane extends JPanel {
 					double c = dest.y - m * dest.x;
 
 					if (Math.abs(m) < 1) {
-						int inc = 5 * (int) Math.signum(dest.y - src.y);
+						int inc = 10 * (int) Math.signum(dest.y - src.y);
 						double y = src.y, x = (y - c) / m;
-						while (Math.abs(y - dest.y) > 2) {
+						while (Math.abs(y - dest.y) > 11) {
 							y += inc;
 							x = (y - c) / m;
 							item.setLocation((int) x, (int) y);
@@ -190,9 +203,9 @@ public class DraggableItemPane extends JPanel {
 							UtilBox.getInstance().wait(wait);
 						}
 					} else {
-						int inc = (int) Math.signum(dest.x - src.x);
+						int inc = 10*(int) Math.signum(dest.x - src.x);
 						double x = src.x, y = m * x + c;
-						while (Math.abs(x - dest.x) > 2) {
+						while (Math.abs(x - dest.x) > 11) {
 							x += inc;
 							y = m * x + c;
 							item.setLocation((int) x, (int) y);

@@ -31,7 +31,7 @@ public class DraggablesManager {
 	}
 
 	public void setCurrentFolder(FolderDescriptor folder) {
-		this.currentFolder = folder;
+		this.currentFolder = folder==null?tree.getRoot():folder;
 	}
 
 	public FolderDescriptor getCurrentFolder() {

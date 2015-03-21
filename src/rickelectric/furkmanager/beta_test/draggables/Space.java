@@ -23,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
@@ -40,9 +41,8 @@ import rickelectric.furkmanager.beta_test.draggables.models.FolderDescriptor;
 import rickelectric.furkmanager.beta_test.draggables.models.FolderItem;
 import rickelectric.furkmanager.beta_test.draggables.models.Item;
 import rickelectric.furkmanager.models.LoginModel;
-import rickelectric.furkmanager.network.api_new.FileAPI;
 import rickelectric.furkmanager.network.api_new.FurkAPI;
-import rickelectric.furkmanager.network.api_new.LabelAPI;
+import rickelectric.furkmanager.utils.SettingsManager;
 import rickelectric.furkmanager.utils.ThreadPool;
 import rickelectric.furkmanager.views.LoadingCircle;
 import rickelectric.furkmanager.views.windows.FurkFileView;
@@ -81,23 +81,38 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	public static void main(String... strings) {
 		FurkManager.LAF(0);
 		FurkManager.init();
-		FileAPI.dummy = true;
-		LabelAPI.dummy = true;
-		LoginModel lm = new LoginModel(
-				"5323228d687ed9f7f1bdf9ce87050a1fa672e485");
-		try {
-			boolean logged = FurkAPI.getInstance().login(lm);
-			System.out.println("Logged In: " + logged);
-			if (logged) {
-				Space s = new Space();
-				s.setSize(1024, 700);
-				s.setVisible(true);
-				s.setLocationRelativeTo(null);
-				s.loadItems();
-				s.loadItemsInCurrentFolder();
+		// FileAPI.dummy = true;
+		// LabelAPI.dummy = true;
+		LoginModel lm = SettingsManager.getInstance().loginModel();
+		if (lm.autoLogin()) {
+			try {
+				boolean logged = FurkAPI.getInstance().login(lm);
+				System.out.println("Logged In: " + logged);
+				if (logged) {
+					Space s = new Space();
+					s.setSize(1024, 700);
+					s.setVisible(true);
+					s.setLocationRelativeTo(null);
+					s.loadItems();
+					s.loadItemsInCurrentFolder();
+					s.addWindowListener(new WindowAdapter() {
+
+						public void windowClosed(WindowEvent e) {
+							System.exit(0);
+						}
+
+					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else {
+			JOptionPane
+					.showMessageDialog(
+							null,
+							"Auto-Login is not enabled. \nPlease log in to FurkManager with Auto-Login enabled to use this feature.",
+							"Auto-Login Not Enabled", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
 		}
 	}
 
@@ -116,12 +131,15 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 
 		sizeContentPane();
 		repaint();
+		contentPane.requestFocusInWindow();
 	}
 
 	private boolean sizeContentPane() {
 		Dimension sz = contentPane.getSize();
 		boolean newSz = false;
 		for (Item i : allItems) {
+			if (i == null)
+				continue;
 			if (i.x + i.width > sz.width) {
 				newSz = true;
 				sz.width = i.x + i.width + 10;
@@ -281,7 +299,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		mgr.save();
 		dispose();
 		System.gc();
-		System.exit(0);
+		// System.exit(0);
 	}
 
 	public Dimension vpSize() {
@@ -301,7 +319,8 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 		Item str = null;
 		boolean scanComplete = false;
 		for (Item s : allItems()) {
-			if(s==null) continue;
+			if (s == null)
+				continue;
 			if (s.contains(p)) {
 				str = s;
 				scanComplete = true;
@@ -316,7 +335,7 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	private ArrayList<Item> getItemsBelow(Point p) {
 		ArrayList<Item> str = new ArrayList<Item>();
 		for (Item s : allItems()) {
-			if (s!=null && s.contains(p)) {
+			if (s != null && s.contains(p)) {
 				str.add(s);
 			}
 		}
@@ -368,6 +387,22 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 				position(str.getLocation());
 			}
 		}
+		{
+			ArrayList<Item> below = getItemsBelow(e.getPoint());
+			if (below.contains(str))
+				below.remove(str);
+			if (!below.isEmpty()) {
+				for (Item i : below) {
+					if (i instanceof FolderItem) {
+						boolean moved = mgr.getTree().move(str.getDescriptor(),
+								((FolderItem) i).getDescriptor());
+						if (moved) {
+							loadItemsInCurrentFolder();
+						}
+					}
+				}
+			}
+		}
 		prevPoint = null;
 		startPoint = null;
 		str = null;
@@ -405,6 +440,16 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 			return;
 
 		updateStr(e.getPoint());
+		deselectAll();
+		ArrayList<Item> below = getItemsBelow(e.getPoint());
+		if (below.contains(str))
+			below.remove(str);
+		if (below.isEmpty())
+			return;
+		for (Item i : below)
+			if (i instanceof FolderItem)
+				((FolderItem) i).setTarget(true);
+
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -450,9 +495,12 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 
 	private void deselectAll() {
 		for (Item i : allItems) {
-			if(i==null) continue;
+			if (i == null)
+				continue;
 			i.setSelected(false);
 			i.setHovered(false);
+			if (i instanceof FolderItem)
+				((FolderItem) i).setTarget(false);
 		}
 		repaint();
 	}
@@ -460,7 +508,8 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	public void mouseMoved(MouseEvent e) {
 		if (str == null) {
 			for (Item i : allItems) {
-				if(i==null) continue;
+				if (i == null)
+					continue;
 				i.setHovered(false);
 			}
 			Item i = getSelectedItem(e.getPoint());
@@ -523,7 +572,6 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	protected void reload() {
 		new Thread(new Runnable() {
 			public void run() {
-
 				FolderDescriptor currentFolder = mgr.getCurrentFolder();
 				loadItems();
 				mgr.setCurrentFolder(currentFolder);
@@ -535,10 +583,13 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	protected void alignGrid() {
 		new Thread(new Runnable() {
 			public void run() {
+				actionProgress.setIndeterminate(true);
 				contentPane.alignToGrid();
 				for (Item item : allItems) {
 					mgr.updateItemLocation(item);
 				}
+				contentPane.requestFocusInWindow();
+				actionProgress.setIndeterminate(false);
 			}
 		}).start();
 	}
@@ -546,10 +597,13 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	protected void alignRadial() {
 		new Thread(new Runnable() {
 			public void run() {
+				actionProgress.setIndeterminate(true);
 				contentPane.alignRadial();
 				for (Item item : allItems) {
 					mgr.updateItemLocation(item);
 				}
+				contentPane.requestFocusInWindow();
+				actionProgress.setIndeterminate(false);
 			}
 		}).start();
 	}
@@ -557,10 +611,13 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	protected void alignRadialTriangle() {
 		new Thread(new Runnable() {
 			public void run() {
+				actionProgress.setIndeterminate(true);
 				contentPane.alignRadialTriangle();
 				for (Item item : allItems) {
 					mgr.updateItemLocation(item);
 				}
+				contentPane.requestFocusInWindow();
+				actionProgress.setIndeterminate(false);
 			}
 		}).start();
 	}
@@ -568,10 +625,12 @@ public class Space extends JFrame implements KeyListener, MouseListener,
 	private void back() {
 		Thread t = ThreadPool.getThread(new Runnable() {
 			public void run() {
+				actionProgress.setIndeterminate(true);
 				if (mgr.getCurrentFolder().getParent() != null) {
 					mgr.setCurrentFolder(mgr.getCurrentFolder().getParent());
 					loadItemsInCurrentFolder();
 				}
+				actionProgress.setIndeterminate(false);
 			}
 		});
 		t.setDaemon(true);

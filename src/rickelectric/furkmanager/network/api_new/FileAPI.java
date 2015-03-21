@@ -26,7 +26,7 @@ public class FileAPI implements APIModule {
 	private String apiKey;
 	private long lastUpdatedFin, lastUpdatedDel;
 	private ArrayList<FurkFile> filesFinished, filesDeleted;
-	
+
 	public static boolean dummy = false;
 
 	public FileAPI(String apiKey) throws APIException {
@@ -261,10 +261,17 @@ public class FileAPI implements APIModule {
 					parts.addPart("unlinked", new StringBody("" + unlinked));
 			}
 			String url = "/file/get";
-			String json = dummy?StreamDownloader.getInstance().fileToString("./dummy/file.json")://TODO Remove
-				APIConnector.getInstance().jsonPost(url, parts);
+			String json = dummy ? StreamDownloader.getInstance().fileToString(
+					"./dummy/file.json") : // TODO Remove
+					APIConnector.getInstance().jsonPost(url, parts);
 			if (json == null)
 				return null;
+//			if (!dummy) {
+//				FileWriter r = new FileWriter("./dummy/file.json");
+//				r.write(json);
+//				r.flush();
+//				r.close();
+//			}
 			JSONObject obj = new JSONObject(json);
 			if (obj.getString("status").equals("error"))
 				return null;

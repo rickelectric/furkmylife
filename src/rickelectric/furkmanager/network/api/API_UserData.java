@@ -112,9 +112,9 @@ public class API_UserData extends API {
 			return false;
 		}
 		if (isValid) {
+			currentLogin = login;
 			if (login.save()) {
 				SettingsManager.getInstance().loginModel(login);
-				currentLogin = login;
 				SettingsManager.save();
 			}
 			return true;

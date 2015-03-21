@@ -15,11 +15,13 @@ public class FurkAPI {
 				: thisInstance;
 	}
 
+	private LoginAPI login;
+
 	private FileAPI file;
 	private DownloadAPI dl;
 	private LabelAPI label;
 	private FeedAPI feed;
-	private LoginAPI login;
+
 	private UserAccountAPI account;
 	private PluginAPI plugins;
 
@@ -27,21 +29,26 @@ public class FurkAPI {
 		login = new LoginAPI();
 		// TODO Others created on successful login
 	}
-	
+
 	public boolean login(LoginModel loginModel) throws LoginException {
-		if(login.isLoggedIn())
+		if (login.isLoggedIn())
 			throw new LoginException("Already Logged In. Please Log Out First.");
 		try {
-			int x=1;
-			//TODO Undo when complete;
-			if(/*login.login(loginModel)*/true){
-				API.init(loginModel.apiKey());
+			int x = 1;
+			// TODO Undo when complete. Replace With Actual API Login.
+			if (/* login.login(loginModel) */true) {
+				{
+					// For Backwards Compatibility With APIBridge Model.
+					// TODO Remove This When Complete
+					if (API.key() == null)
+						API.init(loginModel.apiKey());
+				}
 				FileUpdater.destroyInstance();
 				account = new UserAccountAPI(loginModel.apiKey());
-				file=new FileAPI(loginModel.apiKey());
-				dl=new DownloadAPI(loginModel.apiKey());
-				label=new LabelAPI(loginModel.apiKey());
-				feed=new FeedAPI(loginModel.apiKey());
+				file = new FileAPI(loginModel.apiKey());
+				dl = new DownloadAPI(loginModel.apiKey());
+				label = new LabelAPI(loginModel.apiKey());
+				feed = new FeedAPI(loginModel.apiKey());
 				plugins = new PluginAPI(loginModel.apiKey());
 				account.start();
 				file.start();
@@ -50,9 +57,9 @@ public class FurkAPI {
 				plugins.start();
 				return true;
 			}
-//		} catch (LoginException e) {
-//			e.printStackTrace();
-		} catch(APIException e){
+			// } catch (LoginException e) {
+			// e.printStackTrace();
+		} catch (APIException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -65,8 +72,8 @@ public class FurkAPI {
 	public DownloadAPI dl() {
 		return dl;
 	}
-	
-	public LabelAPI label(){
+
+	public LabelAPI label() {
 		return label;
 	}
 
@@ -77,8 +84,8 @@ public class FurkAPI {
 	public UserAccountAPI account() {
 		return account;
 	}
-	
-	public PluginAPI plugins(){
+
+	public PluginAPI plugins() {
 		return plugins;
 	}
 

@@ -28,8 +28,11 @@ public class ItemContextMenu extends JPopupMenu implements ActionListener {
 
 	private Item space;
 
-	private JMenuItem folder_delete,folder_delete_cascade;
+	private JMenuItem folder_delete, folder_delete_cascade;
 	private JMenuItem folder_rename, folder_colorchange;
+	private JMenuItem folder_anchor;
+
+	private JMenuItem push_to_parent;
 
 	private JMenuItem view, fview, link;
 	private JMenuItem browser, idm, internal, copylink;
@@ -41,23 +44,47 @@ public class ItemContextMenu extends JPopupMenu implements ActionListener {
 		this.parent = parent;
 		this.space = spr;
 
+		push_to_parent = new JMenuItem("Push To Parent Folder");
+		push_to_parent.setIcon(new ImageIcon(ImageLoader.getInstance()
+				.getImage("sm/file_upload.png")));
+		push_to_parent.addActionListener(this);
+
 		if (spr instanceof FolderItem) {
+			if (((FolderItem) spr).getDescriptor().isOrphaned()) {
+				JMenuItem o = new JMenuItem("--Orphaned Folder--");
+				o.setEnabled(false);
+				add(o);
+
+				folder_anchor = new JMenuItem("Anchor Folder Here");
+				folder_anchor.addActionListener(this);
+				folder_anchor.setIcon(new ImageIcon(ImageLoader.getInstance()
+						.getImage("sm/anchor-18.png")));
+				add(folder_anchor);
+				addSeparator();
+			}
+
 			folder_rename = new JMenuItem("Rename Folder");
 			folder_rename.addActionListener(this);
 			folder_rename.setIcon(new ImageIcon(ImageLoader.getInstance()
 					.getImage("sm/edit_icon.png")));
 			add(folder_rename);
 
+			if (!space.getDescriptor().getParent()
+					.equals(parent.getManager().getTree().getRoot())) {
+				add(push_to_parent);
+			}
+
 			folder_delete = new JMenuItem("Delete Folder");
 			folder_delete.addActionListener(this);
 			folder_delete.setIcon(new ImageIcon(ImageLoader.getInstance()
 					.getImage("sm/edit_delete.png")));
 			add(folder_delete);
-			
-			folder_delete_cascade = new JMenuItem("Delete Folder & It's Contents");
+
+			folder_delete_cascade = new JMenuItem(
+					"Delete Folder & It's Contents");
 			folder_delete_cascade.addActionListener(this);
-			folder_delete_cascade.setIcon(new ImageIcon(ImageLoader.getInstance()
-					.getImage("sm/remove.png")));
+			folder_delete_cascade.setIcon(new ImageIcon(ImageLoader
+					.getInstance().getImage("sm/remove.png")));
 			add(folder_delete_cascade);
 		} else if (spr instanceof FileItem) {
 			view = new JMenuItem("View Details");
@@ -108,6 +135,11 @@ public class ItemContextMenu extends JPopupMenu implements ActionListener {
 						"sm/edit_icon.png")));
 				link.addActionListener(this);
 				download.add(link);
+			}
+
+			if (!space.getDescriptor().getParent()
+					.equals(parent.getManager().getTree().getRoot())) {
+				add(push_to_parent);
 			}
 
 			recycle = new JMenuItem("Send To Recycle Bin");
@@ -214,13 +246,43 @@ public class ItemContextMenu extends JPopupMenu implements ActionListener {
 								.getFileObject().getID();
 						if (FurkAPI.getInstance().file()
 								.unlinkFiles(new String[] { id })) {
-							space.getDescriptor().getParent().removeChild(space.getDescriptor());
+							space.getDescriptor().getParent()
+									.removeChild(space.getDescriptor());
 							parent.loadItemsInCurrentFolder();
+						}
+					}
+					
+					if(src==push_to_parent){
+						FolderDescriptor parentFolder = space.getDescriptor().getParent().getParent();
+						if(parent==null) return;
+						int resp = JOptionPane.showConfirmDialog(
+								parent.getContentPane(),
+								"Push Folder '"+space.getName()+"' To Parent '"+parentFolder.getName()+"'?",
+								"Move Folder", JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+						if (resp == JOptionPane.YES_OPTION) {
+							if (parent.getManager().getTree().move(space.getDescriptor(),parentFolder)) {
+								parent.loadItemsInCurrentFolder();
+							}
 						}
 					}
 					
 					if (src == folder_colorchange) {
 						// TODO Change Color, Update The Label
+					}
+					if (src == folder_anchor) {
+						FolderDescriptor folder = ((FolderItem) space)
+								.getDescriptor();
+						int resp = JOptionPane.showConfirmDialog(
+								parent.getContentPane(),
+								"Are You Sure You Want To Anchor This Orphaned Folder?",
+								"Anchor Folder", JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+						if (resp == JOptionPane.YES_OPTION) {
+							if (parent.getManager().getTree().move(folder,parent.getManager().getTree().getRoot())) {
+								parent.loadItemsInCurrentFolder();
+							}
+						}
 					}
 					if (src == folder_rename) {
 						FolderDescriptor folder = ((FolderItem) space)

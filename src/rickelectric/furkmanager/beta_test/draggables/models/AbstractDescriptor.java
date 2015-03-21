@@ -14,4 +14,8 @@ public abstract class AbstractDescriptor {
 		return parent;
 	}
 
+	public void setParent(FolderDescriptor parent) {
+		this.parent=parent;
+	}
+
 }

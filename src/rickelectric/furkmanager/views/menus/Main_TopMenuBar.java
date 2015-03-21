@@ -14,6 +14,7 @@ public class Main_TopMenuBar extends JMenuBar implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private JMenuItem mi_addfdownload;
+	private JMenuItem mi_viewspaces;
 	private JMenuItem mi_logout;
 
 	private JMenuItem mi_exit;
@@ -35,6 +36,10 @@ public class Main_TopMenuBar extends JMenuBar implements ActionListener {
 		mi_addfdownload = new JMenuItem("Add Furk Download");
 		mi_addfdownload.addActionListener(this);
 		mnFile.add(mi_addfdownload);
+
+		mi_viewspaces = new JMenuItem("View Files In FurkSpaces");
+		mi_viewspaces.addActionListener(this);
+		mnFile.add(mi_viewspaces);
 
 		mi_logout = new JMenuItem("Log Out");
 		mi_logout.addActionListener(this);
@@ -72,33 +77,41 @@ public class Main_TopMenuBar extends JMenuBar implements ActionListener {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
-		if (src.equals(mi_addfdownload)) {
-			new AddDownloadFrame().setVisible(true);
-		}
-		if (src.equals(mi_logout)) {
-			FurkManager.logout();
-		}
-		if (src.equals(mi_exit)) {
-			FurkManager.exit();
-		}
-		if (src.equals(mi_downloadman)) {
-			FurkManager.downloader(true);
-		}
-		if (src.equals(mi_apiconsole)) {
-			FurkManager.showConsole(true);
-		}
-		if (src.equals(mi_imgcache)) {
-			FurkManager.showImgCache(true);
-		}
-		if (src.equals(mi_topics)) {
+	public void actionPerformed(final ActionEvent e) {
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				Object src = e.getSource();
+				if (src.equals(mi_addfdownload)) {
+					new AddDownloadFrame().setVisible(true);
+				}
+				if (src.equals(mi_viewspaces)) {
+					FurkManager.launchSpaces();
+				}
+				if (src.equals(mi_logout)) {
+					FurkManager.logout();
+				}
+				if (src.equals(mi_exit)) {
+					FurkManager.exit();
+				}
+				if (src.equals(mi_downloadman)) {
+					FurkManager.downloader(true);
+				}
+				if (src.equals(mi_apiconsole)) {
+					FurkManager.showConsole(true);
+				}
+				if (src.equals(mi_imgcache)) {
+					FurkManager.showImgCache(true);
+				}
+				if (src.equals(mi_topics)) {
 
-		}
-		if (src.equals(mi_about)) {
+				}
+				if (src.equals(mi_about)) {
 
-		}
-
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
 	}
 
 }
